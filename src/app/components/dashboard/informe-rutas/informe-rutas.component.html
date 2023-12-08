@@ -1,0 +1,99 @@
+<div class="container">
+
+    <mat-toolbar>
+      <span>Rutas</span>
+      <div class="example-spacer"></div>
+        <button mat-raised-button color="primary" routerLink="/dashboard/gestion-gestores" >Administrar gestores</button>
+    </mat-toolbar>
+
+    <br>
+
+    <mat-grid-list  cols="2" rowHeight="70px">
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+        <mat-form-field>
+          <input matInput [matDatepicker]="picker" placeholder="Choose a date" (dateChange)="onDateChange($event)">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </mat-grid-tile>
+
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+        <mat-form-field class="ancho">
+          <mat-label>Gestor</mat-label>
+          <mat-select [(ngModel)]="valorSeleccionado">
+              <mat-option *ngFor="let elemento of listaGestores" [value]="elemento.usuario">
+              {{elemento.nombre}}
+              </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </mat-grid-tile>
+    </mat-grid-list>
+
+    <h2 style="text-align: center;">
+      <button mat-raised-button color="primary" (click)="buscar()" >Buscar</button>
+    </h2>
+    
+    <br>
+    
+    <div *ngIf="cargar">
+    
+      <mat-form-field>
+        <mat-label>Busqueda</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Nombre" #input autocomplete="off">
+      </mat-form-field>
+
+      <div class="table-container">
+
+      <div class="mat-elevation-z8">
+        <table mat-table [dataSource]="dataSource" matSort>
+        
+          <!-- Position Column 
+          <ng-container matColumnDef="_id">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
+            <td mat-cell class="custom-cell" *matCellDef="let element"> {{element._id}} </td>
+          </ng-container>
+        
+          -->
+          <!-- Name Column -->
+          <ng-container matColumnDef="gestor">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Gestor </th>
+            <td mat-cell *matCellDef="let element"> {{element.gestor}} </td>
+          </ng-container>
+        
+          <!-- Weight Column -->
+          <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef> Fecha </th>
+            <td mat-cell *matCellDef="let element"> {{element.fecha}} </td>
+          </ng-container>
+        
+          <!-- Symbol Column -->
+          <ng-container matColumnDef="hora">
+            <th mat-header-cell *matHeaderCellDef> Hora </th>
+            <td mat-cell *matCellDef="let element"> {{element.hora}} </td>
+          </ng-container>
+      
+          <!-- Symbol Column -->
+          <ng-container matColumnDef="actividad">
+            <th mat-header-cell *matHeaderCellDef> Actividad </th>
+            <td mat-cell *matCellDef="let element"> {{element.actividad}} </td>
+          </ng-container>
+      
+          <!-- Symbol Column -->
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef> </th>
+            <td mat-cell class="center-cell" *matCellDef="let element" style="text-align: center;"> 
+      
+            <a class="pointer" style="color:cornflowerblue" matTooltip="Maps" (click)="abrirUbicacion(element.latitud, element.longitud)">
+              <mat-icon>travel_explore</mat-icon>
+            </a>
+            </td>
+          </ng-container>
+        
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>    
+      </div>
+    </div>
+    </div>
+
+</div>

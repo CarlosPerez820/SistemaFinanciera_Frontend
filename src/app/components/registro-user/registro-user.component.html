@@ -1,0 +1,50 @@
+<div class="body">
+    <div class="login">
+
+        <form [formGroup]="form" (ngSubmit)="registrar()">
+            <img src="assets\img\register.png" alt="" width="50%">
+            <h2>Registro de usuario</h2>
+            <p>Registrate para poder administrar tu sucursal financiera</p>
+
+            <mat-form-field class="ancho">
+                <mat-label>Nombre</mat-label>
+                <input matInput formControlName="nombre" autocomplete="off">
+            </mat-form-field>
+
+            <mat-form-field class="ancho">
+                <mat-label>Correo</mat-label>
+                <input matInput formControlName="correo" autocomplete="off">
+            </mat-form-field>
+    
+            <mat-form-field class="ancho">
+                <mat-label>Telefono</mat-label>
+                <input type="number" matInput formControlName="telefono" autocomplete="off">
+            </mat-form-field>
+
+            <mat-form-field class="ancho">
+                <mat-label>Contraseña</mat-label>
+                <input matInput type="password" formControlName="password">
+            </mat-form-field>
+
+            <mat-form-field class="ancho">
+                <mat-label>Sucursal</mat-label>
+                <input matInput formControlName="sucursal" autocomplete="off">
+            </mat-form-field>
+
+            <mat-form-field class="ancho">
+                <mat-label>Membresia</mat-label>
+                <mat-select formControlName="membresia">
+                    <mat-option *ngFor="let tipo of planes" [value]="tipo.value">
+                    {{tipo.viewValue}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            
+
+            <br>
+            <button type="submit" class="ancho" mat-raised-button color="primary" [disabled]="form.invalid">Registrarme</button>
+
+        </form>
+        
+    </div>
+</div>

@@ -1,0 +1,143 @@
+<div class="container">
+    <mat-toolbar>
+      <span>Consulta de Expediente</span>
+      <div class="example-spacer"></div>
+    </mat-toolbar>
+    <br>
+
+    <mat-grid-list cols="3" rowHeight="70px">
+        <mat-grid-tile [colspan]="2" [rowspan]="1">   
+            <mat-form-field class="example-full-width">
+                <mat-label>Numero de cliente</mat-label>
+                <input matInput placeholder="Num. Cliente" [(ngModel)]="mongoIdCliente">
+            </mat-form-field>
+        </mat-grid-tile>
+
+        <mat-grid-tile [colspan]="1" [rowspan]="1">   
+            <button mat-raised-button (click)="buscar()" color="primary">Buscar</button>
+        </mat-grid-tile>
+
+    </mat-grid-list>
+
+<br>
+<br>
+
+    <div *ngIf="loading">
+
+        <mat-card class="informacion">
+
+          <mat-grid-list cols="3" rowHeight="30px">
+
+            
+              <mat-grid-tile [colspan]="1" [rowspan]="1">   
+                {{clienteEspecifico.numeroCliente}}
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="2" [rowspan]="9">  
+              <div> 
+              <img src="assets\img\user.png" alt="" class="img_Cliente">
+              </div>
+            </mat-grid-tile>
+              <mat-grid-tile [colspan]="1" [rowspan]="1">   
+                  {{clienteEspecifico.nombre}}
+              </mat-grid-tile>
+              <mat-grid-tile [colspan]="1" [rowspan]="1">   
+                {{clienteEspecifico.edad}}
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="1" [rowspan]="1">   
+              {{clienteEspecifico.estadoCivil}}
+          </mat-grid-tile>
+              
+              <mat-grid-tile [colspan]="1" [rowspan]="1">   
+                {{clienteEspecifico.direccion}}, {{clienteEspecifico.colonia}}, {{clienteEspecifico.ciudad}}
+              </mat-grid-tile>
+              <mat-grid-tile [colspan]="1" [rowspan]="1">   
+                Celular: {{clienteEspecifico.celular}}
+              </mat-grid-tile>
+              <mat-grid-tile [colspan]="1" [rowspan]="1">   
+                Gestor: {{clienteEspecifico.gestorAsignado}}
+              </mat-grid-tile>
+              <mat-grid-tile [colspan]="1" [rowspan]="1">   
+                {{clienteEspecifico.numeroIdentificacion}}
+              </mat-grid-tile>
+              <mat-grid-tile [colspan]="1" [rowspan]="1">   
+                {{clienteEspecifico.numeroPrestamos}}
+              </mat-grid-tile>
+              <mat-grid-tile [colspan]="1" [rowspan]="1">   
+                {{clienteEspecifico.clasificacion}}
+              </mat-grid-tile>
+              
+          </mat-grid-list>
+
+      </mat-card>
+
+      <mat-toolbar>
+          <span>Lista de Prestamos</span>
+          <div class="example-spacer"></div>
+        </mat-toolbar>
+      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+          <!--- Note that these columns can be defined in any order.
+                The actual rendered columns are set as a property on the row definition" -->
+        
+          <!-- Position Column -->
+          <ng-container matColumnDef="folio">
+            <th mat-header-cell *matHeaderCellDef> Folio </th>
+            <td mat-cell *matCellDef="let element"> {{element.folio}} </td>
+          </ng-container>
+        
+          <!-- Name Column -->
+          <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef> Fecha </th>
+            <td mat-cell *matCellDef="let element"> {{element.fecha}} </td>
+          </ng-container>
+        
+          <!-- Weight Column -->
+          <ng-container matColumnDef="cantidad">
+            <th mat-header-cell *matHeaderCellDef> Cantidad </th>
+            <td mat-cell *matCellDef="let element"> {{element.cantidadPrestamo}} </td>
+          </ng-container>
+        
+          <!-- Symbol Column -->
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef> Estado </th>
+            <td mat-cell *matCellDef="let element"> {{element.estatus}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef>  </th>
+            <td mat-cell *matCellDef="let element" style="text-align: right;"> 
+      
+            <a class="pointer" style="color:cornflowerblue" matTooltip="Informacion" (click)="openDialog(element._id)">
+              <mat-icon>search</mat-icon>
+            </a>
+            </td>
+          </ng-container>
+      
+        
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>      
+      
+      <div class="slider-container">
+        <div class="slider">
+          <img [src]="currentImage" alt="Slide {{ currentSlideIndex + 1 }}" />
+        </div>
+        <button (click)="prevSlide()" [disabled]="currentSlideIndex === 0">Anterior</button>
+        <button (click)="nextSlide()" [disabled]="currentSlideIndex === 2">Siguiente</button>
+      </div>
+      
+        
+    </div>
+    
+    <div class="respuesta"  *ngIf="errorCarga">
+      <mat-card>
+        <h1 style="text-align: center;">
+          Lo sentimos no se encontraron resultados, verifica tu información
+        </h1>
+      </mat-card>
+    </div>
+
+</div>
+
+
+  

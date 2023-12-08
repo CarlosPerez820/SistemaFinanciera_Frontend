@@ -1,0 +1,42 @@
+table {
+    width: 100%;
+}
+
+.pointer{
+  cursor: pointer;
+}
+
+.mat-mdc-form-field {
+  font-size: 14px;
+  width: 100%;
+
+}
+
+
+.table-container {
+  overflow-x: auto;
+}
+
+.example-spacer {
+  flex: 1 1 auto;
+}
+
+.contenedor {
+  display: flex;
+  justify-content: space-between; /* Esto separará los elementos al máximo */
+  align-items: center; /* Esto centrará verticalmente los elementos */
+}
+  
+.elemento-oculto {
+  display: none;
+}
+
+.fila-activa {
+  background-color: #7fdd82;  /* Puedes ajustar el color según tus preferencias */
+}
+.fila-inactiva {
+  background-color: #faea5a;  /* Puedes ajustar el color según tus preferencias */
+}
+.celda-mora {
+  color: red; /* Puedes ajustar el color según tus preferencias */
+}

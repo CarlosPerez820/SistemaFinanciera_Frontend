@@ -1,0 +1,69 @@
+<div class="container">
+
+    <mat-toolbar>
+      <span>Historial de Solicitudes</span>
+      <div class="example-spacer"></div>
+      
+    </mat-toolbar>
+    <p>En este apartado aparecera un historial de todas las Solicitudesgeneradas ya finalizadas o no aprobadas para 
+        poder ser descargadas
+      </p>
+
+
+    <mat-form-field>
+      <mat-label>Busqueda</mat-label>
+      <input matInput (keyup)="applyFilter($event)" placeholder="Nombre" #input autocomplete="off">
+    </mat-form-field>
+
+    <div class="table-container">
+
+    <div class="mat-elevation-z8">
+      <table mat-table [dataSource]="dataSource" matSort>
+      
+        <!-- Position Column -->
+        <ng-container matColumnDef="nombre">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre </th>
+          <td mat-cell *matCellDef="let element"> {{element.nombre}} </td>
+        </ng-container>
+      
+        <!-- Name Column -->
+        <ng-container matColumnDef="montoSolicitado">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Monto Solicitado </th>
+          <td mat-cell *matCellDef="let element"> ${{element.montoSolicitado}} </td>
+        </ng-container>
+      
+        <!-- Weight Column -->
+        <ng-container matColumnDef="telefono">
+          <th mat-header-cell *matHeaderCellDef> Fecha </th>
+          <td mat-cell *matCellDef="let element"> {{element.fechaSolicitud}} </td>
+        </ng-container>
+
+        <!-- Weight Column -->
+        <ng-container matColumnDef="tipo">
+          <th mat-header-cell *matHeaderCellDef> Estado </th>
+          <td mat-cell *matCellDef="let element"> {{element.estatus}} </td>
+        </ng-container>
+      
+        <!-- Symbol Column -->
+        <ng-container matColumnDef="gestor">
+          <th mat-header-cell *matHeaderCellDef> Gestor </th>
+          <td mat-cell *matCellDef="let element"> {{element.gestorAsignado}} </td>
+        </ng-container>
+                
+        <!-- Symbol Column -->
+        <ng-container matColumnDef="accion">
+          <th mat-header-cell *matHeaderCellDef>  </th>
+          <td mat-cell *matCellDef="let element"> <a (click)="generarPDF(element)"> <mat-icon>download</mat-icon></a> </td>
+        </ng-container>
+        
+      
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    <!--  <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of users"></mat-paginator> -->
+    
+    </div>
+    </div>
+  
+  
+  </div>

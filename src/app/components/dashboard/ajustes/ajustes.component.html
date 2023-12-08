@@ -1,0 +1,223 @@
+<div class="container">
+    <mat-toolbar>
+        <span>Configuracion de Parametros</span>
+    </mat-toolbar>
+
+    <div>
+          <mat-grid-list cols="3" rowHeight="75px">
+  
+              <mat-grid-tile class="izquierdo" [colspan]="2" [rowspan]="2">   
+                Bienvenido al apartado de configuracion de la plataforma, aqui pagina seras capaz
+                de modificar parametros para personalizar tu experiencia como tu logo, 
+                slos montos de las moras, entre otras opciones asi como las tasas de interes.
+              </mat-grid-tile>
+              <mat-grid-tile [colspan]="1" [rowspan]="2">  
+                  <div> 
+                  <img src={{urlImagen}} alt="" class="img_Cliente">
+                  </div>
+              </mat-grid-tile>
+          </mat-grid-list>
+
+    <mat-card style="margin-top: 10px;">
+
+            <mat-grid-list  cols="2" rowHeight="70px">
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <h2>Configuracion General</h2>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <button type="button" mat-raised-button (click)="openInput()" class="ancho">Logotipo</button>
+                    <input id="fileInput" hidden type="file"  accept=".jpg,.png" (change)="onFileSelected($event, 'logotipo')">
+                </mat-grid-tile>
+
+            <form [formGroup]="form2" (ngSubmit)="registrarParametros()">
+               
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Mora para Prestamo Semanal</mat-label>
+                        <input type="Number" matInput autocomplete="off" formControlName="moraSemanal">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Monto Correpondiente a mora diaria</mat-label>
+                        <input type="Number" matInput autocomplete="off" formControlName="mora">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <!--
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Hora Limite</mat-label>
+                        <input matInput autocomplete="off" formControlName="hora" placeholder="19:30">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Tipo de cobro (diario, semanal)</mat-label>
+                        <input matInput autocomplete="off">
+                    </mat-form-field>
+                </mat-grid-tile>
+                -->
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                </mat-grid-tile>
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <button type="submit" mat-raised-button class="ancho" color="primary" [disabled]="form2.invalid">Aplicar</button>
+                </mat-grid-tile>
+            </form>
+
+                <br>
+                <br>
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <h2>Tasas de interes para Prestamo por dia</h2>
+                </mat-grid-tile>
+
+                <form [formGroup]="form" (ngSubmit)="agregarInteres()">
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Limite Inferior</mat-label>
+                        <input type="number" matInput autocomplete="off" formControlName="lInferior">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Limite Superior</mat-label>
+                        <input type="number" matInput autocomplete="off" formControlName="lSuperior">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Porcentaje</mat-label>
+                        <input type="number" matInput autocomplete="off" formControlName="porcentaje">
+                    </mat-form-field>
+                </mat-grid-tile>
+                
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Tipo Prestamo</mat-label>
+                        <mat-select formControlName="tipo">
+                            <mat-option *ngFor="let tipo of tipoPrestamos" [value]="tipo.value">
+                            {{tipo.viewValue}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <button type="submit" mat-raised-button class="ancho" color="primary" [disabled]="form.invalid">Guardar</button>
+                </mat-grid-tile>
+            </form>
+            </mat-grid-list>
+
+            
+            <div class="centrar">
+                <br>
+                <br>
+                <h2>Tasas de interes para Prestamo por Dia</h2>
+            </div>
+
+        <div class="mat-elevation-z8">
+            <table mat-table [dataSource]="dataSource" matSort>
+            
+              <!-- Position Column -->
+              <ng-container matColumnDef="inferior">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Limite Inferior </th>
+                <td mat-cell *matCellDef="let element"> ${{element.limiteInferior}} </td>
+              </ng-container>
+            
+              <!-- Name Column -->
+              <ng-container matColumnDef="superior">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Limite Superior </th>
+                <td mat-cell *matCellDef="let element"> ${{element.limiteSuperior}} </td>
+              </ng-container>
+                          
+              <!-- Name Column -->
+              <ng-container matColumnDef="porcentaje">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Porcentaje </th>
+                <td mat-cell *matCellDef="let element"> {{element.porcentaje}}% </td>
+              </ng-container>
+          
+              <!-- Symbol Column -->
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>  </th>
+                <td mat-cell *matCellDef="let element" style="text-align: right;"> 
+                <a class="pointer" matTooltip="Eliminar" (click)="eliminarInteres(element._id)">
+                  <mat-icon>delete</mat-icon>
+                </a>
+                </td>
+              </ng-container>
+            
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{
+                'fila-activa': row.prestamosActivos === true,
+                'fila-inactiva': row.prestamosActivos === false,
+                'fila-buro': row.clasificacion === 'C'
+                }"></tr>
+            </table>
+        </div>
+
+            <div class="centrar">
+                <br>
+                <br>
+                <h2>Tasas de interes para Prestamo por Semana</h2>
+            </div>
+
+        
+        <div class="mat-elevation-z8">
+            <table mat-table [dataSource]="dataSource2" matSort>
+            
+              <!-- Position Column -->
+              <ng-container matColumnDef="inferior">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Limite Inferior </th>
+                <td mat-cell *matCellDef="let element"> ${{element.limiteInferior}} </td>
+              </ng-container>
+            
+              <!-- Name Column -->
+              <ng-container matColumnDef="superior">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Limite Superior </th>
+                <td mat-cell *matCellDef="let element"> ${{element.limiteSuperior}} </td>
+              </ng-container>
+                          
+              <!-- Name Column -->
+              <ng-container matColumnDef="porcentaje">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Porcentaje </th>
+                <td mat-cell *matCellDef="let element"> {{element.porcentaje}}% </td>
+              </ng-container>
+          
+              <!-- Symbol Column -->
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>  </th>
+                <td mat-cell *matCellDef="let element" style="text-align: right;"> 
+                <a class="pointer" matTooltip="Eliminar" (click)="eliminarInteres(element._id)">
+                  <mat-icon>delete</mat-icon>
+                </a>
+                </td>
+              </ng-container>
+            
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{
+                'fila-activa': row.prestamosActivos === true,
+                'fila-inactiva': row.prestamosActivos === false,
+                'fila-buro': row.clasificacion === 'C'
+                }"></tr>
+            </table>
+        </div>
+
+    </mat-card>
+
+</div>

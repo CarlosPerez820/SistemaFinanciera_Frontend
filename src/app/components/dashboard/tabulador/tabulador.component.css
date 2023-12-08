@@ -1,0 +1,116 @@
+body{
+  background: linear-gradient(to right, #66f5ff, #5e7cff);
+}
+
+.tarjeta{
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+}
+
+.tarjeta2{
+  width: 100%;
+ /* max-width: 500px;*/
+  text-align: center;
+}
+
+.body{
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    align-items: center;
+
+}
+
+.example-small-box, .example-large-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 16px;
+    padding: 16px;
+    border-radius: 8px;
+}
+  
+.example-small-box {
+    height: 100px;
+    width: 100px;
+}
+  
+.example-large-box {
+    height: 300px;
+    width: 300px;
+}
+
+table {
+    width: 100%;
+}
+
+.pointer{
+  cursor: pointer;
+}
+
+.mat-mdc-form-field {
+  font-size: 14px;
+  width: 100%;
+}
+
+.example-spacer {
+  flex: 1 1 auto;
+}
+  
+.example-card {
+  max-width: 450px;
+/*  background-color: chartreuse;*/
+  align-items: center;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(to right, #2cb0b9, rgb(62, 231, 236));
+}
+
+.example-card2 {
+  max-width: 450px;
+/*  background-color: chartreuse;*/
+  align-items: center;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(to right, #FFB711, #FFEF4F);
+}
+
+.example-card3 {
+  max-width: 450px;
+/*  background-color: chartreuse;*/
+  align-items: center;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(to right, #3BEE0B, #12FF88);
+}
+
+.example-header-image {
+  background-image: url('https://material.angular.io/assets/img/examples/shiba1.jpg');
+  background-size: cover;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+
+.fila-medio {
+  background-color: #f8ec80;  /* Puedes ajustar el color según tus preferencias */
+  color: white;
+}
+.fila-alto {
+  background-color: rgb(253, 125, 125);  /* Puedes ajustar el color según tus preferencias */
+  color: white  ;
+}
+
+.customer-image {
+  border-radius: 15px;
+  margin-right: 20px;
+  margin-top: 35px;
+  overflow: hidden;
+  width: 140px;
+  height: 140px;
+  max-width: 100%; /* Hace que la imagen sea responsiva */
+  margin: 0 auto; /* Centra la imagen y agrega margen hacia los lados */
+}

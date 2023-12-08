@@ -1,0 +1,92 @@
+.example-h2 {
+    margin: 10px;
+  }
+  
+  .example-section {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    height: 60px;
+  }
+  
+  .example-margin {
+    margin: 0 10px;
+  }
+
+  .example-spacer {
+    flex: 1 1 auto;
+  }
+
+  .center{
+    align-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+/* Estilos generales */
+.card-container {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px; /* Ajusta el margen según tus preferencias */
+}
+
+/* Estilos responsivos para móviles */
+@media (max-width: 600px) {
+  .card-container {
+    flex-direction: column; /* Cambia la dirección a vertical en dispositivos móviles */
+    align-items: center; /* Centra las tarjetas en dispositivos móviles */
+  }
+  
+  .custom-card {
+    width: 100%; /* Ocupa el 100% del ancho en dispositivos móviles */
+  }
+}
+
+
+  .desplazamiento{
+    overflow-x: auto;
+  }
+  
+  .card {
+    align-content: center;
+    align-items: center;
+    text-align: center;
+    width: 300px;
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .red {
+    background-color: #165DF5;
+    color: aliceblue;
+  }
+  
+  .green {
+    background-color: #165DF5;
+    color: aliceblue;
+  }
+  
+  .blue {
+    background: linear-gradient(to bottom right, #0c9174, #1864a3);
+    color: rgb(255, 255, 255);
+    margin-bottom: 30px;
+    border-radius: 15px;
+  }
+
+  .main-card {
+    align-content: center;
+    align-items: center;
+    text-align: center;
+    background: linear-gradient(to right, #0055FF, #1885b8);
+    width: 70%;
+    margin: 0 auto;
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+    color: aliceblue;
+    border-radius: 15px;
+  }
+
+  .conenedorListas{
+    width: 80%;
+    margin: 0 auto;
+    background-color: red;
+  }

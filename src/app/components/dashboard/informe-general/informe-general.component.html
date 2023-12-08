@@ -1,0 +1,206 @@
+<div class="container">
+    <mat-toolbar>
+        <span>Informe de Financiera</span>
+        <br>
+        <div class="example-spacer"></div>
+        <mat-radio-group [(ngModel)]="selectedOption">
+            <mat-radio-button value="option1" (click)="cambiarValores()">General</mat-radio-button>
+            <mat-radio-button value="option2" (click)="cambiarValores()">Ruta</mat-radio-button>
+        </mat-radio-group>
+
+    </mat-toolbar>
+    
+    <div *ngIf="selectedOption === 'option1'" class="center">
+        <mat-form-field class="example-full-width">
+          <input matInput [matDatepicker]="picker" placeholder="Choose a date" (dateChange)="onDateChangeGeneral($event)">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker touchUi #picker></mat-datepicker>
+        </mat-form-field>
+
+    </div>
+      
+    <div *ngIf="selectedOption === 'option2'">
+        <mat-grid-list  cols="2" rowHeight="70px">
+            <mat-grid-tile [colspan]="1" [rowspan]="1">
+              <mat-form-field>
+                <input matInput [matDatepicker]="picker" placeholder="Choose a date" (dateChange)="onDateChange($event)">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </mat-form-field>
+            </mat-grid-tile>
+      
+            <mat-grid-tile [colspan]="1" [rowspan]="1">
+              <mat-form-field class="ancho">
+                <mat-label>Gestor</mat-label>
+                <mat-select [(ngModel)]="valorSeleccionado">
+                  <mat-option *ngFor="let elemento of listaGestores" [value]="elemento.usuario">
+                  {{elemento.nombre}}
+                  </mat-option>
+              </mat-select>
+              </mat-form-field>
+            </mat-grid-tile>
+          </mat-grid-list>
+      
+          <h2 style="text-align: center;">
+            <button mat-raised-button color="primary" (click)="buscar()">Buscar</button>
+          </h2>
+    </div>
+
+    <div *ngIf="mostrarResultados">
+      <mat-card class="main-card">
+        <mat-card-title>Estadísticas de Cartera</mat-card-title>
+        <mat-card-content>
+          <p>Aqui se mostrara la información financiera de tu sucursal</p>
+          <br>
+          <h2>Prestamos Activos</h2>
+          <h4>{{contadorNumeroPrestamos}} Prestamos</h4>
+          <h2>Total a cobrar en el Dia</h2>
+          <h4>${{totalCobrarDia}} Por cobrar</h4>
+          <h2>Valor Cartera</h2>
+          <h4>${{totalCartera}}</h4>
+          <h2>Cuentas Por Cobrar</h2>
+          <h4>Faltan un total de {{cuentasxCobrar}} cuentas = ${{totalFaltante}}</h4>
+          <h2>Cuentas Cobradas</h2>
+          <h4>Se cobro un total de {{cuentasCobradas}} cuentas = ${{pagosDelDia}}</h4>
+
+        </mat-card-content>
+      </mat-card>
+
+      <div class="desplazamiento">
+      <h1>Información</h1>
+
+      <div class="card-container">
+        
+      <mat-card class="card blue">
+        <mat-card-header>
+          <mat-card-title>Pagos Recolectados</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          Se recolectaron {{listaPagosEspecificos.length}} pagos y un total de ${{pagosDelDia}}
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="card blue">
+        <mat-card-header>
+          <mat-card-title>Solicitudes Generadas</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          Se generaron {{numeroSolicitudes}} solicitudes con un valor de ${{totalSolicitudesDia}}
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="card blue">
+        <mat-card-header>
+          <mat-card-title>Renovaciones Generadas</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          Se generaron {{numeroRenovaciones}} solicitudes con un valor de ${{totalRenovacionesDia}}
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="card blue">
+        <mat-card-header>
+          <mat-card-title>Prestamos Generados</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          Se generaron {{numeroPrestamos}} Prestamos con un valor de ${{totalPrestamos}}
+        </mat-card-content>
+      </mat-card>
+    </div>
+    </div>
+
+    <div class="contenedorListas">
+      <mat-expansion-panel (opened)="panelOpenState = true"
+      (closed)="panelOpenState = false">
+      <mat-expansion-panel-header>
+      <mat-panel-title>
+      Lista pagos registrados
+      </mat-panel-title>
+
+      </mat-expansion-panel-header>
+      <mat-list>
+          <mat-list-item *ngFor="let elemento of listaPagosEspecificos">
+            <mat-icon matListItemIcon>payments</mat-icon>
+            <div matListItemTitle>{{elemento.fecha}}</div>
+            <div matListItemLine>Cliente: {{elemento.nombreCliente}}</div>
+            <div matListItemLine>Abono: ${{elemento.abono}}</div>
+            <div matListItemLine>Hora de registro: {{elemento.horaPago}}</div>  
+            <div matListItemLine>El cobro fue por: {{elemento.personasCobrador}}</div>  
+            <div matListItemLine>El restante es: {{elemento.totalRestante}}</div>  
+            <div matListItemLine>_____________________________________________________</div>  
+              <br>
+
+          </mat-list-item>
+          <mat-divider></mat-divider>   
+      </mat-list>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel (opened)="panelOpenState = true"
+      (closed)="panelOpenState = false">
+      <mat-expansion-panel-header>
+      <mat-panel-title>
+      Lista Solicitudes registrados
+      </mat-panel-title>
+
+      </mat-expansion-panel-header>
+      <mat-list>
+          <mat-list-item *ngFor="let elemento of solicitudesEspecificas">
+            <mat-icon matListItemIcon>payments</mat-icon>
+            <div matListItemTitle>{{elemento.fechaSolicitud}}</div>
+            <div matListItemLine>Monto Solicitado: {{elemento.montoSolicitado}}</div>  
+            <div matListItemLine>Total a Pagar: {{elemento.totalPagar}}</div>  
+            <div matListItemLine>Solicitante: {{elemento.nombre}}</div>  
+            <div matListItemLine>_____________________________________________________</div>  
+              <br>
+
+          </mat-list-item>
+          <mat-divider></mat-divider>   
+      </mat-list>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel (opened)="panelOpenState = true"
+      (closed)="panelOpenState = false">
+      <mat-expansion-panel-header>
+      <mat-panel-title>
+      Lista de Renovaciones registradas
+      </mat-panel-title>
+
+      </mat-expansion-panel-header>
+      <mat-list>
+          <mat-list-item *ngFor="let elemento of renovacionesEspecificas">
+            <mat-icon matListItemIcon>payments</mat-icon>
+            <div matListItemTitle>{{elemento.fechaSolicitud}}</div>
+            <div matListItemLine>Monto Solicitado: {{elemento.montoSolicitado}}</div>  
+            <div matListItemLine>Total a Pagar: {{elemento.totalPagar}}</div>  
+            <div matListItemLine>Solicitante: {{elemento.nombre}}</div>  
+            <div matListItemLine>_____________________________________________________</div>  
+              <br>
+
+          </mat-list-item>
+          <mat-divider></mat-divider>   
+      </mat-list>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel (opened)="panelOpenState = true"
+      (closed)="panelOpenState = false">
+      <mat-expansion-panel-header>
+      <mat-panel-title>
+      Lista de Prestamos
+      </mat-panel-title>
+
+      </mat-expansion-panel-header>
+      <mat-list>
+          <mat-list-item *ngFor="let elemento of listaPrestamosDelDia">
+            <mat-icon matListItemIcon>payments</mat-icon>
+            <div matListItemTitle>{{elemento.fecha}}</div>
+            <div matListItemLine>Monto Prestado: {{elemento.cantidadPrestamo}}</div>  
+            <div matListItemLine>Total a Pagar: {{elemento.cantidadPagar}}</div>  
+            <div matListItemLine>Solicitante: {{elemento.nombre}}</div>  
+            <div matListItemLine>_____________________________________________________</div>  
+              <br>
+
+          </mat-list-item>
+          <mat-divider></mat-divider>   
+      </mat-list>
+      </mat-expansion-panel>
+    </div>
+    </div>
+
+</div>

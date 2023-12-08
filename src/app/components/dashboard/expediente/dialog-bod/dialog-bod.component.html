@@ -1,0 +1,49 @@
+<mat-toolbar>
+    <span>Informacion Prestamos</span>
+    <div class="example-spacer"></div>
+</mat-toolbar>
+
+<div>
+  <mat-expansion-panel (opened)="panelOpenState = true"
+  (closed)="panelOpenState = false">
+      <mat-expansion-panel-header>
+      <mat-panel-title>
+      Lista pagos registrados
+      </mat-panel-title>
+
+      </mat-expansion-panel-header>
+
+      <div class="timeline">
+        <div class="timeline-item" *ngFor="let payment of listaPagos">
+        <mat-icon matListItemIcon>paid</mat-icon>
+        <br>
+          <div class="timeline-dot" [ngStyle]="{'background-color': payment.tipo == 'Mora' ? 'orange' : 'green'}"></div>
+          <div class="timeline-content">
+            <p class="timeline-date">{{payment.fecha}}</p>
+            <p class="timeline-description">Hora del Movimiento: {{payment.horaPago}}</p>
+            <p class="timeline-amount">Tipo de movimiento: {{payment.tipo}}</p>
+            <p class="timeline-description">Monto a pagar: ${{payment.pagoDiario}}</p>
+            <p class="timeline-amount">Monto registrado: ${{payment.abono}}</p>
+            <p class="timeline-description">Fue registrado por: {{payment.personasCobrador}}<p>
+            <p class="timeline-description">El nuevo monto restante es: ${{payment.totalRestante}}<p>
+          </div>
+        </div>
+      </div>
+
+  </mat-expansion-panel>
+    
+</div>
+
+
+
+<br><br>
+<h3 style="text-align: center;">Documentos</h3>
+
+<div class="slider-container">
+  <div class="slider">
+    <img [src]="currentImage" alt="Slide {{ currentSlideIndex + 1 }}" />
+  </div>
+  <button (click)="prevSlide()" [disabled]="currentSlideIndex === 0">Anterior</button>
+  <button (click)="nextSlide()" [disabled]="currentSlideIndex === 2">Siguiente</button>
+</div>
+  

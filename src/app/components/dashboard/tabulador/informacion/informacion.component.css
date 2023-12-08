@@ -1,0 +1,100 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    margin-top: 10%;
+    padding: 0;
+  }
+
+  .container {
+    width: 80%;
+    margin: auto;
+  }
+
+  .report-title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .credit-report-subtitle {
+    font-size: 18px;
+    text-align: center;
+  }
+
+  .divider {
+    height: 5px;
+    background-color: #FCA426;
+    margin: 20px 0;
+  }
+
+  .divider2 {
+    height: 5px;
+    background-color: #fc2626;
+    margin: 20px 0;
+  }
+
+  .customer-info {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 20px;
+  }
+
+  .customer-details {
+    flex-grow: 1;
+    margin-left: 15px;
+  }
+
+  .customer-number {
+    font-weight: bold;
+    font-size: 18px;
+  }
+
+  .customer-contact {
+    margin-top: 8px;
+  }
+
+  .credit-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+   overflow: auto; 
+  }
+
+  .credit-table th, .credit-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+    background-color: #FFC26B; /* Color de fondo para la fila de encabezado */
+
+  }
+
+  .credit-meter {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  /* Define los colores del medidor */
+  .green { color: green; }
+  .yellow { color: yellow; }
+  .red { color: red; }
+
+
+  .customer-image {
+    border-radius: 15px;
+    margin-right: 20px;
+    margin-top: 20px;
+    overflow: hidden;
+    width: 200px;
+    height: 200px;
+    max-width: 100%; /* Hace que la imagen sea responsiva */
+    margin: 0 auto; /* Centra la imagen y agrega margen hacia los lados */
+  }
+  
+  .customer-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center; /* Centra la imagen si las dimensiones son diferentes */
+  }
+  

@@ -1,0 +1,44 @@
+<mat-toolbar>
+  <span>Informacion Prestamos</span>
+  <div class="example-spacer"></div>
+</mat-toolbar>
+
+<div>
+<mat-expansion-panel (opened)="panelOpenState = true"
+(closed)="panelOpenState = false">
+    <mat-expansion-panel-header>
+    <mat-panel-title>
+    Lista pagos registrados
+    </mat-panel-title>
+
+    </mat-expansion-panel-header>
+    <mat-list>
+        <mat-list-item *ngFor="let elemento of listaPagos">
+          <mat-icon matListItemIcon>payments</mat-icon>
+          <div matListItemTitle>{{elemento.fecha}}</div>
+          <div matListItemLine>Abono: ${{elemento.abono}}</div>
+          <div matListItemLine>Hora de registro: {{elemento.horaPago}}</div>  
+          <div matListItemLine>El cobro fue por: {{elemento.personasCobrador}}</div>  
+          <div matListItemLine>El restante es: {{elemento.totalRestante}}</div>  
+          <div matListItemLine>_____________________________________________________</div>  
+            <br>
+
+        </mat-list-item>
+        <mat-divider></mat-divider>   
+    </mat-list>
+</mat-expansion-panel>
+  
+</div>
+
+
+
+<br><br>
+<h3 style="text-align: center;">Documentos</h3>
+
+<div class="slider-container">
+<div class="slider">
+  <img [src]="currentImage" alt="Slide {{ currentSlideIndex + 1 }}" />
+</div>
+<button (click)="prevSlide()" [disabled]="currentSlideIndex === 0">Anterior</button>
+<button (click)="nextSlide()" [disabled]="currentSlideIndex === 2">Siguiente</button>
+</div>

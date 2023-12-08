@@ -1,0 +1,30 @@
+table {
+    width: 100%;
+}
+
+.pointer{
+  cursor: pointer;
+}
+
+.mat-mdc-form-field {
+  font-size: 14px;
+  width: 100%;
+}
+
+.example-spacer {
+  flex: 1 1 auto;
+}
+
+.contenedor {
+  display: flex;
+  justify-content: space-between; /* Esto separará los elementos al máximo */
+  align-items: center; /* Esto centrará verticalmente los elementos */
+}
+  
+.separar{
+  margin-left: 20px;
+}
+
+.table-container {
+  overflow-x: auto;
+}

@@ -1,0 +1,30 @@
+table {
+    width: 100%;
+}
+
+.pointer{
+  cursor: pointer;
+}
+
+.mat-mdc-form-field {
+  font-size: 14px;
+  width: 100%;
+}
+
+.example-spacer {
+  flex: 1 1 auto;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.fila-activa {
+  background-color: #7fdd82;  /* Puedes ajustar el color según tus preferencias */
+}
+.fila-inactiva {
+  background-color: #faea5a;  /* Puedes ajustar el color según tus preferencias */
+}
+.fila-buro {
+  background-color: rgb(253, 125, 125);  /* Puedes ajustar el color según tus preferencias */
+}

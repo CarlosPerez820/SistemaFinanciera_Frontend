@@ -1,0 +1,40 @@
+<mat-toolbar color="primary" class="navbar">
+    <button mat-icon-button class="hamburger" (click)="toggleMenu()">
+        <mat-icon>menu</mat-icon>
+      </button>
+
+      <span>{{nombreFinanciera}}</span>
+      
+      <span class="example-spacer"></span>
+    <!-- Opciones para escritorio -->
+    <div class="navbar-desktop">
+     
+      <a mat-button routerLink="/dashboard/clientes">Clientes</a>
+      <a mat-button routerLink="/dashboard/renovaciones">Renovaciones</a>
+      <a mat-button routerLink="/dashboard/solicitudes">Solicitudes</a>
+      <a mat-button routerLink="/dashboard/prestamos">Prestamos</a>
+      <a mat-button routerLink="/dashboard/informe-rutas">Rutas</a>
+      <a mat-button routerLink="/dashboard/informe-general">Informe</a>
+      <a mat-button routerLink="/dashboard/ajustes">Configuracion</a>
+      <a mat-button routerLink="/dashboard/tabulador">Herramientas</a>
+     
+    </div>
+    <span class="example-spacer"></span>
+    <button mat-icon-button (click)="cerrarSesion()" routerLink="/logout">
+        <mat-icon>logout</mat-icon>
+      </button>
+    <!-- Opciones para dispositivos móviles -->
+    <div class="navbar-mobile" [class.active]="isMenuOpen">
+      <div class="navbar-links">
+        <a mat-button routerLink="/dashboard/clientes" (click)="toggleMenu()">Clientes</a>
+        <a mat-button routerLink="/dashboard/renovaciones" (click)="toggleMenu()">Renovaciones</a>
+        <a mat-button routerLink="/dashboard/solicitudes" (click)="toggleMenu()">Solicitudes</a>
+        <a mat-button routerLink="/dashboard/prestamos" (click)="toggleMenu()">Prestamos</a>
+        <a mat-button routerLink="/dashboard/informe-rutas" (click)="toggleMenu()">Rutas</a>
+        <a mat-button routerLink="/dashboard/informe-general" (click)="toggleMenu()">Informe</a>
+        <a mat-button routerLink="/dashboard/ajustes" (click)="toggleMenu()">Configuracion</a>
+        <a mat-button routerLink="/dashboard/tabulador" (click)="toggleMenu()">Herramientas</a>
+      </div>
+    </div>
+  </mat-toolbar>
+  

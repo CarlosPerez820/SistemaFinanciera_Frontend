@@ -1,0 +1,121 @@
+<div class="container">
+    <mat-toolbar>
+      <span>Expediente</span>
+      <div class="example-spacer"></div>
+    </mat-toolbar>
+
+    <mat-card class="informacion">
+
+        <mat-grid-list cols="2" rowHeight="30px">
+
+          
+            <mat-grid-tile [colspan]="1" [rowspan]="1">   
+            NumCliente: {{clienteEspecifico.numeroCliente}} <br>
+           </mat-grid-tile>
+           <mat-grid-tile [colspan]="1" [rowspan]="10">  
+            <div> 
+            <img src={{variableURL}}{{clienteEspecifico.fotoIneFrente}} alt="" class="img_Cliente">
+            </div>
+           </mat-grid-tile>
+            <mat-grid-tile [colspan]="1" [rowspan]="1">   
+                Nombre:{{clienteEspecifico.nombre}}<br>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="1" [rowspan]="1">   
+              Edad:{{clienteEspecifico.edad}}<br>
+           </mat-grid-tile>
+           <mat-grid-tile [colspan]="1" [rowspan]="1">   
+            Estado Civil:{{clienteEspecifico.estadoCivil}}<br>
+         </mat-grid-tile>
+            
+            <mat-grid-tile [colspan]="1" [rowspan]="1">   
+              Direccion:{{clienteEspecifico.direccion}}, {{clienteEspecifico.colonia}}, {{clienteEspecifico.ciudad}}<br>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="1" [rowspan]="1">   
+              Celular: {{clienteEspecifico.celular}}<br>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="1" [rowspan]="1">   
+              Gestor: {{clienteEspecifico.gestorAsignado}}<br>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="1" [rowspan]="1">   
+              Identificacion:{{clienteEspecifico.numeroIdentificacion}}<br>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="1" [rowspan]="1">   
+              Numero de Prestamos:{{clienteEspecifico.numeroPrestamos}}<br>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="1" [rowspan]="1">   
+              Prestamos Activos:{{clienteEspecifico.numeroActivos}}<br>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="1" [rowspan]="1">   
+              Clasificacion:{{clienteEspecifico.clasificacion}}<br>
+            </mat-grid-tile>
+            
+            
+        </mat-grid-list>
+
+    </mat-card>
+
+    <div class="table-container">
+    <mat-toolbar>
+        <span>Lista de Prestamos</span>
+        <div class="example-spacer"></div>
+      </mat-toolbar>
+
+   
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+        <!--- Note that these columns can be defined in any order.
+              The actual rendered columns are set as a property on the row definition" -->
+      
+        <!-- Position Column -->
+        <ng-container matColumnDef="folio">
+          <th mat-header-cell *matHeaderCellDef> Folio </th>
+          <td mat-cell *matCellDef="let element"> {{element.folio}} </td>
+        </ng-container>
+      
+        <!-- Name Column -->
+        <ng-container matColumnDef="fecha">
+          <th mat-header-cell *matHeaderCellDef> Fecha </th>
+          <td mat-cell *matCellDef="let element"> {{element.fecha}} </td>
+        </ng-container>
+      
+        <!-- Weight Column -->
+        <ng-container matColumnDef="cantidad">
+          <th mat-header-cell *matHeaderCellDef> Cantidad </th>
+          <td mat-cell *matCellDef="let element"> {{element.cantidadPrestamo}} </td>
+        </ng-container>
+      
+        <!-- Symbol Column -->
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef> Estado </th>
+          <td mat-cell *matCellDef="let element"> {{element.estatus}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>  </th>
+          <td mat-cell *matCellDef="let element" style="text-align: right;"> 
+    
+          <a class="pointer" style="color:cornflowerblue" matTooltip="Informacion" (click)="openDialog(element._id)">
+            <mat-icon>search</mat-icon>
+          </a>
+          </td>
+        </ng-container>
+    
+      
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>      
+    </div>
+    
+    <div class="slider-container">
+      <div class="slider">
+        <img [src]="currentImage" alt="Slide {{ currentSlideIndex + 1 }}" class="img_Expediente"/>
+      </div>
+      <button (click)="prevSlide()" [disabled]="currentSlideIndex === 0">Anterior</button>
+      <button (click)="nextSlide()" [disabled]="currentSlideIndex === 2">Siguiente</button>
+    </div>
+      
+    
+</div>
+
+
+  

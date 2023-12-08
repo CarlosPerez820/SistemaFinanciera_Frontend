@@ -1,0 +1,81 @@
+<body>
+
+  <div class="container">
+
+    <div class="report-title">Reporte</div>
+    <div class="credit-report-subtitle">Buro de Crédito</div>
+
+    <div class="divider" *ngIf="clienteEspecifico.clasificacion=='B'"></div>
+    <div class="divider2" *ngIf="clienteEspecifico.clasificacion=='C'"></div>
+
+    <div class="customer-info">
+      <div class="customer-image">
+        <img src="https://node-restserver-financiera-production.up.railway.app/{{clienteEspecifico.fotoIneFrente}}" alt="Customer Image">
+      </div>
+      <div class="customer-details">
+        <div class="customer-number">Número de Cliente: {{clienteEspecifico.numeroCliente}}</div>
+        <div class="customer-contact">
+          <p>Nombre: {{clienteEspecifico.nombre}}</p>
+          <p>Numero INE: {{clienteEspecifico.numeroIdentificacion}}</p>
+          <p>Registro: {{clienteEspecifico.fechaRegistro}}</p>
+          <p>Edad: {{clienteEspecifico.edad}}</p>
+          <p>Direccion: {{clienteEspecifico.direccion}}, {{clienteEspecifico.colonia}}, {{clienteEspecifico.ciudad}}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="credit-table">
+
+      <h2>Prestamos Activos</h2>
+      
+      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+        <!--- Note that these columns can be defined in any order.
+              The actual rendered columns are set as a property on the row definition" -->
+      
+      
+        <!-- Name Column -->
+        <ng-container matColumnDef="fecha">
+          <th mat-header-cell *matHeaderCellDef> Fecha </th>
+          <td mat-cell *matCellDef="let element"> {{element.fecha}} </td>
+        </ng-container>
+      
+        <!-- Weight Column -->
+        <ng-container matColumnDef="cantidad">
+          <th mat-header-cell *matHeaderCellDef> Cantidad </th>
+          <td mat-cell *matCellDef="let element"> {{element.cantidadPrestamo}} </td>
+        </ng-container>
+      
+        <!-- Symbol Column -->
+        <ng-container matColumnDef="plazo">
+          <th mat-header-cell *matHeaderCellDef> Plazo </th>
+          <td mat-cell *matCellDef="let element"> {{element.plazoPrestamo}} </td>
+        </ng-container>
+      
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>      
+    </div>
+
+    <div class="divider" *ngIf="clienteEspecifico.clasificacion=='B'"></div>
+    <div class="divider2" *ngIf="clienteEspecifico.clasificacion=='C'"></div>
+
+
+    <div class="credit-meter">
+      <h1>Clasificacion: "{{clienteEspecifico.clasificacion}}"</h1>
+      <h3>Numero de Moras: {{clienteEspecifico.puntuacion}}</h3>
+      <img src="assets\img\actuacion.png" alt="Credit Meter" class="customer-image">
+      <p class="red" *ngIf="clienteEspecifico.clasificacion=='C'">
+        El tipo de clasificacion "C" nos indica que el cliente tiene 1 o mas prestamos sin pagar consecutivamente por mas de 60 dias.
+        Es un tipo de cliente de alto riesgo y no se recomienda aprobar prestamos.
+      </p>
+      <p class="red" *ngIf="clienteEspecifico.clasificacion=='B'">
+        El tipo de clasificacion "B" nos indica que el cliente tiene 1 o mas prestamos sin pagar consecutivamente por mas de 30 dias.
+        Es un tipo de cliente de riesgo medio a tener en cuenta y la aprobacion de prestamos queda a consideracion.
+      </p>
+    </div>
+    
+
+  </div>
+
+</body>

@@ -1,0 +1,194 @@
+<div class="container">
+    <mat-toolbar>
+        <span>Herramientas</span>
+    </mat-toolbar>
+
+    <br>
+
+    
+    <mat-tab-group dynamicHeight>
+    <mat-tab label="Buro">
+    <div class="body">
+        
+        <mat-card class="tarjeta2">
+            <br>
+            <h2>Buro de Credito</h2>
+            <div class="table-container">
+        <mat-form-field>
+            <mat-label>Busqueda</mat-label>
+            <input matInput (keyup)="applyFilter($event)" placeholder="Nombre" #input autocomplete="off">
+          </mat-form-field>
+        
+        
+          <div class="mat-elevation-z8">
+            <table mat-table [dataSource]="dataSource" matSort>
+            
+              <!-- Position Column -->
+              <ng-container matColumnDef="nombre">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre </th>
+                <td mat-cell *matCellDef="let element"> {{element.nombre}} </td>
+              </ng-container>
+            
+              <!-- Name Column -->
+              <ng-container matColumnDef="direccion">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Direccion </th>
+                <td mat-cell *matCellDef="let element"> {{element.direccion}} </td>
+              </ng-container>
+            
+              <!-- Weight Column -->
+              <ng-container matColumnDef="telefono">
+                <th mat-header-cell *matHeaderCellDef> Telefono </th>
+                <td mat-cell *matCellDef="let element"> {{element.celular}} </td>
+              </ng-container>
+            
+              <!-- Symbol Column -->
+              <ng-container matColumnDef="identificacion">
+                <th mat-header-cell *matHeaderCellDef> Identificación </th>
+                <td mat-cell *matCellDef="let element"> {{element.numeroIdentificacion}} </td>
+              </ng-container>
+            
+              <!-- Symbol Column -->
+              <ng-container matColumnDef="clasificacion">
+                <th mat-header-cell *matHeaderCellDef> Clasificación </th>
+                <td mat-cell *matCellDef="let element"> {{element.clasificacion}} </td>
+              </ng-container>
+
+              <!-- Symbol Column -->
+              <ng-container matColumnDef="creditos">
+                <th mat-header-cell *matHeaderCellDef> Creditos Activos </th>
+                <td mat-cell *matCellDef="let element"> {{element.numeroActivos}} </td>
+              </ng-container>
+
+              <!-- Symbol Column -->
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef> Acciones </th>
+                <td mat-cell *matCellDef="let element"> 
+                  <a class="pointer" matTooltip="Informacion" (click)="openDialog(element._id)">
+                    <mat-icon>visibility</mat-icon>
+                  </a>
+                </td>
+              </ng-container>
+                  
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"[ngClass]="{
+                'fila-medio': row.clasificacion === 'B',
+                'fila-alto': row.clasificacion === 'C'
+                }"></tr>
+            </table>
+            </div>
+            </div>
+        </mat-card>
+    </div>
+    </mat-tab>
+
+    <mat-tab label="Chequeo">
+        <div class="body">
+            <mat-card class="tarjeta">
+                <br>
+                <h2>Verificacion de cliente</h2>
+                <mat-grid-list cols="3" rowHeight="70px">
+                    <mat-grid-tile [colspan]="2" [rowspan]="1">   
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Numero de identificacion</mat-label>
+                            <input matInput placeholder="Num. Cliente" [(ngModel)]="valorABuscar">
+                        </mat-form-field>
+                    </mat-grid-tile>
+            
+                    <mat-grid-tile [colspan]="1" [rowspan]="1">   
+                        <button mat-raised-button (click)="buscar(valorABuscar)" color="primary">Buscar</button>
+                    </mat-grid-tile>
+            
+                </mat-grid-list>
+                    <br>
+
+                <mat-card class="example-card" *ngIf="card1">
+                    <mat-card-header>
+                      <mat-card-title>{{numeroIdenti}}</mat-card-title>
+                      <mat-card-subtitle>Numero de identificacion</mat-card-subtitle>
+                    </mat-card-header>
+                    <mat-card-content>
+                      <br>
+                      <h3>Este cliente no esta registrado en el sistema y por lo tanto no cuenta con prestamos activos con ninguna Financiera</h3>
+                    </mat-card-content>
+                    <img src="assets\img\like.png" alt="Credit Meter" class="customer-image">
+
+                  </mat-card>
+
+                  <mat-card class="example-card2" *ngIf="card2">
+                    <mat-card-header>
+                      <mat-card-title>{{numeroIdenti}}</mat-card-title>
+                      <mat-card-subtitle>Numero de identificacion</mat-card-subtitle>
+                    </mat-card-header>
+                    <mat-card-content>
+                      <h3>{{nombreCliente}}</h3>
+                      <h3>Edad: {{edadCliente}}</h3>
+                      <h3>Direccion: {{direccionCliente}}</h3>
+                      <br>
+                      <h2>Numero de Creditos Activos:{{numeroDeCreditos}}</h2>
+                      <h3>Este cliente si cuenta con prestamos activos con una Financiera en este momento</h3>
+                    </mat-card-content>
+                    <img src="assets\img\cancelar.png" alt="Credit Meter" class="customer-image">
+                  </mat-card>
+
+                  <mat-card class="example-card3" *ngIf="card3">
+                    <mat-card-header>
+                      <mat-card-title>{{numeroIdenti}}</mat-card-title>
+                      <mat-card-subtitle>Numero de identificacion</mat-card-subtitle>
+                    </mat-card-header>
+                    <mat-card-content>
+                      <h3>Este cliente ya se encuentra registrado en el sistema de una financiera, pero actualmente no
+                        cuenta con ningun prestamo activo o vigente.
+                      </h3>
+                    </mat-card-content>
+                    <img src="assets\img\cheque.png" alt="Credit Meter" class="customer-image">
+                  </mat-card>
+  
+            </mat-card>
+        </div>
+    </mat-tab>
+
+    <mat-tab label="Tabulador">
+    <div class="body">
+        <mat-card class="tarjeta">
+            <br>
+            <h2>Tabulador de Prestamos</h2>
+            
+            <mat-form-field class="example-full-width">
+              <mat-label>Cantidad del prestamo (MX)</mat-label>
+              <input matInput type="number" placeholder="Ejem: $5000" [(ngModel)]="prestado" name="prestado">
+            </mat-form-field>
+
+            <mat-form-field class="example-full-width">
+                <mat-label>Plazo del prestamo (en dias)</mat-label>
+                <input matInput type="number" placeholder="Ejem: 5" [(ngModel)]="plazo" name="plazo">
+            </mat-form-field>
+
+            <mat-form-field class="ancho">
+                  <mat-label>Tipo Prestamo</mat-label>
+                  <mat-select [(ngModel)]="tipoPrestamo" name="tipoPrestamo">
+                      <mat-option *ngFor="let tipo of prestamos" [value]="tipo.value">
+                      {{tipo.viewValue}}
+                      </mat-option>
+                  </mat-select>
+            </mat-form-field>
+                    
+            <button mat-raised-button color="primary" (click)="calcularMontos()">Calcular</button>
+       
+              <br>
+              <br>
+              <br>
+            <mat-form-field class="example-full-width">
+                <mat-label>Total a Pagar:</mat-label>
+                <input matInput type="number" [(ngModel)]="apagar" name="apagar" readonly>
+            </mat-form-field>
+            <mat-form-field class="example-full-width">
+              <mat-label>Pago Diario:</mat-label>
+              <input matInput type="number" [(ngModel)]="pagoDiario" name="pagoDiario" readonly >
+            </mat-form-field>
+       
+          </mat-card>
+        </div>
+        </mat-tab>
+
+    </mat-tab-group>  
+</div>

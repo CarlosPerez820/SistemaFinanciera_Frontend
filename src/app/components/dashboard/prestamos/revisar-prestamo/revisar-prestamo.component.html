@@ -1,0 +1,153 @@
+<div class="container">
+    <mat-toolbar>
+        <span>Revision de Prestamo</span>
+    </mat-toolbar>
+
+    <mat-card style="margin-top: 10px;">
+
+        <form [formGroup]="form" (ngSubmit)="editarPrestamo()">
+
+            <mat-grid-list  cols="2" rowHeight="70px">
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <h3>Datos de prestamo</h3>
+                </mat-grid-tile>
+                
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Fecha</mat-label>
+                        <input matInput autocomplete="off" formControlName="fecha">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Tipo Prestamo:</mat-label>
+                        <input matInput autocomplete="off" formControlName="tipoPrestamo">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Monto Aprobado</mat-label>
+                        <input matInput type="number" autocomplete="off" formControlName="montoAutorizado">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Plazo</mat-label>
+                        <input matInput type="number" autocomplete="off" formControlName="plazo">
+                    </mat-form-field>
+                </mat-grid-tile>
+                
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Total a pagar</mat-label>
+                        <input matInput type="number" autocomplete="off" formControlName="totalPagar">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Pago diario</mat-label>
+                        <input matInput type="number" autocomplete="off" formControlName="pagoDiario">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <h3>Datos de cliente</h3>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Numero de Cliente</mat-label>
+                        <input matInput autocomplete="off" formControlName="numeroCliente">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Nombre</mat-label>
+                        <input matInput autocomplete="off" formControlName="nombreSolicitante">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Dirección</mat-label>
+                        <input matInput autocomplete="off" formControlName="direccion">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Colonia</mat-label>
+                        <input matInput autocomplete="off" formControlName="colonia">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Telefono Celular</mat-label>
+                        <input type="number" matInput autocomplete="off" formControlName="celular">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Gestor</mat-label>
+                        <mat-select formControlName="gestor">
+                            <mat-option *ngFor="let elemento of listaGestores" [value]="elemento.usuario">
+                            {{elemento.nombre}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </mat-grid-tile>    
+
+                <br>
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Comentarios:</mat-label>
+                        <input  matInput autocomplete="off" formControlName="comentario">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <button type="submit" mat-raised-button  class="ancho" routerLink="/dashboard/prestamos">Cancelar</button>
+                </mat-grid-tile>
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <button type="submit" mat-raised-button class="my-custom-button">Iniciar</button>
+                </mat-grid-tile>
+            </mat-grid-list>
+        </form>
+    </mat-card>
+
+
+    <mat-card style="margin-top: 10px;">
+        <h2 style="text-align: center;">Documentos</h2>
+        <mat-grid-list  cols="2" rowHeight="70px">
+            
+            <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <button type="button" mat-raised-button (click)="openInput()" class="ancho">Foto con Dinero</button>
+                <input id="fileInput" hidden type="file"  accept=".pdf,.jpg,.png" (change)="onFileSelected($event, 'dinero')">
+            </mat-grid-tile>
+            
+            <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <button type="button" mat-raised-button (click)="openInput2()" class="ancho">Foto del Pagare</button>
+                <input id="fileInput2" hidden type="file"   accept=".pdf,.jpg,.png" (change)="onFileSelected($event, 'pagare')">
+            </mat-grid-tile>
+    
+            <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <button type="button" mat-raised-button (click)="openInput3()" class="ancho">Foto de la Fachada</button>
+                <input id="fileInput3" hidden type="file"   accept=".pdf,.jpg,.png" (change)="onFileSelected($event, 'fachada')">
+            </mat-grid-tile>
+
+            <br>
+            <br>
+
+        </mat-grid-list>
+    </mat-card>
+
+</div>

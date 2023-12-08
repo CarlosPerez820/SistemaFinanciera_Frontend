@@ -1,0 +1,77 @@
+.ancho{
+    width: 85%;
+}
+
+.my-custom-button {
+    width: 85%;
+    background-color: #0aa404; /* Cambia el color de fondo al color deseado */
+    color: white; /* Cambia el color del texto al deseado */
+  }
+
+  /*---*/
+
+  .timeline {
+    position: relative;
+    width: 100%;
+    margin-left: 11%;  
+}
+  
+  .timeline-item {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 40px; /* Ajusta según sea necesario */
+  }
+  
+  .timeline-dot {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    background-color: #007bff;
+    border-radius: 50%;
+    margin-right: 10px;
+    z-index: 1;
+  }
+  
+  .timeline-content {
+    align-items: center;
+    background-color: #f4f4f4;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .timeline-date {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .timeline-amount {
+    color: #28a745; /* Color verde para el monto del pago */
+    margin-bottom: 5px;
+  }
+  
+  .timeline-description {
+    color: #6c757d; /* Color gris oscuro para la descripción */
+  }
+  
+
+  /*---*/
+  .timeline-item {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 40px; /* Aumenta el margen inferior */
+  }
+  
+  .timeline-dot {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    background-color: #007bff;
+    border-radius: 50%;
+    margin-right: 10px;
+    z-index: 1;
+  }
+  
+  

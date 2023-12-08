@@ -1,0 +1,185 @@
+<div class="container">
+    <mat-toolbar>
+        <span>Registro de Pago</span>
+    </mat-toolbar>
+
+    <mat-card style="margin-top: 10px;">
+
+        <form [formGroup]="form" (ngSubmit)="registrarPagos()">
+
+            <mat-grid-list  cols="2" rowHeight="70px">
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <h3>Datos de prestamo</h3>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Fecha</mat-label>
+                        <input matInput autocomplete="off" formControlName="fecha">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Total Restante</mat-label>
+                        <input matInput autocomplete="off" formControlName="totalRestante">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Monto Aprobado</mat-label>
+                        <input matInput type="number" autocomplete="off" formControlName="montoAutorizado">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Plazo</mat-label>
+                        <input matInput type="number" autocomplete="off" formControlName="plazo">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Total a pagar</mat-label>
+                        <input matInput type="number" autocomplete="off" formControlName="totalPagar">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Pago diario</mat-label>
+                        <input matInput type="number" autocomplete="off" formControlName="pagoDiario">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Monto</mat-label>
+                        <input matInput autocomplete="off" formControlName="montoPagado">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <button type="submit" mat-raised-button class="my-custom-button" [disabled]="form.invalid">Registrar</button>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <h3>Datos de cliente</h3>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Numero de Cliente</mat-label>
+                        <input matInput autocomplete="off" formControlName="numeroCliente">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Nombre</mat-label>
+                        <input matInput autocomplete="off" formControlName="nombreSolicitante">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Dirección</mat-label>
+                        <input matInput autocomplete="off" formControlName="direccion">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Colonia</mat-label>
+                        <input matInput autocomplete="off" formControlName="colonia">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Telefono Celular</mat-label>
+                        <input type="number" matInput autocomplete="off" formControlName="celular">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Gestor</mat-label>
+                        <mat-select formControlName="gestor">
+                            <mat-option *ngFor="let elemento of listaGestores" [value]="elemento.usuario">
+                            {{elemento.nombre}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </mat-grid-tile>    
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <h3>Historial</h3>
+                </mat-grid-tile>
+
+            </mat-grid-list>
+        </form>
+
+        <!--
+        <mat-expansion-panel (opened)="panelOpenState = true"
+        (closed)="panelOpenState = false">
+            <mat-expansion-panel-header>
+            <mat-panel-title>
+            Lista pagos registrados
+            </mat-panel-title>
+            <mat-panel-description>
+                Aqui estan todas las pagos y moras registradas a este prestamo
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <mat-list>
+                <mat-list-item *ngFor="let elemento of listaPagos">
+                  <mat-icon matListItemIcon>folder</mat-icon>
+                  <div matListItemTitle>| {{elemento.fecha}}</div>
+                  <div matListItemLine>| Abono: ${{elemento.abono}}</div>
+                  <div matListItemLine>| Hora de registro: {{elemento.horaPago}}</div>  
+                  <div matListItemLine>| El cobro fue por: {{elemento.personasCobrador}}</div>  
+                  <div matListItemLine>| El restante es: {{elemento.totalRestante}}</div>  
+                  <div matListItemLine>| _____________________________________________________</div>  
+                    <br>
+                </mat-list-item>
+                <mat-divider></mat-divider>   
+            </mat-list>
+        </mat-expansion-panel>
+        -->
+    
+          <mat-expansion-panel (opened)="panelOpenState = true"
+          (closed)="panelOpenState = false">
+              <mat-expansion-panel-header>
+              <mat-panel-title>
+              Lista pagos registrados
+              </mat-panel-title>
+              <mat-panel-description>
+                  Aqui estan todas las pagos y moras registradas a este prestamo
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+
+              <div class="timeline">
+                <div class="timeline-item" *ngFor="let payment of listaPagos">
+                <mat-icon matListItemIcon>paid</mat-icon>
+                <br>
+                  <div class="timeline-dot" [ngStyle]="{'background-color': payment.tipo == 'Mora' ? 'orange' : 'green'}"></div>
+                  <div class="timeline-content">
+                    <p class="timeline-date">{{payment.fecha}}</p>
+                    <p class="timeline-description">Hora del Movimiento: {{payment.horaPago}}</p>
+                    <p class="timeline-amount">Tipo de movimiento: {{payment.tipo}}</p>
+                    <p class="timeline-description">Monto a pagar: ${{payment.pagoDiario}}</p>
+                    <p class="timeline-amount">Monto registrado: ${{payment.abono}}</p>
+                    <p class="timeline-description">Fue registrado por: {{payment.personasCobrador}}<p>
+                    <p class="timeline-description">El nuevo monto restante es: ${{payment.totalRestante}}<p>
+                  </div>
+                </div>
+              </div>
+          </mat-expansion-panel>
+  
+
+    </mat-card>
+</div>
+
