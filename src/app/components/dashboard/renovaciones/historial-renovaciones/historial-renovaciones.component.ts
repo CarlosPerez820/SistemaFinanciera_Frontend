@@ -12,6 +12,12 @@ import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import { HttpClient } from '@angular/common/http';
 import { ParametroServiceService } from 'src/app/services/parametro-service.service';
+import { environment } from 'src/environments/environment';
+import { InfoDialogComponent } from 'src/app/components/info-dialog/info-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+import { style } from 'd3-selection';
+
+const url_server = environment.url+"/";
 
 (<any>pdfMake).vfs = pdfFonts.pdfMake.vfs;
 
@@ -38,7 +44,7 @@ export class HistorialRenovacionesComponent {
   dataSource = new MatTableDataSource(this.listaSolicitudes);
 
   constructor(private solicitudService: SolicitudServiceService, private sharedService: SharedService,
-             private http: HttpClient, private parametroService: ParametroServiceService){}
+             private http: HttpClient, private parametroService: ParametroServiceService, private dialog: MatDialog){}
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -73,9 +79,9 @@ export class HistorialRenovacionesComponent {
   obtenerParametos(){
     this.parametroService.getParametrosFinanciera(this.sharedService.getFinanciera()).subscribe(
       (data) => {
-        //console.log(data);
+
         this.lista2 = data;
-        this.listaParametros = this.lista2.parametros[0];
+        this.listaParametros = this.lista2.parametros;
         console.log(this.listaParametros);
       },
       (error) => {
@@ -83,6 +89,16 @@ export class HistorialRenovacionesComponent {
       });
   }
 
+  openDialog(mensaje: string, imagen:string): void {
+    this.dialog.open(InfoDialogComponent, {
+      width: '300px',  // Ajusta el ancho según sea necesario
+      data: {
+        message: mensaje,
+        imageUrl: imagen  // Ruta de la imagen que quieres mostrar
+      },
+      disableClose: true // Deshabilita el cierre al hacer clic fuera del diálogo
+    });
+  }
 
   generarPDF(row: any) {
     const indice = this.dataSource.data.indexOf(row);
@@ -92,10 +108,15 @@ export class HistorialRenovacionesComponent {
     if(this.listaSolicitudes[indice]){
       objetoSolicitud = this.listaSolicitudes[indice];
     }
-    console.log(this.listaSolicitudes[indice]);
-   
 
-    this.imageURL= 'https://node-restserver-financiera-production.up.railway.app/'+ this.listaParametros.urlLogo;
+    console.log(this.listaSolicitudes[indice]);
+
+    if(this.listaParametros.length==0){
+      this.openDialog("Es necesario subir primero su logo para generar un PDF", "assets/img/error.png");
+    }
+
+
+    this.imageURL= url_server+ this.listaParametros[0].urlLogo;
 
     console.log(this.imageURL);
         // Realizar la solicitud HTTP para obtener la imagen
@@ -122,7 +143,7 @@ export class HistorialRenovacionesComponent {
                     opacity: 0.3, // Establece la opacidad (0 a 1)
                   },
                   {
-                    text: 'Información del Prestamo'+'\n',
+                    text: '\n'+'Información del Prestamo'+'\n',
                     style: 'header',
                     bold: true,
                   },
@@ -153,45 +174,46 @@ export class HistorialRenovacionesComponent {
                   {
                     style: 'tableExample',
                     table: {
-                      widths: ['*', 'auto'],
+                      widths: ['*'],
                       body: [
-                        ['Numero de cliente: '+objetoSolicitud.numeroCliente, 'Edad:'+objetoSolicitud.edad+' años'],
-                        ['Dirección: '+objetoSolicitud.direccion, 'Colonia:'+objetoSolicitud.colonia],
-                        ['Señas de Domicilio: '+objetoSolicitud.senasDomicilio, 'Ciudad:'+objetoSolicitud.ciudad],
+                        ['Numero de cliente: '+objetoSolicitud.numeroCliente],
+                        ['Dirección: '+objetoSolicitud.direccion],
+                        ['Colonia:'+objetoSolicitud.colonia],
+                        ['Ciudad:'+objetoSolicitud.ciudad],
                       ]
                     }
                   },
                   {
                     style: 'tableExample',
                     table: {
-                      widths: ['*', '*','*'],
+                      widths: ['*'],
                       body: [
-                        ['Celular:'+objetoSolicitud.celular, 'Telefono Fijo:'+objetoSolicitud.telefonoFijo, 'Numero Adicional:'+objetoSolicitud.telefonoAdicional]                      
+                        ['Celular:'+objetoSolicitud.celular]                      
                       ]
                     }
                   },
                   {
                     style: 'tableExample',
                     table: {
-                      widths: ['*', 'auto'],
+                      widths: ['*'],
                       body: [
-                        ['Estado Civil: '+objetoSolicitud.estadoCivil, 'Tiempo de casados: '+objetoSolicitud.tiempoCasados],
-                        ['Personas dependientes: '+objetoSolicitud.dependientes, 'Tipo de vivienda:'+objetoSolicitud.tipoVivienda],
-                        ['Tiempo viviendo en su domicilio: '+objetoSolicitud.tiempoViviendo, 'Pago de renta:'+objetoSolicitud.pagoRenta],
-                        ['Tipo de negocio: '+objetoSolicitud.tipoNegocio, 'Tiempo del negocio: '+objetoSolicitud.tiempoNegocio],
-                        ['Numero de identificación: '+objetoSolicitud.numeroIdentificacion,'RFC: '+objetoSolicitud.RFC],
-                        ['Nombre del conyugue: '+objetoSolicitud.nombreConyugue, 'Trabajo del Conyugue: '+objetoSolicitud.trabajoConyugue],
-                        ['Domicilio del conyugue: '+objetoSolicitud.domicilioConyugue,'Tiempo con el conyugue:'+objetoSolicitud.antiguedadConyugue],
-                        ['Ingreso del Solicitante: $' + objetoSolicitud.ingresoSolicitante,'Ingreso del conyugue: $'+objetoSolicitud.ingresoConyugue],
-                        ['Gastos Totales: $'+objetoSolicitud.gastosTotales, 'Gestor Agisnado: '+objetoSolicitud.gestorAsignado],
-                        ['Se necesita el credito para: '+objetoSolicitud.infoCredito, ''],
+                        ['Estado Civil: '+objetoSolicitud.estadoCivil],
+                        ['Tipo de vivienda:'+objetoSolicitud.tipoVivienda],
+                        ['Tiempo viviendo en su domicilio: '+objetoSolicitud.tiempoViviendo], 
+                        ['Pago de renta:'+objetoSolicitud.pagoRenta],
+                        ['Tiempo del negocio: '+objetoSolicitud.tiempoNegocio],
+                        ['Numero de identificación: '+objetoSolicitud.numeroIdentificacion],
+                        ['RFC: '+objetoSolicitud.RFC],
+                        ['Nombre del conyugue: '+objetoSolicitud.nombreConyugue], 
+                        ['Ingreso del Solicitante: $' + objetoSolicitud.ingresoSolicitante],
+                        ['Se necesita el credito para: '+objetoSolicitud.infoCredito],
 
                         
                       ]
                     }
                   },
                   {
-                    text: '\n'+'\n',
+                    text:  '\n' + "Información de la Solicitud:",
                     style: 'header',
                     bold: true,
                   },
@@ -201,14 +223,26 @@ export class HistorialRenovacionesComponent {
                       widths: ['*', 'auto'],
                       body: [
                         ['Estado: '+objetoSolicitud.estatus, 'Tipo de Solicitud: '+objetoSolicitud.tipo],
+                        ['Gestor Agisnado: '+objetoSolicitud.gestorAsignado, ''],
+
                       ]
                     }
+                  },
+                  {
+                    text: '\n'+'\n'+'\n'+'\n'+'\n'+'\n'+ "Este documento es una solicitud de préstamo. La aprobación del mismo está sujeta a la evaluación crediticia y políticas de ."+objetoSolicitud.sucursal + "."+
+                        "El solicitante declara que toda la información proporcionada es veraz y que ha leído y comprendido los términos y condiciones del préstamo.",
+                    style:'pie',
+                    
                   },
                 ],
                 styles: {
                   header: {
                     fontSize: 18,
                     bold: true,
+                  },
+                  pie:{
+                    fontSize: 10
+                    
                   }
                 }
               };

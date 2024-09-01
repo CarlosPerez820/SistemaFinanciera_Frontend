@@ -9,6 +9,8 @@ import { PagoServiceService } from 'src/app/services/pago-service.service';
 import { Prestamo } from 'src/app/interfaces/prestamo';
 import { Clientes } from 'src/app/interfaces/clientes';
 import { ClienteServiceService } from 'src/app/services/cliente-service.service';
+import { InfoDialogComponent } from 'src/app/components/info-dialog/info-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 //Obtener datos de fecha y hora
 var today = new Date();
@@ -54,7 +56,7 @@ export class RegistroPagoComponent {
 
   constructor(private fb: FormBuilder,  private route: ActivatedRoute, private gestorService: GestorServiceService, 
               private prestamoService: PrestamoServiceService, private sharedService: SharedService, private pagoService:PagoServiceService,
-              private router: Router, private clienteService:ClienteServiceService){
+              private router: Router, private clienteService:ClienteServiceService, private dialog:MatDialog){
     this.form = this.fb.group({
       totalRestante: ['',Validators.required],      
       montoPagado: ['',Validators.required],      
@@ -115,8 +117,11 @@ export class RegistroPagoComponent {
       this.actualizarCliente();
       console.log('Pago registrado con éxito:');
       console.log(response);
-      alert("Pago registrado con exito");
-      this.router.navigate(['dashboard/prestamos']);
+      this.openDialog("Pago registrado con éxito", "assets/img/exito.png");
+
+      this.router.navigateByUrl('/dummyRoute', { skipLocationChange: true }).then(() => {
+        this.router.navigate(['dashboard/prestamos']);
+      });
     },
     (error) => {
       console.error('Error al registrar Pago:', error);
@@ -131,16 +136,22 @@ export class RegistroPagoComponent {
       this.lista4 = data;
       this.clienteEspecifico = this.lista4.clientes;
       //console.log("CLinete:---");
-      //console.log(this.clienteEspecifico[0]);
+      console.log(this.clienteEspecifico[0].numeroActivos);
     })
   }
 
   actualizarCliente(){
-    let activos=this.clienteEspecifico[0].numeroACtivos;
+    console.log(this.clienteEspecifico[0]);
+    let activos=this.clienteEspecifico[0].numeroActivos;
+
+    console.log("cuentas con creditos activos: "+activos);
 
     if(this.totalRestante<=0){
       activos=activos-1;
     }
+
+    console.log("cuentas con creditos activos: "+activos);
+
     const cliente: Clientes={
       puntuacion: '0',
       numeroActivos: activos,
@@ -235,6 +246,17 @@ export class RegistroPagoComponent {
 
   agregarUsuario(){
     console.log(this.form);
+  }
+
+  openDialog(mensaje: string, imagen:string): void {
+    this.dialog.open(InfoDialogComponent, {
+      width: '300px',  // Ajusta el ancho según sea necesario
+      data: {
+        message: mensaje,
+        imageUrl: imagen  // Ruta de la imagen que quieres mostrar
+      },
+      disableClose: true // Deshabilita el cierre al hacer clic fuera del diálogo
+    });
   }
 
 }

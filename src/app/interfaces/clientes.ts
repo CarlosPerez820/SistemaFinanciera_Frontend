@@ -46,8 +46,8 @@ export interface Clientes {
 }
 
 export interface ApiResponse {
-    msg: string;
-    cliente: {
-      _id: string;
-    };
+  msg: string;
+  cliente: {
+    _id: string;
+  };
 }

@@ -8,6 +8,7 @@ import { Clientes } from 'src/app/interfaces/clientes';
 import { SharedService } from 'src/app/services/shared.service';
 import { InteresServiceService } from 'src/app/services/interes-service.service';
 import { ClienteServiceService } from 'src/app/services/cliente-service.service';
+import { TasasService } from 'src/app/services/tasas.service';
 
 @Component({
   selector: 'app-tabulador',
@@ -40,17 +41,22 @@ export class TabuladorComponent {
   listaTasaDiaria: any =[];
   listaTasaSemanal: any =[];
   tipoPrestamo:any;
+  interes: any = 0;
 
-  prestamos: any[] = [
-    {value: 'Diario', viewValue: 'Por dia'},
-    {value: 'Semanal', viewValue: 'Por semana'},
-  ];
+  prestamos: any[] = [];
+
+  tasasTradicional: any[] = [];
+  tasasBlindage: any[] = [];
+  tasaSeleccionada: any = [];
+
+  listaPlazo: any;
 
   displayedColumns: string[] = ['nombre', 'direccion', 'telefono','identificacion','clasificacion','creditos','acciones'];
   dataSource = new MatTableDataSource(this.listaClientes);
 
   constructor(private interesService: InteresServiceService, private sharedService: SharedService, 
-              private clienteService: ClienteServiceService,  private matDialog: MatDialog){}
+              private clienteService: ClienteServiceService,  private matDialog: MatDialog, 
+              private tasasService: TasasService){}
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -59,6 +65,9 @@ export class TabuladorComponent {
   ngOnInit(): void{
     this.obtenerListaDeInteres();
     this.obtenerBuro();
+    this.tasasTradicional = this.tasasService.getTasasTradicional();
+    this.tasasBlindage = this.tasasService.getTasasBlindage();
+    this.prestamos = this.tasasService.getTipoPrestamos();
   }
 
   ngAfterViewInit() {
@@ -95,6 +104,23 @@ export class TabuladorComponent {
       }  
     }
   }
+
+  onTipoChange(){
+    console.log(this.tipoPrestamo);
+    if(this.tipoPrestamo=="tradicional"){
+      this.tasaSeleccionada = this.tasasTradicional;
+    }
+    else if(this.tipoPrestamo=="blindaje"){
+      this.tasaSeleccionada = this.tasasBlindage;
+    }
+  }
+
+  onPlazoChange(){
+    this.interes = this.listaPlazo.interes;
+    this.plazo = this.listaPlazo.dia;
+  }
+
+
 
   obtenerBuro() {
     console.log("Buro");
@@ -156,6 +182,18 @@ export class TabuladorComponent {
         console.error('Error al obtener el cliente de la busqueda:', error);
       }
     );
+  }
+
+  calcularNuevosMontos(){
+    let total=0;
+    let pagoDia = 0;
+
+    total = Math.round((this.prestado * this.interes)/100)+this.prestado;
+    pagoDia = Math.round(total/this.plazo);
+
+    this.apagar = total;
+    this.pagoDiario = pagoDia;
+
   }
 
   calcularMontos(){

@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { NgxImageCompressService } from 'ngx-image-compress';
+import { InfoDialogComponent } from 'src/app/components/info-dialog/info-dialog.component';
 import { Clientes } from 'src/app/interfaces/clientes';
 import { Gestor } from 'src/app/interfaces/gestor';
 import { ClienteServiceService } from 'src/app/services/cliente-service.service';
@@ -37,6 +39,11 @@ export class AgregarClienteComponent {
   activo = false;
   lista2:any = [];
   listaDeInteres: any = [];
+
+  //barra de progeso
+  subiendoArchivo: boolean = false; // Controla la visibilidad de la barra de progreso
+  progreso: number = 0; // Valor de progreso para la barra
+  
   
   viviendas: any[] = [
     {value: 'Propia', viewValue: 'Propia'},
@@ -46,37 +53,24 @@ export class AgregarClienteComponent {
 
 
   constructor(private fb: FormBuilder, private gestorService: GestorServiceService, private sharedService: SharedService,
-              private clienteService: ClienteServiceService, 
+              private clienteService: ClienteServiceService,  private dialog: MatDialog,
               private imageCompress: NgxImageCompressService, private uploadService: UploadService)
               {
     this.form = this.fb.group({
       nombreSolicitante: ['',Validators.required],
-      edad: ['',Validators.required],
       direccion: ['',Validators.required],
       colonia: ['',Validators.required],
-      senasDomicilio: [''],
-      entreCalles: [''],
       ciudad: ['',Validators.required],
       celular: ['',Validators.required],
-      telefonoFijo: [''],
-      telefonoAdicional: [''],
       estadoCivil: ['',Validators.required],
-      tiempoCasados: ['',Validators.required],
-      dependientes: ['',Validators.required],
       tipoVivienda: ['',Validators.required],
       tiempoVivienda: [''],
       pagoRenta: [''],
-      tipoNegocio: ['',Validators.required],
       tiempoNegocio: [''],
       numeroINE: ['',Validators.required],
       RFC: ['',Validators.required],
       conyugue: ['',Validators.required],
-      trabajoConyugue: [''],
-      domicilioConyugue: [''],
-      antiguedadConyugue: [''],
       ingresoSolicitante: ['',Validators.required],
-      ingresosConyugue: [''],
-      gastos: ['',Validators.required],
       creditosActuales: [''],
       gestor: ['',Validators.required],
     })
@@ -108,32 +102,32 @@ export class AgregarClienteComponent {
     const cliente: Clientes = {
       numeroCliente: this.numeroDeClienteID,
       nombre: this.eliminarAcentos2(this.form.value.nombreSolicitante),
-      edad: this.form.value.edad,
+      edad: "desabilitado",
       direccion: this.form.value.direccion,
       colonia: this.form.value.colonia,
-      senasDomicilio: this.form.value.senasDomicilio,
-      entrecalles: this.form.value.entreCalles,
+      senasDomicilio: "desabilitado",
+      entrecalles:"desabilitado",
       ciudad: this.form.value.ciudad,
       celular: this.form.value.celular,
-      telefonoFijo: this.form.value.telefonoFijo,
-      telefonoAdicional: this.form.value.telefonoAdicional,
+      telefonoFijo: "desabilitado",
+      telefonoAdicional: "desabilitado",
       estadoCivil: this.form.value.estadoCivil,
-      tiempoCasados: this.form.value.tiempoCasados,
-      dependientes: this.form.value.dependientes,
+      tiempoCasados: "desabilitado",
+      dependientes: "desabilitado",
       tipoVivienda: this.form.value.tipoVivienda,
       tiempoViviendo: this.form.value.tiempoVivienda,
       pagoRenta: this.form.value.pagoRenta,
-      tipoNegocio: this.form.value.tipoNegocio,
+      tipoNegocio:"desabilitado",
       tiempoNegocio: this.form.value.tiempoNegocio,
       numeroIdentificacion: this.form.value.numeroINE,
       RFC: this.form.value.RFC,
       nombreConyugue: this.form.value.conyugue,
-      trabajoConyugue: this.form.value.trabajoConyugue,
-      domicilioConyugue: this.form.value.domicilioConyugue,
-      antiguedadConyugue: this.form.value.antiguedadConyugue,
+      trabajoConyugue: "desabilitado",
+      domicilioConyugue: "desabilitado",
+      antiguedadConyugue: "desabilitado",
       ingresoSolicitante: this.form.value.ingresoSolicitante,
-      ingresoConyugue: this.form.value.ingresosConyugue,
-      gastosTotales: this.form.value.gastos,
+      ingresoConyugue: 0,
+      gastosTotales: 0,
       gestorAsignado: this.form.value.gestor,
       fotoComprobante: "URL",
       fotoFachada: "URL",
@@ -160,6 +154,7 @@ export class AgregarClienteComponent {
     },
     (error) => {
       console.error('Error al registrar cliente:', error);
+      this.openDialog("Lo sentimos ocurrio un problema y no se pudo registrar", "assets/img/exito.png");
     });
   }
 
@@ -197,20 +192,38 @@ export class AgregarClienteComponent {
     reader.readAsDataURL(file);
   }
 
-  subirArchivo(file: File, tipo:any){
-    console.log("tipo en subir archivo "+tipo);
-    const nombreArchivo = this.numeroDeClienteID+'_'+tipo;
-    const _sucursalFinanciera = this.sharedService.getFinanciera()??'vacio';
+  openDialog(mensaje: string, imagen:string): void {
+    this.dialog.open(InfoDialogComponent, {
+      width: '300px',  // Ajusta el ancho según sea necesario
+      data: {
+        message: mensaje,
+        imageUrl: imagen  // Ruta de la imagen que quieres mostrar
+      },
+      disableClose: true // Deshabilita el cierre al hacer clic fuera del diálogo
+    });
+  }
+
+
+  subirArchivo(file: File, tipo: any) {
+    console.log("tipo en subir archivo " + tipo);
+    const nombreArchivo = this.numeroDeClienteID + '_' + tipo;
+    const _sucursalFinanciera = this.sharedService.getFinanciera() ?? 'vacio';
 
     if (file) {
-      this.uploadService.uploadUpdateFile(file,this.mongoIdCliente,'clientes',_sucursalFinanciera,'clientes',nombreArchivo,tipo).then((response) => {
-       // console.log('Archivo cargado con éxito ('+tipo+'):', response);
+      this.subiendoArchivo = true; // Mostrar la barra de progreso
+      this.progreso = 0; // Reiniciar el progreso
+
+      this.uploadService.uploadUpdateFile2(file, this.mongoIdCliente, 'clientes', _sucursalFinanciera, 'clientes', nombreArchivo, tipo, (progress: number) => {
+        this.progreso = progress;  // Actualizar el progreso
+      }).then((response) => {
         console.log("Documento subido");
         console.log(response);
-       // Realiza acciones adicionales después de la carga exitosa
-       alert("Se subio el archivo correctamente");
+        this.subiendoArchivo = false; // Ocultar la barra de progreso
+        this.openDialog("La imagen se subio exitosamente", "assets/img/exito.png");
       }).catch((error) => {
         console.error('Error al cargar el archivo:', error);
+        this.subiendoArchivo = false; // Ocultar la barra de progreso
+        this.openDialog("No se pudo subir la imagen", "assets/img/error.png");
       });
     }
   }

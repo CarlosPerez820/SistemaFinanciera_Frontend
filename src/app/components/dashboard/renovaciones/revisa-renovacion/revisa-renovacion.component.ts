@@ -14,6 +14,9 @@ import { Clientes } from 'src/app/interfaces/clientes';
 import { ParametroServiceService } from 'src/app/services/parametro-service.service';
 import { HttpClient } from '@angular/common/http';
 import { saveAs } from 'file-saver';
+import { environment } from 'src/environments/environment';
+
+const url_server = environment.url+"/";
 
 //Obtener datos de fecha y hora
 var today = new Date();
@@ -29,6 +32,9 @@ var fechaDia = `${day}-${month}-${year}`;
 
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+import { InfoDialogComponent } from 'src/app/components/info-dialog/info-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+import { TasasService } from 'src/app/services/tasas.service';
 
 (<any>pdfMake).vfs = pdfFonts.pdfMake.vfs;
 
@@ -66,45 +72,46 @@ export class RevisaRenovacionComponent {
     {value: 'Familiar', viewValue: 'Familiar'},
   ];
 
+  //------------------------Nuevo calculo de montos y tasas
+  tasasTradicional: any[] = [];
+  tasasBlindage: any[] = [];
+  tasaSeleccionada: any = [];
+  prestamos: any = [];
+  interes: any;
+  tipoPrestamo: any;
+  listaPlazo: any;
+
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private gestorService: GestorServiceService,
               private solicitudService: SolicitudServiceService, private sharedService: SharedService,
               private interesService: InteresServiceService, private router: Router, private prestamoService: PrestamoServiceService,
               private clienteService: ClienteServiceService, private parametroService: ParametroServiceService,
+              private dialog: MatDialog, private tasasService: TasasService,
               private http: HttpClient){
     this.form = this.fb.group({
-      numeroCliente: ['',Validators.required],
-      fecha: ['',Validators.required],
+
+       numeroCliente: ['',Validators.required],
+      fecha: [this.fecha_Solicitud,Validators.required],
       montoSolicitado: ['',Validators.required],
       montoAutorizado: ['',Validators.required],
       totalPagar: ['',Validators.required],
       pagoDiario: ['',Validators.required],
       plazo: ['',Validators.required],
+
       nombreSolicitante: ['',Validators.required],
-      edad: ['',Validators.required],
       direccion: ['',Validators.required],
       colonia: ['',Validators.required],
-      senasDomicilio: ['',Validators.required],
       ciudad: ['',Validators.required],
       celular: ['',Validators.required],
-      telefonoFijo: ['',Validators.required],
-      telefonoAdicional: ['',Validators.required],
       estadoCivil: ['',Validators.required],
-      tiempoCasados: ['',Validators.required],
-      dependientes: ['',Validators.required],
       tipoVivienda: ['',Validators.required],
-      tiempoVivienda: ['',Validators.required],
-      pagoRenta: ['',Validators.required],
-      tipoNegocio: ['',Validators.required],
-      tiempoNegocio: ['',Validators.required],
+      tiempoVivienda: [''],
+      pagoRenta: [''],
+      tiempoNegocio: [''],
       numeroINE: ['',Validators.required],
       RFC: ['',Validators.required],
       conyugue: ['',Validators.required],
-      trabajoConyugue: ['',Validators.required],
-      domicilioConyugue: ['',Validators.required],
-      antiguedadConyugue: ['',Validators.required],
       ingresoSolicitante: ['',Validators.required],
-      ingresosConyugue: ['',Validators.required],
-      gastos: ['',Validators.required],
+      creditosActuales: [''],
       motivos: ['',Validators.required],
       gestor: ['',Validators.required],
       tipoPrestamo: ['', Validators.required],
@@ -118,12 +125,14 @@ export class RevisaRenovacionComponent {
     this.obtenerSolicitud();
     this.obtenerListaDeInteres();
     this.obtenerParametos();
+    this.tasasTradicional = this.tasasService.getTasasTradicional();
+    this.tasasBlindage = this.tasasService.getTasasBlindage();
+    this.prestamos = this.tasasService.getTipoPrestamos();
   }
 
   obtenerParametos(){
     this.parametroService.getParametrosFinanciera(this.sharedService.getFinanciera()).subscribe(
       (data) => {
-        //console.log(data);
         this.lista5 = data;
         this.listaParametros = this.lista5.parametros;
         console.log(this.listaParametros);
@@ -167,7 +176,15 @@ export class RevisaRenovacionComponent {
   }
 
   llenarFormulario(){
-    console.log(this.SolicitudEspecifica.nombre);
+    console.log(this.SolicitudEspecifica.plazo);
+
+    if(this.SolicitudEspecifica.tipoPrestamo=="tradicional"){
+      this.tasaSeleccionada = this.tasasTradicional;
+    }
+    else if(this.SolicitudEspecifica.tipoPrestamo=="blindaje"){
+      this.tasaSeleccionada = this.tasasBlindage;
+    }
+
     this.form.patchValue({
       plazo: this.SolicitudEspecifica.plazo,
       fecha : this.SolicitudEspecifica.fechaSolicitud,
@@ -233,6 +250,37 @@ export class RevisaRenovacionComponent {
     }
   }
 
+  
+  onTipoChange(){
+    if(this.tipoPrestamo=="tradicional"){
+      this.tasaSeleccionada = this.tasasTradicional;
+    }
+    else if(this.tipoPrestamo=="blindaje"){
+      this.tasaSeleccionada = this.tasasBlindage;
+    }
+  }
+
+  onPlazoChange(){
+    this.interes = this.listaPlazo.interes;
+  }
+
+
+  calcularMontosNuevo(){
+    let total=0;
+    let pagoDia = 0;
+    let plazoNumber = this.form.value.plazo;
+    let montoNumber =this.form.value.montoAutorizado;
+
+    //console.log(plazoNumber);
+
+    total = Math.round((montoNumber * this.interes)/100)+montoNumber;
+    pagoDia = Math.round(total/plazoNumber.dia);
+
+    this.form.get('totalPagar')?.setValue(total);
+    this.form.get('pagoDiario')?.setValue(pagoDia);
+  }
+
+
   calcularMontos(){
     let plazoNumber = this.form.value.plazo;
     let montoNumber =this.form.value.montoSolicitado;
@@ -282,8 +330,7 @@ export class RevisaRenovacionComponent {
 
   EnviarDatos(){ 
     this.GenerarPrestamo();
-    this.EditarSolicitud();
-    this.actualizarDatosCliente();
+
   }
 
   actualizarDatosCliente(){
@@ -291,7 +338,7 @@ export class RevisaRenovacionComponent {
     const cliente: Clientes={
       prestamosActivos:true,
       numeroPrestamos:this.listaClientes[0].numeroPrestamos+1,
-      numeroActivos:+1
+      numeroActivos:this.listaClientes[0].numeroActivos+1
     }
 
     this.clienteService.PutClienteFinanciera(this.listaClientes[0]._id, cliente).subscribe(data => {
@@ -305,54 +352,78 @@ export class RevisaRenovacionComponent {
     })
   }
 
-  GenerarPrestamo(){
+  GenerarPrestamo() {
+    try {
+      let folioPrestamo = "PR" + this.eliminarAcentos2(this.form.value.nombreSolicitante).substring(0, 2) + year + month + day + hour + minutes + segundes;
+      
+      let valorDeMora = this.listaParametros[0].montoMora;
 
-    let folioPrestamo ="PR"+ this.eliminarAcentos2(this.form.value.nombreSolicitante).substring(0, 2)+year+month+day+hour+minutes+segundes;
-    let valorDeMora = this.listaParametros[0].montoMora;
-    if(this.form.value.tipoPrestamo=='Semanal')
-    {
-      valorDeMora = this.listaParametros[0].MoraSemanal;
-    }
-
-    const prestamo: Prestamo={
-      fecha: this.fecha_Solicitud,
-      folio: folioPrestamo,
-      nombre: this.eliminarAcentos2(this.form.value.nombreSolicitante),
-      tipoPrestamo: this.form.value.tipoPrestamo,
-      direccion: this.form.value.direccion,
-      colonia: this.form.value.colonia,
-      telefono: this.form.value.celular,
-      cobranza: valorDeMora,
-      cantidadPrestamo: this.form.value.montoAutorizado,
-      cantidadPagar: this.form.value.totalPagar,
-      plazoPrestamo: this.form.value.plazo,
-      totalRestante: this.form.value.totalPagar,
-      pagoDiario: this.form.value.pagoDiario,
-      fechaPago: 'xxxx',
-      proximoPago: 'xx-xx-xxxx',
-      gestor: this.form.value.gestor,
-      tipoUltiPago: 'Sin tipo',
-      estatus: 'Pendiente',
-      nota: 'Sin Nota',
-      numeroCliente: this.form.value.numeroCliente,
-      urlDinero: 'URL',
-      urlPagare: 'URL',
-      urlFachada: 'URL',
-      sucursal: this.sharedService.getFinanciera(),
-    }
-
-    console.log(prestamo);
-
-    this.prestamoService.guardarPrestamo(prestamo).subscribe(response => {
-
-      if(response){
-        console.log("Registro de prestamo exitoso");
-        console.log(response);
-        alert("Prestamo Generado");
-        //this.router.navigate(['dashboard/clientes']);
+      if (this.form.value.tipoPrestamo == 'Semanal') {
+        valorDeMora = this.listaParametros[0].MoraSemanal;
       }
-    }, error => {
-      console.log(error); 
+  
+      const prestamo: Prestamo = {
+        fecha: this.fecha_Solicitud,
+        folio: folioPrestamo,
+        nombre: this.eliminarAcentos2(this.form.value.nombreSolicitante),
+        tipoPrestamo: this.form.value.tipoPrestamo,
+        direccion: this.form.value.direccion,
+        colonia: this.form.value.colonia,
+        telefono: this.form.value.celular,
+        cobranza: valorDeMora,
+        cantidadPrestamo: this.form.value.montoAutorizado,
+        cantidadPagar: this.form.value.totalPagar,
+        plazoPrestamo: this.form.value.plazo.dia,
+        totalRestante: this.form.value.totalPagar,
+        pagoDiario: this.form.value.pagoDiario,
+        fechaPago: 'xxxx',
+        proximoPago: 'xx-xx-xxxx',
+        gestor: this.form.value.gestor,
+        tipoUltiPago: 'Sin tipo',
+        estatus: 'Pendiente',
+        nota: 'Sin Nota',
+        numeroCliente: this.form.value.numeroCliente,
+        urlDinero: 'URL',
+        urlPagare: 'URL',
+        urlFachada: 'URL',
+        sucursal: this.sharedService.getFinanciera(),
+      };
+  
+      console.log(prestamo);
+  
+      this.prestamoService.guardarPrestamo(prestamo).subscribe(
+        (response) => {
+          if (response) {
+            console.log(response);
+
+            this.EditarSolicitud();
+            this.actualizarDatosCliente();
+  
+            console.log("Registro de prestamo exitoso");
+            this.openDialog("El Prestamo se genero exitosamente", "assets/img/exito.png");
+            //this.router.navigate(['dashboard/clientes']);
+          }
+        },
+        (error) => {
+          this.openDialog("El Prestamo no se pudo generar", "assets/img/error.png");
+          console.log(error);
+        }
+      );
+    } catch (error) {
+      console.error("Ocurrió un error al generar el préstamo:", error);
+      this.openDialog("Ocurrió un error inesperado."+error, "assets/img/error.png");
+    }
+  }
+  
+
+  openDialog(mensaje: string, imagen:string): void {
+    this.dialog.open(InfoDialogComponent, {
+      width: '300px',  // Ajusta el ancho según sea necesario
+      data: {
+        message: mensaje,
+        imageUrl: imagen  // Ruta de la imagen que quieres mostrar
+      },
+      disableClose: true // Deshabilita el cierre al hacer clic fuera del diálogo
     });
   }
 
@@ -362,33 +433,21 @@ export class RevisaRenovacionComponent {
       montoAutorizado: this.form.value.montoAutorizado,
       totalPagar: this.form.value.totalPagar,
       pagoDiario: this.form.value.pagoDiario,
-      plazo: this.form.value.plazo,
+      plazo: this.form.value.plazo.dia,
       nombre: this.eliminarAcentos2(this.form.value.nombreSolicitante),
-      edad: this.form.value.edad,
       direccion: this.form.value.direccion,
       colonia: this.form.value.colonia,
-      senasDomicilio: this.form.value.senasDomicilio,
       ciudad: this.form.value.ciudad,
       celular: this.form.value.celular,
-      telefonoFijo: this.form.value.telefonoFijo,
-      telefonoAdicional: this.form.value.telefonoAdicional,
       estadoCivil: this.form.value.estadoCivil,
-      tiempoCasados: this.form.value.tiempoCasados,
-      dependientes: this.form.value.dependientes,
       tipoVivienda: this.form.value.tipoVivienda,
       tiempoViviendo: this.form.value.tiempoVivienda,
       pagoRenta: this.form.value.pagoRenta,
-      tipoNegocio: this.form.value.tipoNegocio,
       tiempoNegocio: this.form.value.tiempoNegocio,
       numeroIdentificacion: this.form.value.numeroINE,
       RFC: this.form.value.RFC,
       nombreConyugue: this.form.value.conyugue,
-      trabajoConyugue: this.form.value.trabajoConyugue,
-      domicilioConyugue: this.form.value.domicilioConyugue,
-      antiguedadConyugue: this.form.value.antiguedadConyugue,
       ingresoSolicitante: this.form.value.ingresoSolicitante,
-      ingresoConyugue: this.form.value.ingresosConyugue,
-      gastosTotales: this.form.value.gastos,
       gestorAsignado: this.form.value.gestor,
       infoCredito: this.form.value.motivos,
       estatus: "Finalizada",
@@ -419,12 +478,13 @@ export class RevisaRenovacionComponent {
       if(data){
         console.log(data);
         //alert("Solicitud Actualizado");
-        alert("Solicitud Rechazada");
+        this.openDialog("La Solicitud fue rechada", "assets/img/info.png");
         this.router.navigate(['dashboard/clientes']);
       }
     }, (error: any) => {
       console.log(error);
-      alert("Problemas al actualizar, intente mas tarde");
+    //  alert("Problemas al actualizar, intente mas tarde");
+      this.openDialog("Problemas al actualizar, intente mas tarde", "assets/img/error.png");
     })
   }
 
@@ -439,10 +499,14 @@ export class RevisaRenovacionComponent {
   //Generar EL archivo PDF
   generarPDF() {
 
-    console.log(this.listaParametros[0].urlLogo);
+    if(this.listaParametros.length==0){
+      this.openDialog("Es necesario subir primero su logo para generar un PDF", "assets/img/error.png");
+    }
+
+    console.log(this.listaParametros);
     let objetoSolicitud = this.SolicitudEspecifica;
   
-    this.imageURL= 'https://node-restserver-financiera-production.up.railway.app/'+ this.listaParametros[0].urlLogo;
+    this.imageURL= url_server+ this.listaParametros[0].urlLogo;
 
     console.log(this.imageURL);
         // Realizar la solicitud HTTP para obtener la imagen
@@ -469,7 +533,7 @@ export class RevisaRenovacionComponent {
                     opacity: 0.3, // Establece la opacidad (0 a 1)
                   },
                   {
-                    text: 'Información del Prestamo'+'\n',
+                    text: '\n'+'Información del Prestamo'+'\n',
                     style: 'header',
                     bold: true,
                   },
@@ -500,45 +564,46 @@ export class RevisaRenovacionComponent {
                   {
                     style: 'tableExample',
                     table: {
-                      widths: ['*', 'auto'],
+                      widths: ['*'],
                       body: [
-                        ['Numero de cliente: '+objetoSolicitud.numeroCliente, 'Edad:'+objetoSolicitud.edad+' años'],
-                        ['Dirección: '+objetoSolicitud.direccion, 'Colonia:'+objetoSolicitud.colonia],
-                        ['Señas de Domicilio: '+objetoSolicitud.senasDomicilio, 'Ciudad:'+objetoSolicitud.ciudad],
+                        ['Numero de cliente: '+objetoSolicitud.numeroCliente],
+                        ['Dirección: '+objetoSolicitud.direccion],
+                        ['Colonia:'+objetoSolicitud.colonia],
+                        ['Ciudad:'+objetoSolicitud.ciudad],
                       ]
                     }
                   },
                   {
                     style: 'tableExample',
                     table: {
-                      widths: ['*', '*','*'],
+                      widths: ['*'],
                       body: [
-                        ['Celular:'+objetoSolicitud.celular, 'Telefono Fijo:'+objetoSolicitud.telefonoFijo, 'Numero Adicional:'+objetoSolicitud.telefonoAdicional]                      
+                        ['Celular:'+objetoSolicitud.celular]                      
                       ]
                     }
                   },
                   {
                     style: 'tableExample',
                     table: {
-                      widths: ['*', 'auto'],
+                      widths: ['*'],
                       body: [
-                        ['Estado Civil: '+objetoSolicitud.estadoCivil, 'Tiempo de casados: '+objetoSolicitud.tiempoCasados],
-                        ['Personas dependientes: '+objetoSolicitud.dependientes, 'Tipo de vivienda:'+objetoSolicitud.tipoVivienda],
-                        ['Tiempo viviendo en su domicilio: '+objetoSolicitud.tiempoViviendo, 'Pago de renta:'+objetoSolicitud.pagoRenta],
-                        ['Tipo de negocio: '+objetoSolicitud.tipoNegocio, 'Tiempo del negocio: '+objetoSolicitud.tiempoNegocio],
-                        ['Numero de identificación: '+objetoSolicitud.numeroIdentificacion,'RFC: '+objetoSolicitud.RFC],
-                        ['Nombre del conyugue: '+objetoSolicitud.nombreConyugue, 'Trabajo del Conyugue: '+objetoSolicitud.trabajoConyugue],
-                        ['Domicilio del conyugue: '+objetoSolicitud.domicilioConyugue,'Tiempo con el conyugue:'+objetoSolicitud.antiguedadConyugue],
-                        ['Ingreso del Solicitante: $' + objetoSolicitud.ingresoSolicitante,'Ingreso del conyugue: $'+objetoSolicitud.ingresoConyugue],
-                        ['Gastos Totales: $'+objetoSolicitud.gastosTotales, 'Gestor Agisnado: '+objetoSolicitud.gestorAsignado],
-                        ['Se necesita el credito para: '+objetoSolicitud.infoCredito, ''],
+                        ['Estado Civil: '+objetoSolicitud.estadoCivil],
+                        ['Tipo de vivienda:'+objetoSolicitud.tipoVivienda],
+                        ['Tiempo viviendo en su domicilio: '+objetoSolicitud.tiempoViviendo], 
+                        ['Pago de renta:'+objetoSolicitud.pagoRenta],
+                        ['Tiempo del negocio: '+objetoSolicitud.tiempoNegocio],
+                        ['Numero de identificación: '+objetoSolicitud.numeroIdentificacion],
+                        ['RFC: '+objetoSolicitud.RFC],
+                        ['Nombre del conyugue: '+objetoSolicitud.nombreConyugue], 
+                        ['Ingreso del Solicitante: $' + objetoSolicitud.ingresoSolicitante],
+                        ['Se necesita el credito para: '+objetoSolicitud.infoCredito],
 
                         
                       ]
                     }
                   },
                   {
-                    text: '\n'+'\n',
+                    text:  '\n' + "Información de la Solicitud:",
                     style: 'header',
                     bold: true,
                   },
@@ -548,14 +613,26 @@ export class RevisaRenovacionComponent {
                       widths: ['*', 'auto'],
                       body: [
                         ['Estado: '+objetoSolicitud.estatus, 'Tipo de Solicitud: '+objetoSolicitud.tipo],
+                        ['Gestor Agisnado: '+objetoSolicitud.gestorAsignado, ''],
+
                       ]
                     }
+                  },
+                  {
+                    text: '\n'+'\n'+'\n'+'\n'+'\n'+'\n'+ "Este documento es una solicitud de préstamo. La aprobación del mismo está sujeta a la evaluación crediticia y políticas de ."+objetoSolicitud.sucursal + "."+
+                        "El solicitante declara que toda la información proporcionada es veraz y que ha leído y comprendido los términos y condiciones del préstamo.",
+                    style:'pie',
+                    
                   },
                 ],
                 styles: {
                   header: {
                     fontSize: 18,
                     bold: true,
+                  },
+                  pie:{
+                    fontSize: 10
+                    
                   }
                 }
               };

@@ -10,7 +10,6 @@
     <mat-card style="margin-top: 10px;">
 
       <form [formGroup]="form" (ngSubmit)="registrarGestor()">
-
           <mat-grid-list  cols="2" rowHeight="70px">
 
               <mat-grid-tile [colspan]="2" [rowspan]="1">
@@ -37,13 +36,16 @@
                       <input matInput autocomplete="off" formControlName="password">
                   </mat-form-field>
               </mat-grid-tile>
+              
+              <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <h3>Datos del Gestor</h3>
+            </mat-grid-tile>
 
             </mat-grid-list>
 
             <h2 style="text-align: right;">
               <button type="submit" *ngIf="guardarActivo" mat-raised-button color="primary" [disabled]="form.invalid">Agregar</button>
             </h2>
-
       </form>
     </mat-card>
 
@@ -53,13 +55,11 @@
     </h2>
     <br>
     
-    <mat-toolbar>
-      <span>Administracion de gestores</span>
-      <div class="example-spacer"></div>
-    </mat-toolbar>
 
     <div>
     
+      <h2>Usuarios Registrados</h2>
+
       <div class="mat-elevation-z8">
         <table mat-table [dataSource]="dataSource" matSort>
         

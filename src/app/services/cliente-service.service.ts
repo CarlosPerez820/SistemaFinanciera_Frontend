@@ -49,7 +49,6 @@ export class ClienteServiceService {
   
     //Post Cliente Funciona
     guardarCliente(cliente: Clientes): Observable<ApiResponse> {
-  
       return this.http.post<ApiResponse>(`${ApiURL}/clientes/`, cliente);
     }
 

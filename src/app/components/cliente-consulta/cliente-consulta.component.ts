@@ -6,7 +6,9 @@ import { ActivatedRoute } from '@angular/router';
 import { ClienteServiceService } from 'src/app/services/cliente-service.service';
 import { PrestamoServiceService } from 'src/app/services/prestamo-service.service';
 import { SharedService } from 'src/app/services/shared.service';
+import { environment } from 'src/environments/environment';
 
+const url_server = environment.url+"/";
 
 @Component({
   selector: 'app-cliente-consulta',
@@ -21,7 +23,6 @@ export class ClienteConsultaComponent {
   mongoIdCliente :any;
   lista2:any;
   listaPrestamos: any =[];
-  variableURL= 'https://node-restserver-financiera-production.up.railway.app/';
 
   currentSlideIndex = 0;
   currentImage: any;
@@ -38,13 +39,13 @@ export class ClienteConsultaComponent {
     setCurrentImage() {
       switch (this.currentSlideIndex) {
         case 0:
-          this.currentImage = this.variableURL+this.clienteEspecifico.fotoIneFrente;
+          this.currentImage = url_server+this.clienteEspecifico.fotoIneFrente;
           break;
         case 1:
-          this.currentImage = this.variableURL+this.clienteEspecifico.fotoIneReverso;
+          this.currentImage = url_server+this.clienteEspecifico.fotoIneReverso;
           break;
         case 2:
-          this.currentImage = this.variableURL+this.clienteEspecifico.fotoComprobante;
+          this.currentImage = url_server+this.clienteEspecifico.fotoComprobante;
           break;
         default:
           this.currentImage = '';

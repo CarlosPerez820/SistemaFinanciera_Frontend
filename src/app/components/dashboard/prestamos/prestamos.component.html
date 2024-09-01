@@ -36,7 +36,7 @@
       
         <!-- Name Column -->
         <ng-container matColumnDef="cantidadPagar">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> cantidad a Pagar </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> A Pagar </th>
           <td mat-cell *matCellDef="let element"> ${{element.cantidadPagar}} </td>
         </ng-container>
       
@@ -54,11 +54,6 @@
         <ng-container matColumnDef="tipo">
           <th mat-header-cell *matHeaderCellDef> Movimiento </th>
           <td mat-cell *matCellDef="let element"> {{element.tipoUltiPago}} </td>
-        </ng-container>
-
-        <ng-container matColumnDef="proximo">
-          <th mat-header-cell *matHeaderCellDef> Proximo Pago </th>
-          <td mat-cell *matCellDef="let element"> {{element.proximoPago}} </td>
         </ng-container>
 
         <!-- Symbol Column -->
@@ -106,8 +101,8 @@
 
         <!-- Name Column -->
         <ng-container matColumnDef="comienzo">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Inicio </th>
-          <td mat-cell *matCellDef="let element"> {{element.fecha}} </td>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Colonia </th>
+          <td mat-cell *matCellDef="let element"> {{element.colonia}} </td>
         </ng-container>
         
         <!-- Name Column -->
@@ -118,7 +113,7 @@
 
         <!-- Name Column -->
         <ng-container matColumnDef="cantidadPagar">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> cantidad a Pagar </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>A Pagar </th>
           <td mat-cell *matCellDef="let element"> ${{element.cantidadPagar}} </td>
         </ng-container>
       

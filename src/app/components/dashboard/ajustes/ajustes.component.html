@@ -35,34 +35,17 @@
                
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
                     <mat-form-field class="ancho">
-                        <mat-label>Mora para Prestamo Semanal</mat-label>
+                        <mat-label>Mora tipo Blindaje</mat-label>
                         <input type="Number" matInput autocomplete="off" formControlName="moraSemanal">
                     </mat-form-field>
                 </mat-grid-tile>
 
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
                     <mat-form-field class="ancho">
-                        <mat-label>Monto Correpondiente a mora diaria</mat-label>
+                        <mat-label>Mora para prestamo Tradicional</mat-label>
                         <input type="Number" matInput autocomplete="off" formControlName="mora">
                     </mat-form-field>
                 </mat-grid-tile>
-
-                <!--
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
-                    <mat-form-field class="ancho">
-                        <mat-label>Hora Limite</mat-label>
-                        <input matInput autocomplete="off" formControlName="hora" placeholder="19:30">
-                    </mat-form-field>
-                </mat-grid-tile>
-
-                
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
-                    <mat-form-field class="ancho">
-                        <mat-label>Tipo de cobro (diario, semanal)</mat-label>
-                        <input matInput autocomplete="off">
-                    </mat-form-field>
-                </mat-grid-tile>
-                -->
 
                 <mat-grid-tile [colspan]="1" [rowspan]="1">
                 </mat-grid-tile>
@@ -70,7 +53,10 @@
                     <button type="submit" mat-raised-button class="ancho" color="primary" [disabled]="form2.invalid">Aplicar</button>
                 </mat-grid-tile>
             </form>
+        </mat-grid-list>
 
+<!--
+        <mat-grid-list cols="2" rowHeight="70px">
                 <br>
                 <br>
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
@@ -134,25 +120,21 @@
         <div class="mat-elevation-z8">
             <table mat-table [dataSource]="dataSource" matSort>
             
-              <!-- Position Column -->
               <ng-container matColumnDef="inferior">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Limite Inferior </th>
                 <td mat-cell *matCellDef="let element"> ${{element.limiteInferior}} </td>
               </ng-container>
             
-              <!-- Name Column -->
               <ng-container matColumnDef="superior">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Limite Superior </th>
                 <td mat-cell *matCellDef="let element"> ${{element.limiteSuperior}} </td>
               </ng-container>
                           
-              <!-- Name Column -->
               <ng-container matColumnDef="porcentaje">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Porcentaje </th>
                 <td mat-cell *matCellDef="let element"> {{element.porcentaje}}% </td>
               </ng-container>
           
-              <!-- Symbol Column -->
               <ng-container matColumnDef="acciones">
                 <th mat-header-cell *matHeaderCellDef>  </th>
                 <td mat-cell *matCellDef="let element" style="text-align: right;"> 
@@ -176,30 +158,26 @@
                 <br>
                 <h2>Tasas de interes para Prestamo por Semana</h2>
             </div>
-
-        
+-->
+        <!--
         <div class="mat-elevation-z8">
             <table mat-table [dataSource]="dataSource2" matSort>
             
-              <!-- Position Column -->
               <ng-container matColumnDef="inferior">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Limite Inferior </th>
                 <td mat-cell *matCellDef="let element"> ${{element.limiteInferior}} </td>
               </ng-container>
             
-              <!-- Name Column -->
               <ng-container matColumnDef="superior">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Limite Superior </th>
                 <td mat-cell *matCellDef="let element"> ${{element.limiteSuperior}} </td>
               </ng-container>
                           
-              <!-- Name Column -->
               <ng-container matColumnDef="porcentaje">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Porcentaje </th>
                 <td mat-cell *matCellDef="let element"> {{element.porcentaje}}% </td>
               </ng-container>
           
-              <!-- Symbol Column -->
               <ng-container matColumnDef="acciones">
                 <th mat-header-cell *matHeaderCellDef>  </th>
                 <td mat-cell *matCellDef="let element" style="text-align: right;"> 
@@ -217,6 +195,7 @@
                 }"></tr>
             </table>
         </div>
+        -->
 
     </mat-card>
 

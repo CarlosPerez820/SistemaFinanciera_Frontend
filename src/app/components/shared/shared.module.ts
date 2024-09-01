@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 
 //Componentes
 import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 
 // Material
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
@@ -31,9 +32,9 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatRadioGroup } from '@angular/material/radio';
 //import {MatFileUploadModule} from '@angular/material/select';
-import { FormsModule } from '@angular/forms';
 import {MatListModule} from '@angular/material/list';
 import {MatChipsModule} from '@angular/material/chips';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 
 
@@ -69,7 +70,8 @@ import {MatChipsModule} from '@angular/material/chips';
     MatRadioModule,
     FormsModule,
     MatListModule,
-    MatChipsModule
+    MatChipsModule,
+    MatProgressBarModule
 //    MatRadioGroup
   ],
   exports:[
@@ -101,7 +103,8 @@ import {MatChipsModule} from '@angular/material/chips';
     MatRadioGroup,
     FormsModule,
     MatListModule,
-    MatChipsModule
+    MatChipsModule,
+    MatProgressBarModule
   ]
 })
 export class SharedModule {
