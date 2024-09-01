@@ -1,0 +1,8 @@
+<div mat-dialog-content class="dialog-content">
+  <h2>{{ data.message }}</h2>
+    <img [src]="data.imageUrl" alt="Imagen informativa" class="dialog-image">
+  </div>
+  <div mat-dialog-actions class="dialog-actions">
+    <button mat-button color="primary" (click)="onClose()">Aceptar</button>
+  </div>
+  

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+//importaciones de librerias necesarias
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router'
@@ -12,6 +13,7 @@ import { UsuarioServiceService } from 'src/app/services/usuario-service.service'
   styleUrls: ['./registro-user.component.css']
 })
 export class RegistroUserComponent {
+  //variable formGroup
   form: FormGroup;
   errorMessage: any;
   //loading = false;
@@ -41,15 +43,9 @@ export class RegistroUserComponent {
   }
 
   registrar(){
-    //console.log(this.form);
-    const nombre = this.form.value.nombre;
-    const correo = this.form.value.correo;
+    console.log(this.form);
+    const correo = this.form.value.correo.toLowerCase();
     const pass = this.form.value.password;
-    const sucursal = this.form.value.sucursal;
-
-    const telef = this.form.value.telefono;
-    const membre = this.form.value.membresia;
-    //console.log(nombre + "-"+ correo+"-"+pass+"-"+sucursal);
 
     // Expresión regular para verificar si es una dirección de correo electrónico válida
     const regexCorreo = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
@@ -70,14 +66,15 @@ export class RegistroUserComponent {
   registrarUsuario(){
     const user: Usuario = {
       nombre: this.form.value.nombre,
-      correo: this.form.value.correo,
+      correo: this.form.value.correo.toLowerCase(),
       telefono:this.form.value.telefono,
       password: this.form.value.password,
       rol: "SUCURSAL_ROLE",
-      sucursal: this.form.value.sucursal,
+      sucursal: this.form.value.sucursal.toLowerCase(),
       membresia: this.form.value.membresia,
     }
 
+    console.log(user);
 
     this.usuarioService.guardarCliente(user).pipe(
       catchError((error) => {

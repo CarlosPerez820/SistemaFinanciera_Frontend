@@ -16,6 +16,9 @@ import { RenovacionClienteComponent } from './components/cliente-consulta/renova
 import { InfoPrestamoClienteComponent } from './components/info-prestamo-cliente/info-prestamo-cliente.component';
 import { DialogBodyComponent } from './components/dialog-body/dialog-body.component';
 
+import {MatButtonModule} from '@angular/material/button';
+import { InfoDialogComponent } from './components/info-dialog/info-dialog.component';
+
 
 @NgModule({
   declarations: [
@@ -26,6 +29,7 @@ import { DialogBodyComponent } from './components/dialog-body/dialog-body.compon
     RenovacionClienteComponent,
     InfoPrestamoClienteComponent,
     DialogBodyComponent,
+    InfoDialogComponent,
     
   ],
   imports: [
@@ -33,7 +37,8 @@ import { DialogBodyComponent } from './components/dialog-body/dialog-body.compon
     AppRoutingModule,
     BrowserAnimationsModule,
     SharedModule,
-    HttpClientModule
+    HttpClientModule,
+    MatButtonModule
 
   ],
   providers: [],

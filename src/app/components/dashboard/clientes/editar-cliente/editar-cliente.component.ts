@@ -10,6 +10,7 @@ import { GestorServiceService } from 'src/app/services/gestor-service.service';
 import { SharedService } from 'src/app/services/shared.service';
 import { UploadService } from 'src/app/services/upload.service';
 import { ConfirmacionComponent } from '../../informe-rutas/confirmacion/confirmacion.component';
+import { InfoDialogComponent } from 'src/app/components/info-dialog/info-dialog.component';
 
 //Obtener datos de fecha y hora
 var today = new Date();
@@ -41,6 +42,10 @@ export class EditarClienteComponent {
   lista2:any = [];
   clienteEspecifico: any = [];
   
+  //barra de progeso
+  subiendoArchivo: boolean = false; // Controla la visibilidad de la barra de progreso
+  progreso: number = 0; // Valor de progreso para la barra
+
   viviendas: any[] = [
     {value: 'Propia', viewValue: 'Propia'},
     {value: 'Rentada', viewValue: 'Rentada'},
@@ -49,39 +54,26 @@ export class EditarClienteComponent {
 
 
   constructor(private fb: FormBuilder, private gestorService: GestorServiceService, private sharedService: SharedService,
-              private clienteService: ClienteServiceService, private route: ActivatedRoute,
+              private clienteService: ClienteServiceService, private route: ActivatedRoute, private dialog: MatDialog,
               private imageCompress: NgxImageCompressService, private uploadService: UploadService,
               private matDialog: MatDialog,  private router: Router)
               {
     this.form = this.fb.group({
       numeroCliente: ['',Validators.required],
       nombreSolicitante: ['',Validators.required],
-      edad: ['',Validators.required],
       direccion: ['',Validators.required],
       colonia: ['',Validators.required],
-      senasDomicilio: [''],
-      entreCalles: [''],
       ciudad: ['',Validators.required],
       celular: ['',Validators.required],
-      telefonoFijo: [''],
-      telefonoAdicional: [''],
       estadoCivil: ['',Validators.required],
-      tiempoCasados: ['',Validators.required],
-      dependientes: ['',Validators.required],
       tipoVivienda: ['',Validators.required],
       tiempoVivienda: [''],
       pagoRenta: [''],
-      tipoNegocio: ['',Validators.required],
       tiempoNegocio: [''],
       numeroINE: ['',Validators.required],
       RFC: ['',Validators.required],
       conyugue: ['',Validators.required],
-      trabajoConyugue: [''],
-      domicilioConyugue: [''],
-      antiguedadConyugue: [''],
       ingresoSolicitante: ['',Validators.required],
-      ingresosConyugue: [''],
-      gastos: ['',Validators.required],
       creditosActuales: [''],
       gestor: ['',Validators.required],
     })
@@ -120,31 +112,19 @@ export class EditarClienteComponent {
     this.form.patchValue({
       numeroCliente: this.clienteEspecifico.numeroCliente,
       nombreSolicitante: this.clienteEspecifico.nombre,
-      edad: this.clienteEspecifico.edad,
       direccion:  this.clienteEspecifico.direccion,
       colonia:  this.clienteEspecifico.colonia,
-      senasDomicilio:  this.clienteEspecifico.senasDomicilio,
       ciudad:  this.clienteEspecifico.ciudad,
       celular:  this.clienteEspecifico.celular,
-      telefonoFijo:  this.clienteEspecifico.telefonoFijo,
-      telefonoAdicional:  this.clienteEspecifico.telefonoAdicional,
       estadoCivil:  this.clienteEspecifico.estadoCivil,
-      tiempoCasados:  this.clienteEspecifico.tiempoCasados,
-      dependientes:  this.clienteEspecifico.dependientes,
       tipoVivienda:  this.clienteEspecifico.tipoVivienda,
       tiempoVivienda:  this.clienteEspecifico.tiempoViviendo,
       pagoRenta:  this.clienteEspecifico.pagoRenta,
-      tipoNegocio:  this.clienteEspecifico.tipoNegocio,
       tiempoNegocio:  this.clienteEspecifico.tiempoNegocio,
       numeroINE:  this.clienteEspecifico.numeroIdentificacion,
       RFC:  this.clienteEspecifico.RFC,
       conyugue:  this.clienteEspecifico.nombreConyugue,
-      trabajoConyugue:  this.clienteEspecifico.trabajoConyugue,
-      domicilioConyugue:  this.clienteEspecifico.domicilioConyugue,
-      antiguedadConyugue:  this.clienteEspecifico.antiguedadConyugue,
       ingresoSolicitante:  this.clienteEspecifico.ingresoSolicitante,
-      ingresosConyugue:  this.clienteEspecifico.ingresoConyugue,
-      gastos:  this.clienteEspecifico.gastosTotales,
       creditosActuales:  this.clienteEspecifico.numeroPrestamos,
       gestor:  this.clienteEspecifico.gestorAsignado
     });
@@ -159,31 +139,19 @@ export class EditarClienteComponent {
 
     const cliente: Clientes = {
       nombre: this.eliminarAcentos2(this.form.value.nombreSolicitante),
-      edad: this.form.value.edad,
       direccion: this.form.value.direccion,
       colonia: this.form.value.colonia,
-      senasDomicilio: this.form.value.senasDomicilio,
       ciudad: this.form.value.ciudad,
       celular: this.form.value.celular,
-      telefonoFijo: this.form.value.telefonoFijo,
-      telefonoAdicional: this.form.value.telefonoAdicional,
       estadoCivil: this.form.value.estadoCivil,
-      tiempoCasados: this.form.value.tiempoCasados,
-      dependientes: this.form.value.dependientes,
       tipoVivienda: this.form.value.tipoVivienda,
       tiempoViviendo: this.form.value.tiempoVivienda,
       pagoRenta: this.form.value.pagoRenta,
-      tipoNegocio: this.form.value.tipoNegocio,
       tiempoNegocio: this.form.value.tiempoNegocio,
       numeroIdentificacion: this.form.value.numeroINE,
       RFC: this.form.value.RFC,
       nombreConyugue: this.form.value.conyugue,
-      trabajoConyugue: this.form.value.trabajoConyugue,
-      domicilioConyugue: this.form.value.domicilioConyugue,
-      antiguedadConyugue: this.form.value.antiguedadConyugue,
       ingresoSolicitante: this.form.value.ingresoSolicitante,
-      ingresoConyugue: this.form.value.ingresosConyugue,
-      gastosTotales: this.form.value.gastos,
       gestorAsignado: this.form.value.gestor,
     }
     console.log(cliente);
@@ -191,11 +159,11 @@ export class EditarClienteComponent {
     this.clienteService.PutClienteFinanciera(this.mongoIdCliente, cliente).subscribe(data => {
       if(data){
         console.log(data);
-        alert("Cliente Actualizado");
+        this.openDialogInfo("Se edito la información correctamente", "assets/img/exito.png");
       }
     }, (error: any) => {
       console.log(error);
-      alert("Problemas al actualizar, intente mas tarde");
+      this.openDialogInfo("Lo sentimos, hubo un error y no se actualizo la información", "assets/img/error.png");
     })
   }
 
@@ -233,25 +201,58 @@ export class EditarClienteComponent {
     reader.readAsDataURL(file);
   }
 
-  subirArchivo(file: File, tipo:any){
-    console.log("tipo en subir archivo "+this.numeroDeClienteID);
-    const nombreArchivo = this.mongoIdCliente+'_'+tipo;
-    const _sucursalFinanciera = this.sharedService.getFinanciera()??'vacio';
+  openDialogInfo(mensaje: string, imagen:string): void {
+    this.dialog.open(InfoDialogComponent, {
+      width: '300px',  // Ajusta el ancho según sea necesario
+      data: {
+        message: mensaje,
+        imageUrl: imagen  // Ruta de la imagen que quieres mostrar
+      },
+      disableClose: true // Deshabilita el cierre al hacer clic fuera del diálogo
+    });
+  }
+
+  openDialog(){
+    const dialogRef = this.matDialog.open(ConfirmacionComponent,{
+      data: { parametro_id: this.mongoIdCliente },
+      width:'250px',
+      disableClose: true 
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log("Si se ejecuto el despues de cerrar");
+      if (result === 'confirmar') {
+        console.log("Si devolvio el confirmar");
+        this.eliminarCliente(this.mongoIdCliente);
+        // Si se confirma la eliminación, vuelve a cargar la lista
+      }
+   
+    });
+  }
+
+  subirArchivo(file: File, tipo: any) {
+    console.log("tipo en subir archivo " + tipo);
+    const nombreArchivo = this.numeroDeClienteID + '_' + tipo;
+    const _sucursalFinanciera = this.sharedService.getFinanciera() ?? 'vacio';
 
     if (file) {
-      this.uploadService.uploadUpdateFile(file,this.mongoIdCliente,'clientes',_sucursalFinanciera,'clientes',nombreArchivo,tipo).then((response) => {
-       // console.log('Archivo cargado con éxito ('+tipo+'):', response);
+      this.subiendoArchivo = true; // Mostrar la barra de progreso
+      this.progreso = 0; // Reiniciar el progreso
+
+      this.uploadService.uploadUpdateFile2(file, this.mongoIdCliente, 'clientes', _sucursalFinanciera, 'clientes', nombreArchivo, tipo, (progress: number) => {
+        this.progreso = progress;  // Actualizar el progreso
+      }).then((response) => {
         console.log("Documento subido");
         console.log(response);
-       // Realiza acciones adicionales después de la carga exitosa
-       alert("Se subio el archivo correctamente");
+        this.subiendoArchivo = false; // Ocultar la barra de progreso
+        this.openDialogInfo("La imagen se subio exitosamente", "assets/img/exito.png");
       }).catch((error) => {
         console.error('Error al cargar el archivo:', error);
+        this.subiendoArchivo = false; // Ocultar la barra de progreso
+        this.openDialogInfo("No se pudo subir la imagen", "assets/img/error.png");
       });
     }
   }
-
-
 
   verificarCamposOpcionales(){
     // Verificar los campos opcionales y asignar valores por defecto si están vacíos
@@ -291,21 +292,7 @@ export class EditarClienteComponent {
   }
 
 
-  openDialog(){
-    const dialogRef = this.matDialog.open(ConfirmacionComponent,{
-      data: { parametro_id: this.mongoIdCliente },
-      width:'250px',
-    });
 
-    dialogRef.afterClosed().subscribe(result => {
-      console.log("Si se ejecuto el despues de cerrar");
-      if (result === 'confirmar') {
-        console.log("Si devolvio el confirmar");
-        this.eliminarCliente(this.mongoIdCliente);
-        // Si se confirma la eliminación, vuelve a cargar la lista
-      }
-    });
-  }
 
   eliminarCliente(_id: any){
     this.clienteService.DeleteClienteFinanciera(_id).subscribe(data => {

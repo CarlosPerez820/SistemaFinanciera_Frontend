@@ -28,7 +28,7 @@ export class LoginComponent {
   }
 
   ingresar(){
-    const usuario = this.form.value.usuario;
+    const usuario = this.form.value.usuario.toLowerCase();
     const pass = this.form.value.password;
 
     this.authService.login(usuario, pass)
@@ -69,7 +69,7 @@ export class LoginComponent {
   }
 
   errorLogin(){
-    this._snackBar.open("Usuario y/o contraseña invalida",'',{
+    this._snackBar.open("Correo y/o contraseña invalida",'',{
         duration:5000,
         horizontalPosition: 'center',
         verticalPosition: 'bottom'

@@ -6,6 +6,7 @@ import { Clientes } from 'src/app/interfaces/clientes';
 import { SharedService } from 'src/app/services/shared.service';
 import { SolicitudServiceService } from 'src/app/services/solicitud-service.service';
 import { PrestamoServiceService } from 'src/app/services/prestamo-service.service';
+import { NavigationEnd, Router } from '@angular/router';
 
 //Obtener datos de fecha y hora
 var today = new Date();
@@ -32,16 +33,25 @@ export class PrestamosComponent {
   listaPrestamosActivos: any=[];
   listaPrestamosPendiente: any =[];
 
-  displayedColumns: string[] = ['nombre','comienzo','tipoPrestamo', 'cantidadPagar', 'totalRestante','fecha','tipo','proximo','gestor','acciones'];
+  displayedColumns: string[] = ['nombre','comienzo','tipoPrestamo', 'cantidadPagar', 'totalRestante','fecha','tipo','gestor','acciones'];
   dataSource = new MatTableDataSource(this.listaPrestamosActivos);
   dataSource2 = new MatTableDataSource(this.listaPrestamosPendiente);
 
-  constructor(private prestamoSrvice: PrestamoServiceService, private sharedService: SharedService){}
+  constructor(private prestamoSrvice: PrestamoServiceService, private sharedService: SharedService,
+              private router: Router
+  ){}
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   ngOnInit(): void{
+
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd && event.urlAfterRedirects === '/dashboard/prestamos') {
+        this.obtenerPrestamosValidos();
+      }
+    });
+
     this.obtenerPrestamosValidos();
     console.log(this.fechaActual);
   }

@@ -7,6 +7,8 @@ import { PrestamoServiceService } from 'src/app/services/prestamo-service.servic
 import { Prestamo } from 'src/app/interfaces/prestamo';
 import { UploadService } from 'src/app/services/upload.service';
 import { NgxImageCompressService } from 'ngx-image-compress';
+import { InfoDialogComponent } from 'src/app/components/info-dialog/info-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 //Obtener datos de fecha y hora
 var today = new Date();
@@ -35,6 +37,11 @@ export class RevisarPrestamoComponent {
   lista2: any = [];
   prestamoEspecifico: any =[];
 
+  //barra de progeso
+  subiendoArchivo: boolean = false; // Controla la visibilidad de la barra de progreso
+  progreso: number = 0; // Valor de progreso para la barra
+  
+
   viviendas: any[] = [
     {value: 'Propia', viewValue: 'Propia'},
     {value: 'Rentada', viewValue: 'Rentada'},
@@ -50,7 +57,7 @@ export class RevisarPrestamoComponent {
   constructor(private fb: FormBuilder,  private route: ActivatedRoute, private gestorService: GestorServiceService, 
               private prestamoService: PrestamoServiceService, private sharedService: SharedService,
               private imageCompress: NgxImageCompressService, private uploadService: UploadService,
-              private router: Router){
+              private router: Router, private dialog: MatDialog){
     this.form = this.fb.group({
       numeroCliente: ['',Validators.required],
       fecha: ['',Validators.required],
@@ -133,13 +140,13 @@ export class RevisarPrestamoComponent {
     this.prestamoService.PutPrestamoFinanciera(this.mongoIdPrestamo, prestamo).subscribe(data => {
       if(data){
         console.log(data);
-        alert("Prestamo Activo");
+        this.openDialog("El Prestamo esta iniciado, asegurase de registrar los pagos correspondientes", "assets/img/exito.png");
         this.router.navigate(['dashboard/prestamos']);
 
       }
     }, (error: any) => {
       console.log(error);
-      alert("Problemas al actualizar, intente mas tarde");
+      this.openDialog("Sucedio un error: "+error, "assets/img/error.png");
     })
   }
 
@@ -167,7 +174,7 @@ export class RevisarPrestamoComponent {
     }
   }
 
-  compressImage(file: File, tipo:any) {
+  compresklsImage(file: File, tipo:any) {
     const reader = new FileReader();
 
     reader.onload = (e: any) => {
@@ -192,22 +199,40 @@ export class RevisarPrestamoComponent {
     reader.readAsDataURL(file);
   }
 
+  openDialog(mensaje: string, imagen:string): void {
+    this.dialog.open(InfoDialogComponent, {
+      width: '300px',  // Ajusta el ancho según sea necesario
+      data: {
+        message: mensaje,
+        imageUrl: imagen  // Ruta de la imagen que quieres mostrar
+      },
+      disableClose: true // Deshabilita el cierre al hacer clic fuera del diálogo
+    });
+  }
+
+
   subirArchivo(file: File, tipo:any){
     console.log("tipo en subir archivo "+tipo);
     const nombreArchivo = this.mongoIdPrestamo+'_'+tipo;
     const _sucursalFinanciera = this.sharedService.getFinanciera()??'vacio';
 
     if (file) {
-      this.uploadService.uploadUpdateFile(file,this.mongoIdPrestamo,'prestamos',_sucursalFinanciera,'prestamos',nombreArchivo,tipo).then((response) => {
-       // console.log('Archivo cargado con éxito ('+tipo+'):', response);
-        console.log("Documento subido");
-        console.log(response);
-       // Realiza acciones adicionales después de la carga exitosa
-       alert("Se subio el archivo correctamente");
+      this.subiendoArchivo = true; // Mostrar la barra de progreso
+      this.progreso = 0; // Reiniciar el progreso
+
+      this.uploadService.uploadUpdateFile2(file, this.mongoIdPrestamo, 'prestamos', _sucursalFinanciera, 'prestamos', nombreArchivo,tipo, (progress: number) => {
+        this.progreso = progress;  // Actualizar el progreso
+      }).then((response) => {
+
+        this.subiendoArchivo = false; // Ocultar la barra de progreso
+        this.openDialog("La imagen se subio exitosamente", "assets/img/exito.png");
       }).catch((error) => {
         console.error('Error al cargar el archivo:', error);
+        this.subiendoArchivo = false; // Ocultar la barra de progreso
+        this.openDialog("No se pudo subir la imagen", "assets/img/error.png");
       });
     }
+
   }
 
 

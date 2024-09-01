@@ -29,13 +29,6 @@
 
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
                     <mat-form-field class="ancho">
-                        <mat-label>Edad</mat-label>
-                        <input type="number" matInput autocomplete="off" formControlName="edad">
-                    </mat-form-field>
-                </mat-grid-tile>
-
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
-                    <mat-form-field class="ancho">
                         <mat-label>Dirección</mat-label>
                         <input matInput autocomplete="off" formControlName="direccion">
                     </mat-form-field>
@@ -45,13 +38,6 @@
                     <mat-form-field class="ancho">
                         <mat-label>Colonia</mat-label>
                         <input matInput autocomplete="off" formControlName="colonia">
-                    </mat-form-field>
-                </mat-grid-tile>
-
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
-                    <mat-form-field class="ancho">
-                        <mat-label>Señas de domicilio</mat-label>
-                        <input matInput autocomplete="off" formControlName="senasDomicilio">
                     </mat-form-field>
                 </mat-grid-tile>
 
@@ -71,20 +57,6 @@
 
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
                     <mat-form-field class="ancho">
-                        <mat-label>Telefono Fijo</mat-label>
-                        <input type="number" matInput autocomplete="off" formControlName="telefonoFijo">
-                    </mat-form-field>
-                </mat-grid-tile>
-
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
-                    <mat-form-field class="ancho">
-                        <mat-label>Tel. Adicional</mat-label>
-                        <input type="number" matInput autocomplete="off" formControlName="telefonoAdicional">
-                    </mat-form-field>
-                </mat-grid-tile>
-
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
-                    <mat-form-field class="ancho">
                         <mat-label>Estado Civil</mat-label>
                         <input matInput autocomplete="off" formControlName="estadoCivil">
                     </mat-form-field>
@@ -92,21 +64,7 @@
 
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
                     <mat-form-field class="ancho">
-                        <mat-label>Tiempo de casado</mat-label>
-                        <input matInput autocomplete="off" formControlName="tiempoCasados">
-                    </mat-form-field>
-                </mat-grid-tile>
-
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
-                    <mat-form-field class="ancho">
-                        <mat-label>Personas dependientes</mat-label>
-                        <input matInput autocomplete="off" formControlName="dependientes">
-                    </mat-form-field>
-                </mat-grid-tile>
-
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
-                    <mat-form-field class="ancho">
-                        <mat-label>Tipo Viviendo</mat-label>
+                        <mat-label>Tipo Vivienda</mat-label>
                         <mat-select formControlName="tipoVivienda">
                             <mat-option *ngFor="let tipo of viviendas" [value]="tipo.value">
                             {{tipo.viewValue}}
@@ -125,14 +83,7 @@
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Pago de renta</mat-label>
-                        <input matInput autocomplete="off" formControlName="pagoRenta">
-                    </mat-form-field>
-                </mat-grid-tile>
-
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
-                    <mat-form-field class="ancho">
-                        <mat-label>tipo de negocio</mat-label>
-                        <input matInput autocomplete="off" formControlName="tipoNegocio">
+                        <input type="number" matInput autocomplete="off" formControlName="pagoRenta">
                     </mat-form-field>
                 </mat-grid-tile>
 
@@ -166,27 +117,6 @@
 
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
                     <mat-form-field class="ancho">
-                        <mat-label>Trabajo del conyugue</mat-label>
-                        <input matInput autocomplete="off" formControlName="trabajoConyugue">
-                    </mat-form-field>
-                </mat-grid-tile>
-
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
-                    <mat-form-field class="ancho">
-                        <mat-label>Domicilio del conyugue</mat-label>
-                        <input matInput autocomplete="off" formControlName="domicilioConyugue">
-                    </mat-form-field>
-                </mat-grid-tile>
-
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
-                    <mat-form-field class="ancho">
-                        <mat-label>Antiguedad del conyugue</mat-label>
-                        <input matInput autocomplete="off" formControlName="antiguedadConyugue">
-                    </mat-form-field>
-                </mat-grid-tile>
-
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
-                    <mat-form-field class="ancho">
                         <mat-label>Ingreso del solicitante</mat-label>
                         <input type="number" matInput autocomplete="off" formControlName="ingresoSolicitante">
                     </mat-form-field>
@@ -194,22 +124,8 @@
 
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
                     <mat-form-field class="ancho">
-                        <mat-label>Ingreso del conyugue</mat-label>
-                        <input type="number" matInput autocomplete="off" formControlName="ingresosConyugue">
-                    </mat-form-field>
-                </mat-grid-tile>
-
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
-                    <mat-form-field class="ancho">
-                        <mat-label>Gastos totales</mat-label>
-                        <input type="number" matInput autocomplete="off" formControlName="gastos">
-                    </mat-form-field>
-                </mat-grid-tile>
-
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
-                    <mat-form-field class="ancho">
                         <mat-label>Creditos Actuales</mat-label>
-                        <input type="number" matInput autocomplete="off" formControlName="creditosActuales" readonly>
+                        <input type="number" matInput autocomplete="off" formControlName="creditosActuales">
                     </mat-form-field>
                 </mat-grid-tile>
 
@@ -222,7 +138,7 @@
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
-                </mat-grid-tile>                
+                </mat-grid-tile>        
 
                 <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <button type="button" mat-raised-button color="danger" class="ancho" (click)="openDialog()">Eliminar Cliente</button>
@@ -253,8 +169,10 @@
                 <input id="fileInput3" hidden type="file"   accept=".pdf,.jpg,.png" (change)="onFileSelected($event, 'comprobante')">
             </mat-grid-tile>
 
-            <br>
-            <br>
+            <mat-grid-tile [colspan]="2" [rowspan]="2">
+                <mat-progress-spinner *ngIf="subiendoArchivo" mode="determinate" [value]="progreso"></mat-progress-spinner>
+            </mat-grid-tile>
+
             <mat-grid-tile [colspan]="2" [rowspan]="1">
                 <button type="button" mat-raised-button color="primary" class="ancho" routerLink="/dashboard/clientes">Finalizar</button>
             </mat-grid-tile>

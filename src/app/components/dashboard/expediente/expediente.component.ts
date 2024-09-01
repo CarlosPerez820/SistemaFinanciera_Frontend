@@ -8,6 +8,10 @@ import { PrestamoServiceService } from 'src/app/services/prestamo-service.servic
 import { SharedService } from 'src/app/services/shared.service';
 import { VariableBinding } from '@angular/compiler';
 
+import { environment } from 'src/environments/environment';
+
+const url_server = environment.url+"/";
+
 @Component({
   selector: 'app-expediente',
   templateUrl: './expediente.component.html',
@@ -20,16 +24,16 @@ export class ExpedienteComponent {
   mongoIdCliente :any;
   lista2:any;
   listaPrestamos: any =[];
-  variableURL= 'https://node-restserver-financiera-production.up.railway.app/';
 
   currentSlideIndex = 0;
   currentImage: any;
+  variableURL = url_server;
 
   constructor(private route: ActivatedRoute, private matDialog: MatDialog,
               private clienteService: ClienteServiceService, private prestamoService: PrestamoServiceService,
               private sharedService: SharedService){}
 
-  displayedColumns: string[] = ['folio', 'fecha', 'cantidad', 'estado','acciones'];
+  displayedColumns: string[] = ['folio', 'tipo',  'fecha', 'cantidad', 'estado','acciones'];
   dataSource = new MatTableDataSource(this.listaPrestamos);
 
   currentImageIndex = 0;
@@ -37,13 +41,13 @@ export class ExpedienteComponent {
   setCurrentImage() {
     switch (this.currentSlideIndex) {
       case 0:
-        this.currentImage = this.variableURL+this.clienteEspecifico.fotoIneFrente;
+        this.currentImage = url_server+this.clienteEspecifico.fotoIneFrente;
         break;
       case 1:
-        this.currentImage = this.variableURL+this.clienteEspecifico.fotoIneReverso;
+        this.currentImage = url_server+this.clienteEspecifico.fotoIneReverso;
         break;
       case 2:
-        this.currentImage = this.variableURL+this.clienteEspecifico.fotoComprobante;
+        this.currentImage = url_server+this.clienteEspecifico.fotoComprobante;
         break;
       default:
         this.currentImage = '';

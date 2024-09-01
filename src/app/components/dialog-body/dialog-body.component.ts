@@ -5,6 +5,9 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { PrestamoServiceService } from 'src/app/services/prestamo-service.service';
 import { SharedService } from 'src/app/services/shared.service';
 import { PagoServiceService } from 'src/app/services/pago-service.service';
+import { environment } from 'src/environments/environment';
+
+const url_server = environment.url+"/";
 
 export interface Section {
   name: string;
@@ -26,8 +29,6 @@ export class DialogBodyComponent {
   listaPagos:any =[];
   currentSlideIndex = 0;
   currentImage: any;
-  variableURL= 'https://node-restserver-financiera-production.up.railway.app/';
-
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: any, 
             private gestorService: GestorServiceService, private prestamoService: PrestamoServiceService,
@@ -65,13 +66,13 @@ export class DialogBodyComponent {
   setCurrentImage() {
     switch (this.currentSlideIndex) {
       case 0:
-        this.currentImage = this.variableURL+this.prestamoEspecifico.urlDinero;
+        this.currentImage = url_server+this.prestamoEspecifico.urlDinero;
         break;
       case 1:
-        this.currentImage = this.variableURL+this.prestamoEspecifico.urlFachada;
+        this.currentImage = url_server+this.prestamoEspecifico.urlFachada;
         break;
       case 2:
-        this.currentImage = this.variableURL+this.prestamoEspecifico.urlPagare;
+        this.currentImage = url_server+this.prestamoEspecifico.urlPagare;
         break;
       default:
         this.currentImage = '';

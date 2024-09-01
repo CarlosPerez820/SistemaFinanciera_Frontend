@@ -1,0 +1,18 @@
+.dialog-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .dialog-image {
+    max-width: 70%;
+    height: auto;
+    margin-bottom: 16px;
+  }
+  
+  .dialog-actions {
+    display: flex;
+    justify-content: center;
+  }
+  

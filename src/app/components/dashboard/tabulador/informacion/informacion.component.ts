@@ -48,6 +48,7 @@ export class InformacionComponent {
   }
 
   obtenerPrestamos(){
+    console.log("Aqui inicial los prestmaos.--------------------------------------");
     this.prestamoService.getPrestamosCliente(this.sharedService.getFinanciera(),this.clienteEspecifico.numeroCliente)
     .subscribe( data => {
       console.log(data);
@@ -56,12 +57,15 @@ export class InformacionComponent {
       console.log(this.listaTodosPrestamos);
 
       for(let i=0; i<this.listaTodosPrestamos.length;i++){
+        console.log();
         if(this.listaTodosPrestamos[i].estatus=="Activo")
         {
           this.listaPrestamos.push(this.listaTodosPrestamos[i]);
         }
         
       }
+
+      console.log(this.listaPrestamos);
 
       this.dataSource = new MatTableDataSource(this.listaPrestamos);
     })

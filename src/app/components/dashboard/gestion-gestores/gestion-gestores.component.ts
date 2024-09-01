@@ -11,6 +11,7 @@ import { Gestor } from 'src/app/interfaces/gestor';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SharedService } from 'src/app/services/shared.service';
+import { InfoDialogComponent } from '../../info-dialog/info-dialog.component';
 
 @Component({
   selector: 'app-gestion-gestores',
@@ -76,9 +77,6 @@ export class GestionGestoresComponent {
     this.elementoEditar = gestor._id;
   }
 
-
-  
-
   obtenerGestores(){
     this.gestorService.getGestorFinanciera(this.sharedService.getFinanciera())
     .subscribe( data => {
@@ -104,11 +102,11 @@ export class GestionGestoresComponent {
       if(data){
         this.obtenerGestores();
         console.log(data);
-        alert("Gestor Actualizado");
+        this.openDialogInfo("La modifico la información exitosamente", "assets/img/exito.png");
       }
     }, (error: any) => {
       console.log(error);
-      alert("Problemas al actualizar, intente mas tarde");
+      this.openDialogInfo("Ocurrio un problema: "+error, "assets/img/error.png");
     })
 
     this.editarActivo=false;
@@ -124,8 +122,22 @@ export class GestionGestoresComponent {
       }
     }, (error: any) => {
       console.log(error);
+      alert("No se pudo eliminar");
+    });
+    this.form.reset();
+  }
+
+  openDialogInfo(mensaje: string, imagen:string): void {
+    this.matDialog.open(InfoDialogComponent, {
+      width: '300px',  // Ajusta el ancho según sea necesario
+      data: {
+        message: mensaje,
+        imageUrl: imagen  // Ruta de la imagen que quieres mostrar
+      },
+      disableClose: true // Deshabilita el cierre al hacer clic fuera del diálogo
     });
   }
+
 
   registrarGestor(){
     const gestor: Gestor={    

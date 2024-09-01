@@ -1,4 +1,7 @@
 export const environment = {
     production: false,
-    url: 'https://node-restserver-financiera-production.up.railway.app'
+    url: 'http://3.217.193.145'
+    //pruebas
+    //url: 'http://localhost:8080'
+
 };

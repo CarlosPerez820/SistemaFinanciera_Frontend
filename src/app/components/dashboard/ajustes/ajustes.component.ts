@@ -8,7 +8,9 @@ import { ParametroServiceService } from 'src/app/services/parametro-service.serv
 import { Parametro } from 'src/app/interfaces/parametro';
 import { UploadService } from 'src/app/services/upload.service';
 import { MatTableDataSource } from '@angular/material/table';
+import { environment } from 'src/environments/environment';
 
+const url_server = environment.url+"/";
 
 @Component({
   selector: 'app-ajustes',
@@ -88,13 +90,17 @@ export class AjustesComponent {
   obtenerParametos(){
     this.parametroService.getParametrosFinanciera(this.sharedService.getFinanciera()).subscribe(
       (data) => {
-        //console.log(data);
         this.lista2 = data;
         this.listaParametros = this.lista2.parametros;
         console.log(this.listaParametros[0]);
 
         if(this.listaParametros[0]){
-          this.urlImagen = 'https://node-restserver-financiera-production.up.railway.app/' + this.listaParametros[0].urlLogo;
+          this.urlImagen = url_server + this.listaParametros[0].urlLogo;
+
+          this.form2.patchValue({
+            mora: this.listaParametros[0].montoMora,
+            moraSemanal: this.listaParametros[0].MoraSemanal
+          });
         }
       },
       (error) => {
@@ -120,6 +126,8 @@ export class AjustesComponent {
         console.log(response);
         alert("Registro exitoso");
         this.form.reset(); 
+        this.listaTasaDiaria = [];
+        this.listaTasaSemanal = [];
         this.obtenerListaDeInteres();
       }
     }, error => {
@@ -257,10 +265,14 @@ export class AjustesComponent {
     if (file) {
       this.uploadService.uploadUpdateFile(file,this.listaParametros[0]._id,'parametros',_sucursalFinanciera,'parametros',nombreArchivo,tipo).then((response) => {
        // console.log('Archivo cargado con éxito ('+tipo+'):', response);
-        console.log("Documento subido");
+        console.log("Documento de imagen subido efizcasmente");
         console.log(response);
        // Realiza acciones adicionales después de la carga exitosa
        alert("Se subio el archivo correctamente");
+       
+       console.log(response.urlLogo);
+       this.urlImagen = url_server + response.urlLogo;
+
       }).catch((error) => {
         console.error('Error al cargar el archivo:', error);
       });

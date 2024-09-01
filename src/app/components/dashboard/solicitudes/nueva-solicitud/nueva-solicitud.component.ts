@@ -10,6 +10,9 @@ import { SolicitudServiceService } from 'src/app/services/solicitud-service.serv
 import {NgxImageCompressService} from 'ngx-image-compress';
 import { UploadService  } from 'src/app/services/upload.service';
 import { InteresServiceService } from 'src/app/services/interes-service.service';
+import { InfoDialogComponent } from 'src/app/components/info-dialog/info-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+import { TasasService } from 'src/app/services/tasas.service';
 
 
 //Obtener datos de fecha y hora
@@ -45,6 +48,10 @@ export class NuevaSolicitudComponent {
   listaTasaDiaria: any =[];
   listaTasaSemanal: any =[];
 
+  //barra de progeso
+  subiendoArchivo: boolean = false; // Controla la visibilidad de la barra de progreso
+  progreso: number = 0; // Valor de progreso para la barra
+
 
   //Variables pruaba imagen
   imgResultBeforeCompression: string = '';
@@ -59,10 +66,7 @@ export class NuevaSolicitudComponent {
     {value: 'Familiar', viewValue: 'Familiar'},
   ];
 
-  prestamos: any[] = [
-    {value: 'Diario', viewValue: 'Por dia'},
-    {value: 'Semanal', viewValue: 'Por semana'},
-  ];
+  prestamos: any[] = [];
 
   gestores: any[] = [
     {value: 'gestor1', viewValue: 'gestor1'},
@@ -70,43 +74,41 @@ export class NuevaSolicitudComponent {
     {value: 'gestor3', viewValue: 'gestor3'},
   ];
 
+  //------------------------Nuevo calculo de montos y tasas
+  tasasTradicional: any[] = [];
+  tasasBlindage: any[] = [];
+  tasaSeleccionada: any = [];
+  interes: any;
+  tipoPrestamo: any;
+  listaPlazo: any;
+
   constructor(private fb: FormBuilder, private gestorService: GestorServiceService, private sharedService: SharedService,
               private clienteService: ClienteServiceService, private solicitudService: SolicitudServiceService,
               private imageCompress: NgxImageCompressService, private uploadService: UploadService,
-              private interesService: InteresServiceService){
+              private interesService: InteresServiceService, private dialog: MatDialog, private tasasService: TasasService,
+              ){
+
     this.form = this.fb.group({
       fecha: [this.fecha_Solicitud,Validators.required],
       montoSolicitado: ['',Validators.required],
       totalPagar: ['',Validators.required],
       pagoDiario: ['',Validators.required],
       plazo: ['',Validators.required],
+      interes: ['',Validators.required],
       nombreSolicitante: ['',Validators.required],
-      edad: ['',Validators.required],
       direccion: ['',Validators.required],
       colonia: ['',Validators.required],
-      senasDomicilio: [''],
-      entreCalles: [''],
       ciudad: ['',Validators.required],
       celular: ['',Validators.required],
-      telefonoFijo: [''],
-      telefonoAdicional: [''],
       estadoCivil: ['',Validators.required],
-      tiempoCasados: ['',Validators.required],
-      dependientes: ['',Validators.required],
       tipoVivienda: ['',Validators.required],
       tiempoVivienda: [''],
       pagoRenta: [''],
-      tipoNegocio: ['',Validators.required],
       tiempoNegocio: [''],
       numeroINE: ['',Validators.required],
       RFC: ['',Validators.required],
       conyugue: ['',Validators.required],
-      trabajoConyugue: [''],
-      domicilioConyugue: [''],
-      antiguedadConyugue: [''],
       ingresoSolicitante: ['',Validators.required],
-      ingresosConyugue: [''],
-      gastos: ['',Validators.required],
       creditosActuales: [''],
       motivos: ['',Validators.required],
       gestor: ['',Validators.required],
@@ -117,6 +119,9 @@ export class NuevaSolicitudComponent {
   ngOnInit(): void{
     this.obtenerGestores();
     this.obtenerListaDeInteres();
+    this.tasasTradicional = this.tasasService.getTasasTradicional();
+    this.tasasBlindage = this.tasasService.getTasasBlindage();
+    this.prestamos = this.tasasService.getTipoPrestamos();
   }
 
 
@@ -127,6 +132,42 @@ export class NuevaSolicitudComponent {
       console.log("tipo en Seleccionar el archivo "+tipo);
       this.subirArchivo(file, tipo);
     }
+  }
+
+
+  subirArchivo(file: File, tipo: any) {
+    console.log("tipo en subir archivo " + tipo);
+    const nombreArchivo = this.numeroDeClienteID + '_' + tipo;
+    const _sucursalFinanciera = this.sharedService.getFinanciera() ?? 'vacio';
+
+    if (file) {
+      this.subiendoArchivo = true; // Mostrar la barra de progreso
+      this.progreso = 0; // Reiniciar el progreso
+
+      this.uploadService.uploadUpdateFile2(file, this.mongoIdCliente, 'clientes', _sucursalFinanciera, 'clientes', nombreArchivo, tipo, (progress: number) => {
+        this.progreso = progress;  // Actualizar el progreso
+      }).then((response) => {
+        console.log("Documento subido");
+        console.log(response);
+        this.subiendoArchivo = false; // Ocultar la barra de progreso
+        this.openDialog("La imagen se subio exitosamente", "assets/img/exito.png");
+      }).catch((error) => {
+        console.error('Error al cargar el archivo:', error);
+        this.subiendoArchivo = false; // Ocultar la barra de progreso
+        this.openDialog("No se pudo subir la imagen", "assets/img/error.png");
+      });
+    }
+  }
+
+  openDialog(mensaje: string, imagen:string): void {
+    this.dialog.open(InfoDialogComponent, {
+      width: '300px',  // Ajusta el ancho según sea necesario
+      data: {
+        message: mensaje,
+        imageUrl: imagen  // Ruta de la imagen que quieres mostrar
+      },
+      disableClose: true // Deshabilita el cierre al hacer clic fuera del diálogo
+    });
   }
 
   compressImage(file: File, tipo:any) {
@@ -153,26 +194,6 @@ export class NuevaSolicitudComponent {
 
     reader.readAsDataURL(file);
   }
-
-  subirArchivo(file: File, tipo:any){
-    console.log("tipo en subir archivo "+tipo);
-    const nombreArchivo = this.numeroDeClienteID+'_'+tipo;
-    const _sucursalFinanciera = this.sharedService.getFinanciera()??'vacio';
-
-    if (file) {
-      this.uploadService.uploadUpdateFile(file,this.mongoIdCliente,'clientes',_sucursalFinanciera,'clientes',nombreArchivo,tipo).then((response) => {
-       // console.log('Archivo cargado con éxito ('+tipo+'):', response);
-        console.log("Documento subido");
-        console.log(response);
-       // Realiza acciones adicionales después de la carga exitosa
-       alert("Se subio el archivo correctamente");
-      }).catch((error) => {
-        console.error('Error al cargar el archivo:', error);
-      });
-    }
-  }
-
-
 
   verificarCamposOpcionales(){
     // Verificar los campos opcionales y asignar valores por defecto si están vacíos
@@ -235,6 +256,36 @@ export class NuevaSolicitudComponent {
     }
   }
 
+
+  onTipoChange(){
+    if(this.tipoPrestamo=="tradicional"){
+      this.tasaSeleccionada = this.tasasTradicional;
+    }
+    else if(this.tipoPrestamo=="blindaje"){
+      this.tasaSeleccionada = this.tasasBlindage;
+    }
+  }
+
+  onPlazoChange(){
+    this.interes = this.listaPlazo.interes;
+  }
+
+
+  calcularMontosNuevo(){
+    let total=0;
+    let pagoDia = 0;
+    let plazoNumber = this.form.value.plazo;
+    let montoNumber =this.form.value.montoSolicitado;
+
+    //console.log(plazoNumber);
+
+    total = Math.round((montoNumber * this.interes)/100)+montoNumber;
+    pagoDia = Math.round(total/plazoNumber.dia);
+
+    this.form.get('totalPagar')?.setValue(total);
+    this.form.get('pagoDiario')?.setValue(pagoDia);
+  }
+
   calcularMontos(){
     let plazoNumber = this.form.value.plazo;
     let montoNumber =this.form.value.montoSolicitado;
@@ -284,39 +335,39 @@ export class NuevaSolicitudComponent {
 
 
   agregarUsuario(){
-    this.verificarCamposOpcionales();
+     this.verificarCamposOpcionales();
 
      this.numeroDeClienteID = this.eliminarAcentos2(this.form.value.nombreSolicitante).substring(0, 2)+year+month+day+hour+minutes+segundes+mili;
 
     const cliente: Clientes = {
       numeroCliente: this.numeroDeClienteID,
       nombre: this.eliminarAcentos2(this.form.value.nombreSolicitante),
-      edad: this.form.value.edad,
+      edad: "desabilitado",
       direccion: this.form.value.direccion,
       colonia: this.form.value.colonia,
-      senasDomicilio: this.form.value.senasDomicilio,
-      entrecalles: this.form.value.entreCalles,
+      senasDomicilio: "desabilitado",
+      entrecalles:"desabilitado",
       ciudad: this.form.value.ciudad,
       celular: this.form.value.celular,
-      telefonoFijo: this.form.value.telefonoFijo,
-      telefonoAdicional: this.form.value.telefonoAdicional,
+      telefonoFijo: "desabilitado",
+      telefonoAdicional: "desabilitado",
       estadoCivil: this.form.value.estadoCivil,
-      tiempoCasados: this.form.value.tiempoCasados,
-      dependientes: this.form.value.dependientes,
+      tiempoCasados: "desabilitado",
+      dependientes: "desabilitado",
       tipoVivienda: this.form.value.tipoVivienda,
       tiempoViviendo: this.form.value.tiempoVivienda,
       pagoRenta: this.form.value.pagoRenta,
-      tipoNegocio: this.form.value.tipoNegocio,
+      tipoNegocio:"desabilitado",
       tiempoNegocio: this.form.value.tiempoNegocio,
       numeroIdentificacion: this.form.value.numeroINE,
       RFC: this.form.value.RFC,
       nombreConyugue: this.form.value.conyugue,
-      trabajoConyugue: this.form.value.trabajoConyugue,
-      domicilioConyugue: this.form.value.domicilioConyugue,
-      antiguedadConyugue: this.form.value.antiguedadConyugue,
+      trabajoConyugue: "desabilitado",
+      domicilioConyugue: "desabilitado",
+      antiguedadConyugue: "desabilitado",
       ingresoSolicitante: this.form.value.ingresoSolicitante,
-      ingresoConyugue: this.form.value.ingresosConyugue,
-      gastosTotales: this.form.value.gastos,
+      ingresoConyugue: 0,
+      gastosTotales: 0,
       gestorAsignado: this.form.value.gestor,
       fotoComprobante: "URL",
       fotoFachada: "URL",
@@ -330,7 +381,7 @@ export class NuevaSolicitudComponent {
       clasificacion:"Pendiente",
       sucursal: this.sharedService.getFinanciera()
     }
-    console.log(cliente);
+   console.log(cliente);
 
     this.clienteService.guardarCliente(cliente).subscribe(
       (response) => {
@@ -346,8 +397,12 @@ export class NuevaSolicitudComponent {
     },
     (error) => {
       console.error('Error al registrar cliente:', error);
+      this.openDialog("Lo sentimos, hubo un error y no se pudo registrar", "assets/img/error.png");
     }
   );
+
+
+  
   }
 
   registrarSolicitud(){
@@ -360,35 +415,36 @@ export class NuevaSolicitudComponent {
         montoAutorizado: 0,
         totalPagar: this.form.value.totalPagar,
         pagoDiario: this.form.value.pagoDiario,
-        plazo: this.form.value.plazo,
+        plazo: this.form.value.plazo.dia,
+
         numeroCliente: this.numeroDeClienteID,
         nombre: this.eliminarAcentos2(this.form.value.nombreSolicitante),
-        edad: this.form.value.edad,
+        edad: "desabilitado",
         direccion: this.form.value.direccion,
         colonia: this.form.value.colonia,
-        senasDomicilio: this.form.value.senasDomicilio,
-        entrecalles: this.form.value.entreCalles,
+        senasDomicilio:"desabilitado",
+        entrecalles: "desabilitado",
         ciudad: this.form.value.ciudad,
         celular: this.form.value.celular,
-        telefonoFijo: this.form.value.telefonoFijo,
-        telefonoAdicional: this.form.value.telefonoAdicional,
+        telefonoFijo: "desabilitado",
+        telefonoAdicional:"desabilitado",
         estadoCivil: this.form.value.estadoCivil,
-        tiempoCasados: this.form.value.tiempoCasados,
-        dependientes: this.form.value.dependientes,
+        tiempoCasados: "desabilitado",
+        dependientes: "desabilitado",
         tipoVivienda: this.form.value.tipoVivienda,
         tiempoViviendo: this.form.value.tiempoVivienda,
         pagoRenta: this.form.value.pagoRenta,
-        tipoNegocio: this.form.value.tipoNegocio,
+        tipoNegocio: "desabilitado",
         tiempoNegocio: this.form.value.tiempoNegocio,
         numeroIdentificacion: this.form.value.numeroINE,
         RFC: this.form.value.RFC,
         nombreConyugue: this.form.value.conyugue,
-        trabajoConyugue: this.form.value.trabajoConyugue,
-        domicilioConyugue: this.form.value.domicilioConyugue,
-        antiguedadConyugue: this.form.value.antiguedadConyugue,
+        trabajoConyugue: "desabilitado",
+        domicilioConyugue: "desabilitado",
+        antiguedadConyugue: "desabilitado",
         ingresoSolicitante: this.form.value.ingresoSolicitante,
-        ingresoConyugue: this.form.value.ingresosConyugue,
-        gastosTotales: this.form.value.gastos,
+        ingresoConyugue: 0,
+        gastosTotales: 0,
         gestorAsignado: this.form.value.gestor,
         infoCredito: this.form.value.motivos,
         estatus: "Pendiente",
@@ -403,10 +459,11 @@ export class NuevaSolicitudComponent {
       if(response){
         console.log("Registro de solicitud exitoso");
         console.log(response);
-        alert("Registro exitoso");
+
       }
     }, error => {
       console.log(error); 
+      this.openDialog("Lo sentimos hubo un problema y no se pudo registrar.","assets/img/error.png");
     });
   }
 

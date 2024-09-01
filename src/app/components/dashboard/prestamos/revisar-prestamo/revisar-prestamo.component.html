@@ -145,6 +145,11 @@
             </mat-grid-tile>
 
             <br>
+
+            <mat-grid-tile [colspan]="2" [rowspan]="2">
+                <mat-progress-spinner *ngIf="subiendoArchivo" mode="determinate" [value]="progreso"></mat-progress-spinner>
+            </mat-grid-tile>
+            
             <br>
 
         </mat-grid-list>
