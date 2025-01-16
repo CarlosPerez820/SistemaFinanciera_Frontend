@@ -9,13 +9,17 @@
     <mat-card style="margin-top: 10px;">
 
         <form [formGroup]="form" (ngSubmit)="EnviarDatos()">
-
+            
             <mat-grid-list  cols="2" rowHeight="70px">
+
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
-                    <mat-form-field class="ancho">
-                        <mat-label>Numero de Cliente</mat-label>
-                        <input matInput autocomplete="off" formControlName="numeroCliente" readonly>
-                    </mat-form-field>
+                    <h1>No. Cliente: {{SolicitudEspecifica.numeroCliente}}</h1>
+                </mat-grid-tile>
+       
+                <mat-grid-tile [colspan]="2" [rowspan]="3">
+                    <div class="image-container">
+                      <img src={{variableURL}}{{clienteEspecifico.fotoPerfil}} alt="Foto de perfil" class="profile-image" (click)="navegarExpediente(clienteEspecifico._id)">
+                    </div>
                 </mat-grid-tile>
 
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
@@ -24,7 +28,7 @@
 
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
                     <h3>Prestamo {{SolicitudEspecifica.tipoPrestamo}} de ${{SolicitudEspecifica.montoSolicitado}} 
-                        a un plazo de {{SolicitudEspecifica.plazo}} dias, con un total de $ {{SolicitudEspecifica.totalPagar}}</h3>
+                        a un plazo de {{SolicitudEspecifica.plazo}} dias, con un total de ${{SolicitudEspecifica.totalPagar}}</h3>
                 </mat-grid-tile>
 
 
@@ -98,102 +102,98 @@
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Nombre</mat-label>
-                        <input matInput autocomplete="off" formControlName="nombreSolicitante">
+                        <input matInput autocomplete="off" formControlName="nombreSolicitante" readonly="true">
                     </mat-form-field>
                 </mat-grid-tile>
 
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Dirección</mat-label>
-                        <input matInput autocomplete="off" formControlName="direccion">
+                        <input matInput autocomplete="off" formControlName="direccion" readonly="true">
                     </mat-form-field>
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Colonia</mat-label>
-                        <input matInput autocomplete="off" formControlName="colonia">
+                        <input matInput autocomplete="off" formControlName="colonia" readonly="true">
                     </mat-form-field>
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Ciudad</mat-label>
-                        <input matInput autocomplete="off" formControlName="ciudad">
+                        <input matInput autocomplete="off" formControlName="ciudad" readonly="true">
                     </mat-form-field>
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Telefono Celular</mat-label>
-                        <input type="number" matInput autocomplete="off" formControlName="celular">
+                        <input type="number" matInput autocomplete="off" formControlName="celular" readonly="true">
                     </mat-form-field>
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Estado Civil</mat-label>
-                        <input matInput autocomplete="off" formControlName="estadoCivil">
+                        <input matInput autocomplete="off" formControlName="estadoCivil" readonly="true">
                     </mat-form-field>
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Tipo Viviendo</mat-label>
-                        <mat-select formControlName="tipoVivienda">
-                            <mat-option *ngFor="let tipo of viviendas" [value]="tipo.value">
-                            {{tipo.viewValue}}
-                            </mat-option>
-                        </mat-select>
+                        <input matInput autocomplete="off" formControlName="tipoVivienda" readonly="true">
                     </mat-form-field>
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
-                        <mat-label>Tiempo viviendo en el domicilio</mat-label>
-                        <input matInput autocomplete="off" formControlName="tiempoVivienda">
+                        <mat-label>Tiemp. en vivienda</mat-label>
+                        <input matInput autocomplete="off" formControlName="tiempoVivienda" readonly="true">
                     </mat-form-field>
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Pago de renta</mat-label>
-                        <input  matInput autocomplete="off" formControlName="pagoRenta">
+                        <input  matInput autocomplete="off" formControlName="pagoRenta" readonly="true">
                     </mat-form-field>
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
-                        <mat-label>Tiempo del negocio</mat-label>
-                        <input matInput autocomplete="off" formControlName="tiempoNegocio">
+                        <mat-label>Tiemp. del negocio</mat-label>
+                        <input matInput autocomplete="off" formControlName="tiempoNegocio" readonly="true">
                     </mat-form-field>
                 </mat-grid-tile>
 
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Numero de identificacion</mat-label>
-                        <input matInput autocomplete="off" formControlName="numeroINE">
+                        <input matInput autocomplete="off" formControlName="numeroINE" readonly="true">
                     </mat-form-field>
                 </mat-grid-tile>
 
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>RFC</mat-label>
-                        <input matInput autocomplete="off" formControlName="RFC">
+                        <input matInput autocomplete="off" formControlName="RFC" readonly="true">
                     </mat-form-field>
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Nombre del conyugue</mat-label>
-                        <input matInput autocomplete="off" formControlName="conyugue">
+                        <input matInput autocomplete="off" formControlName="conyugue" readonly="true">
                     </mat-form-field>
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Ingreso del solicitante</mat-label>
-                        <input type="number" matInput autocomplete="off" formControlName="ingresoSolicitante">
+                        <input type="number" matInput autocomplete="off" formControlName="ingresoSolicitante" readonly="true">
                     </mat-form-field>
                 </mat-grid-tile>
 
@@ -207,11 +207,7 @@
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Gestor</mat-label>
-                        <mat-select formControlName="gestor">
-                            <mat-option *ngFor="let elemento of listaGestores" [value]="elemento.usuario">
-                            {{elemento.nombre}}
-                            </mat-option>
-                        </mat-select>
+                        <input matInput autocomplete="off" formControlName="gestor" readonly="true">
                     </mat-form-field>
                 </mat-grid-tile>                    
 
@@ -219,10 +215,10 @@
                 
 
                 <mat-grid-tile [colspan]="1" [rowspan]="1">
-                    <button type="button" mat-raised-button color="warn" class="ancho" (click)="rechazoDeSolicitud()">Rechazar</button>
+                    <button type="button" mat-raised-button color="warn" class="ancho" [disabled]="isLoading" (click)="rechazoDeSolicitud()">Rechazar</button>
                 </mat-grid-tile>
                 <mat-grid-tile [colspan]="1" [rowspan]="1">
-                    <button type="submit" mat-raised-button class="my-custom-button" [disabled]="form.invalid">Aprobar</button>
+                    <button type="submit" mat-raised-button class="my-custom-button" [disabled]="isLoading">Aprobar</button>
                 </mat-grid-tile>
             </mat-grid-list>
         </form>

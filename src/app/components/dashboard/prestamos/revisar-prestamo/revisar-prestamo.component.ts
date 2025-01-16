@@ -9,6 +9,11 @@ import { UploadService } from 'src/app/services/upload.service';
 import { NgxImageCompressService } from 'ngx-image-compress';
 import { InfoDialogComponent } from 'src/app/components/info-dialog/info-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { ClienteServiceService } from 'src/app/services/cliente-service.service';
+
+import { environment } from 'src/environments/environment';
+
+const url_server = environment.url+"/";
 
 //Obtener datos de fecha y hora
 var today = new Date();
@@ -36,6 +41,12 @@ export class RevisarPrestamoComponent {
   listaGestores: any =[];
   lista2: any = [];
   prestamoEspecifico: any =[];
+  lista4: any = [];
+  listaClientes: any =[];
+  clienteEspecifico: any = [];
+  isLoading = false;
+
+  variableURL = url_server;
 
   //barra de progeso
   subiendoArchivo: boolean = false; // Controla la visibilidad de la barra de progreso
@@ -57,7 +68,7 @@ export class RevisarPrestamoComponent {
   constructor(private fb: FormBuilder,  private route: ActivatedRoute, private gestorService: GestorServiceService, 
               private prestamoService: PrestamoServiceService, private sharedService: SharedService,
               private imageCompress: NgxImageCompressService, private uploadService: UploadService,
-              private router: Router, private dialog: MatDialog){
+              private router: Router, private dialog: MatDialog, private clienteService: ClienteServiceService){
     this.form = this.fb.group({
       numeroCliente: ['',Validators.required],
       fecha: ['',Validators.required],
@@ -82,6 +93,19 @@ export class RevisarPrestamoComponent {
     this.obtenerPrestamo();
   }
 
+  obtenerClientes(){
+    this.clienteService.getClientesPorNumeroFinanciera(this.sharedService.getFinanciera(),this.prestamoEspecifico.numeroCliente)
+    .subscribe( data => {
+      console.log(data);
+      this.lista4 = data;
+      this.listaClientes = this.lista4.clientes;
+      this.clienteEspecifico = this.listaClientes[0];
+      console.log("El cliente especifico del prestamo es el........");
+      console.log(this.clienteEspecifico);
+
+    })
+  }
+
   obtenerGestores(){
     this.gestorService.getGestorFinanciera(this.sharedService.getFinanciera())
     .subscribe( data => {
@@ -99,6 +123,8 @@ export class RevisarPrestamoComponent {
       this.lista2 = data;
       this.prestamoEspecifico = this.lista2.prestamo;
       console.log(this.prestamoEspecifico);
+
+      this.obtenerClientes();
       this.llenarFormulario();
     })
   }
@@ -123,6 +149,11 @@ export class RevisarPrestamoComponent {
   }
 
   editarPrestamo(){
+    if (this.isLoading) {
+      return;  
+    }
+    this.isLoading = true;  
+
     let fechSiguiente='xx-xx-xx';
 
     if(this.form.value.tipoPrestamo=='Semanal'){
@@ -134,18 +165,21 @@ export class RevisarPrestamoComponent {
       gestor: this.form.value.gestor,
       estatus: 'Activo',
       proximoPago: fechSiguiente,
+      inciadoPor: 'Oficina'
     }
     console.log(prestamo);
 
     this.prestamoService.PutPrestamoFinanciera(this.mongoIdPrestamo, prestamo).subscribe(data => {
       if(data){
         console.log(data);
+        this.isLoading = false;  
         this.openDialog("El Prestamo esta iniciado, asegurase de registrar los pagos correspondientes", "assets/img/exito.png");
         this.router.navigate(['dashboard/prestamos']);
 
       }
     }, (error: any) => {
       console.log(error);
+      this.isLoading = false;
       this.openDialog("Sucedio un error: "+error, "assets/img/error.png");
     })
   }

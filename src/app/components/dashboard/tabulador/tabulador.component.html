@@ -158,11 +158,6 @@
               <input matInput type="number" placeholder="Ejem: $5000" [(ngModel)]="prestado" name="prestado">
             </mat-form-field>
 
-            <mat-form-field class="example-full-width">
-              <mat-label>Tasa de interes</mat-label>
-              <input matInput type="number" [(ngModel)]="interes" name="interes" readonly="true">
-            </mat-form-field>
-
             <mat-form-field class="ancho">
               <mat-label>Plazo del prestamo (en dias)</mat-label>
               <mat-select [(ngModel)]="listaPlazo" name="listaPlazo" (selectionChange)="onPlazoChange()">

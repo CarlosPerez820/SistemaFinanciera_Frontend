@@ -33,7 +33,12 @@ export class PrestamosComponent {
   listaPrestamosActivos: any=[];
   listaPrestamosPendiente: any =[];
 
-  displayedColumns: string[] = ['nombre','comienzo','tipoPrestamo', 'cantidadPagar', 'totalRestante','fecha','tipo','gestor','acciones'];
+  contadorActivos: number = 0;
+  contadorPendientes: number = 0;
+
+  displayedColumns: string[] = ['nombre','comienzo','tipoPrestamo', 'cantidadPagar','plazo','diario','gestor','acciones'];
+  displayedColumns2: string[] = ['nombre','comienzo','tipoPrestamo','retrasos','plazo' ,'cantidadPagar', 'totalRestante','fecha','tipo','gestor','acciones'];
+
   dataSource = new MatTableDataSource(this.listaPrestamosActivos);
   dataSource2 = new MatTableDataSource(this.listaPrestamosPendiente);
 
@@ -81,6 +86,10 @@ export class PrestamosComponent {
     }
     console.log(this.listaPrestamosActivos);
     console.log(this.listaPrestamosPendiente);
+
+    this.contadorActivos= this.listaPrestamosActivos.length;
+    this.contadorPendientes= this.listaPrestamosPendiente.length;
+
     this.dataSource = new MatTableDataSource(this.listaPrestamosActivos);
     this.dataSource2 = new MatTableDataSource(this.listaPrestamosPendiente);
   }
@@ -95,4 +104,10 @@ export class PrestamosComponent {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
+
+  iniciarPrestamo(prestamo: any) {
+    console.log(`Iniciando préstamo para ${prestamo.nombre}`);
+    // Lógica para iniciar el préstamo aquí
+  }
+
 }

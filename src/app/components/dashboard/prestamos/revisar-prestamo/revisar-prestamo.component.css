@@ -7,3 +7,31 @@
     background-color: #0aa404; /* Cambia el color de fondo al color deseado */
     color: white; /* Cambia el color del texto al deseado */
 }
+
+/* Estilo por defecto para pantallas grandes */
+.responsive-container {
+    width: 70%;
+    margin: 0 auto; /* Centra el contenedor horizontalmente */
+  }
+  
+  /* Estilo para pantallas pequeñas */
+  @media (max-width: 768px) {
+    .responsive-container {
+      width: 100%;
+    }
+  }
+
+  .image-container {
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center; /* Centra verticalmente */
+  }
+  
+  .profile-image {
+    width: 200px;  /* Ajusta el tamaño de la imagen */
+    height: 200px; /* Mantén proporción cuadrada para el borde redondeado */
+    border-radius: 50%;  /* Hace la imagen circular */
+    object-fit: cover;  /* Ajusta la imagen para que se vea bien dentro del contenedor */
+    border: 2px solid #ccc;  /* Añade un borde opcional alrededor de la imagen */
+  }
+  

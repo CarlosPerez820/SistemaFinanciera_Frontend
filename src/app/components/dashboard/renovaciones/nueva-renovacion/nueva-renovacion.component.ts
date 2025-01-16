@@ -11,7 +11,9 @@ import { InteresServiceService } from 'src/app/services/interes-service.service'
 import { SharedService } from 'src/app/services/shared.service';
 import { SolicitudServiceService } from 'src/app/services/solicitud-service.service';
 import { TasasService } from 'src/app/services/tasas.service';
+import { environment } from 'src/environments/environment';
 
+const url_server = environment.url+"/";
 //Obtener datos de fecha y hora
 var today = new Date();
 var day = today.getDate();
@@ -52,6 +54,9 @@ export class NuevaRenovacionComponent {
    listaDeInteres:any =[];
    listaTasaDiaria: any =[];
    listaTasaSemanal: any =[];
+   isLoading = false;
+   variableURL = url_server;
+
 
    //------------------------Nuevo calculo de montos y tasas
    tasasTradicional: any[] = [];
@@ -75,7 +80,6 @@ export class NuevaRenovacionComponent {
       totalPagar: ['',Validators.required],
       pagoDiario: ['',Validators.required],
       plazo: ['',Validators.required],
-      interes: ['',Validators.required],
       nombreSolicitante: ['',Validators.required],
       direccion: ['',Validators.required],
       colonia: ['',Validators.required],
@@ -127,6 +131,7 @@ export class NuevaRenovacionComponent {
       this.lista2 = data;
       this.clienteEspecifico = this.lista2.cliente;
       console.log(this.clienteEspecifico);
+      
       this.llenarFormulario();
     })
   }
@@ -281,6 +286,11 @@ export class NuevaRenovacionComponent {
 
 
   generarSolicitud(){
+    if (this.isLoading) {
+      return;  
+    }
+    this.isLoading = true;  
+
     const solicitud: Solicitudes = {
       fechaSolicitud: this.form.value.fecha,
       montoSolicitado: this.form.value.montoSolicitado,
@@ -332,11 +342,13 @@ export class NuevaRenovacionComponent {
       if(response){
         console.log("Registro de solicitud exitoso");
         console.log(response);
+        this.isLoading = false;  
         this.openDialog("La renovación se genero exitosamente", "assets/img/exito.png");
         this.router.navigate(['dashboard/clientes']);
       }
     }, error => {
       console.log(error); 
+      this.isLoading = false;  
       this.openDialog("Lo sentimos, hubo un error y no se pudo registrar", "assets/img/error.png");
     });
   }
@@ -344,5 +356,20 @@ export class NuevaRenovacionComponent {
   eliminarAcentos2(n: any){
     return n.normalize('NFD').replace(/[\u0300-\u036f]/g,"");
   }
+
+  avisoSMS(){
+    let texto="Hola "+ this.clienteEspecifico.nombre + ", nos comunicamos de "+ this.clienteEspecifico.sucursal + " para informarte "+
+    "que su solicitud de una renovacion por el monto de :$"+this.form.value.montoSolicitado+" a un plazo de "+ this.form.value.plazo.dia+" dias, fue "+
+    "generada exitosamente y esta en espera de revisión";
+
+    let WhatsappNumero=this.form.value.celular;
+    let codigoPais: string ="52";
+    let urlWhats= "https://wa.me/"+ codigoPais+WhatsappNumero+"?text="+texto;
+  
+    
+    console.log("SMS....................." + urlWhats);
+    window.open(urlWhats, "_blank"); // Abre en una nueva pestaña o ventana
+  }
+
 
 }

@@ -4,52 +4,160 @@
       <div class="example-spacer"></div>
     </mat-toolbar>
 
-    <mat-card class="informacion">
-
-        <mat-grid-list cols="2" rowHeight="30px">
-
-          
-            <mat-grid-tile [colspan]="1" [rowspan]="1">   
-            NumCliente: {{clienteEspecifico.numeroCliente}} <br>
-           </mat-grid-tile>
-           <mat-grid-tile [colspan]="1" [rowspan]="10">  
-            <div> 
-            <img src={{variableURL}}{{clienteEspecifico.fotoIneFrente}} alt="" class="img_Cliente">
+    <mat-card class="expediente-cliente">
+      <div class="contenedor-cliente">
+    
+        <!-- Título con Nombre y Número de Cliente -->
+        <div class="titulo-cliente">
+          <h1>{{clienteEspecifico.nombre}}</h1>
+          <h2>NumCliente: {{clienteEspecifico.numeroCliente}}</h2>
+        </div>
+    
+        <!-- Foto del Cliente y Datos Personales -->
+        <div class="foto-y-info">
+    
+          <!-- Foto más grande del Cliente -->
+          <div class="foto-cliente">
+            <img [src]="variableURL + clienteEspecifico.fotoPerfil" alt="Foto del Cliente" class="img-cliente">
+          </div>
+    
+          <!-- Información del cliente dividida en dos columnas -->
+          <div class="info-cliente">
+            <!-- Columna 1: Información general -->
+            <div class="columna1">
+              <div class="dato-cliente">
+                <mat-icon>home</mat-icon>
+                <strong>Dirección:</strong> {{clienteEspecifico.direccion}}, {{clienteEspecifico.colonia}}, {{clienteEspecifico.ciudad}}
+              </div>
+              <div class="dato-cliente">
+                <mat-icon>supervisor_account</mat-icon>
+                <strong>Gestor:</strong> {{clienteEspecifico.gestorAsignado}}
+              </div>
+              <div class="dato-cliente">
+                <mat-icon>person_outline</mat-icon>
+                <strong>Conyugue:</strong> {{clienteEspecifico.nombreConyugue}}
+              </div>
             </div>
-           </mat-grid-tile>
-            <mat-grid-tile [colspan]="1" [rowspan]="1">   
-                Nombre:{{clienteEspecifico.nombre}}<br>
-            </mat-grid-tile>
-           <mat-grid-tile [colspan]="1" [rowspan]="1">   
-            Estado Civil:{{clienteEspecifico.estadoCivil}}<br>
-         </mat-grid-tile>
-            
-            <mat-grid-tile [colspan]="1" [rowspan]="1">   
-              Direccion:{{clienteEspecifico.direccion}}, {{clienteEspecifico.colonia}}, {{clienteEspecifico.ciudad}}<br>
-            </mat-grid-tile>
-            <mat-grid-tile [colspan]="1" [rowspan]="1">   
-              Celular: {{clienteEspecifico.celular}}<br>
-            </mat-grid-tile>
-            <mat-grid-tile [colspan]="1" [rowspan]="1">   
-              Gestor: {{clienteEspecifico.gestorAsignado}}<br>
-            </mat-grid-tile>
-            <mat-grid-tile [colspan]="1" [rowspan]="1">   
-              Identificacion:{{clienteEspecifico.numeroIdentificacion}}<br>
-            </mat-grid-tile>
-            <mat-grid-tile [colspan]="1" [rowspan]="1">   
-              Numero de Prestamos:{{clienteEspecifico.numeroPrestamos}}<br>
-            </mat-grid-tile>
-            <mat-grid-tile [colspan]="1" [rowspan]="1">   
-              Prestamos Activos:{{clienteEspecifico.numeroActivos}}<br>
-            </mat-grid-tile>
-            <mat-grid-tile [colspan]="1" [rowspan]="1">   
-              Clasificacion:{{clienteEspecifico.clasificacion}}<br>
-            </mat-grid-tile>
-            
-            
-        </mat-grid-list>
-
+    
+            <!-- Columna 2: Información adicional -->
+            <div class="columna2">
+              <div class="dato-cliente">
+                <mat-icon>phone</mat-icon>
+                <strong>Celular:</strong> {{clienteEspecifico.celular}}
+              </div>
+              <div class="dato-cliente">
+                <mat-icon>home_work</mat-icon>
+                <strong>Tipo Vivienda:</strong> {{clienteEspecifico.tipoVivienda}}
+              </div>
+              <div class="dato-cliente">
+                <mat-icon>schedule</mat-icon>
+                <strong>Tiempo en la vivienda:</strong> {{clienteEspecifico.tiempoViviendo}}
+              </div>
+              <div class="dato-cliente">
+                <mat-icon>payments</mat-icon>
+                <strong>Pago de renta:</strong> {{clienteEspecifico.pagoRenta}}
+              </div>
+            </div>
+          </div>
+        </div>
+    
+        <!-- Información destacada al final -->
+        <div class="resumen-cliente">
+          <div class="dato-cliente destacado">
+            <mat-icon>assignment</mat-icon>
+            <strong>Préstamos:</strong> {{clienteEspecifico.numeroPrestamos}}
+          </div>
+          <div class="dato-cliente destacado">
+            <mat-icon>assignment_turned_in</mat-icon>
+            <strong>Activos:</strong> {{clienteEspecifico.numeroActivos}}
+          </div>
+          <div class="dato-cliente destacado">
+            <mat-icon>payments</mat-icon>
+            <strong>Adeudo:</strong> {{clienteEspecifico.adeudo}}
+          </div>
+          <div class="dato-cliente destacado">
+            <mat-icon>schedule</mat-icon>
+            <strong>Retrasos:</strong> {{clienteEspecifico.puntuacion}}
+          </div>
+          <div class="dato-cliente destacado">
+            <mat-icon>grade</mat-icon>
+            <strong>Clasificación:</strong> {{clienteEspecifico.clasificacion}}
+          </div>
+        </div>
+    
+      </div>
     </mat-card>
+    
+
+    <div class="descargas-container">
+
+      <!-- Primera tarjeta -->
+      <mat-card class="descarga-card">
+        <div class="imagen-descarga">
+          <img src="../../../../assets/img/pdf.png" alt="Descargar PDF 1">
+        </div>
+        <div class="nombre-archivo">
+          <strong>Comprobante</strong>
+        </div>
+        <button mat-button class="boton" (click)="generarPDF(clienteEspecifico.fotoComprobante,'Comprobante')">
+          Descargar
+        </button>
+        <button mat-button class="boton" (click)="openDialogImg(clienteEspecifico.fotoComprobante)">
+          Ver
+        </button>
+      </mat-card>
+    
+      <!-- Segunda tarjeta -->
+      <mat-card class="descarga-card">
+        <div class="imagen-descarga">
+          <img src="../../../../assets/img/pdf.png" alt="Descargar PDF 1">
+        </div>
+        <div class="nombre-archivo">
+          <strong>Fachada</strong>
+        </div>
+        <button mat-button class="boton" (click)="generarPDF(clienteEspecifico.fotoFachada,'Fachada')">
+          Descargar
+        </button>
+        <button mat-button class="boton" (click)="openDialogImg(clienteEspecifico.fotoFachada)">
+          Ver
+        </button>
+      </mat-card>
+    
+      <!-- Tercera tarjeta -->
+      <mat-card class="descarga-card">
+        <div class="imagen-descarga">
+          <img src="../../../../assets/img/pdf.png" alt="Descargar PDF 1">
+        </div>
+        <div class="nombre-archivo">
+          <strong>INE desde el Frente</strong>
+        </div>
+        <button mat-button class="boton" (click)="generarPDF(clienteEspecifico.fotoIneFrente,'INE de Frente')">
+          Descargar
+        </button>
+        <button mat-button class="boton" (click)="openDialogImg(clienteEspecifico.fotoIneFrente)">
+          Ver
+        </button>
+      </mat-card>
+    
+      <!-- Cuarta tarjeta -->
+      <mat-card class="descarga-card">
+        <div class="imagen-descarga">
+          <img src="../../../../assets/img/pdf.png" alt="Descargar PDF 1">
+        </div>
+        <div class="nombre-archivo">
+          <strong>INE de Reverso</strong>
+        </div>
+        <button mat-button class="boton" (click)="generarPDF(clienteEspecifico.fotoIneReverso,'INE de Reverso')">
+          Descargar
+        </button>
+        <button mat-button class="boton" (click)="openDialogImg(clienteEspecifico.fotoIneReverso)">
+          Ver
+        </button>
+      </mat-card>
+    
+    </div>
+    
+    
 
     <div class="table-container">
     <mat-toolbar>
@@ -85,6 +193,26 @@
           <th mat-header-cell *matHeaderCellDef> Cantidad </th>
           <td mat-cell *matCellDef="let element"> {{element.cantidadPrestamo}} </td>
         </ng-container>
+
+          <!-- Weight Column -->
+        <ng-container matColumnDef="restante">
+          <th mat-header-cell *matHeaderCellDef> Restante </th>
+          <td mat-cell *matCellDef="let element"> {{element.totalRestante}} </td>
+        </ng-container>
+      
+        <!-- Weight Column -->
+        <ng-container matColumnDef="adeudo">
+          <th mat-header-cell *matHeaderCellDef> Adeudo </th>
+          <td mat-cell *matCellDef="let element"> {{element.adeudo}} </td>
+        </ng-container>
+      
+
+              
+        <!-- Weight Column -->
+        <ng-container matColumnDef="retrasos">
+          <th mat-header-cell *matHeaderCellDef> Retrasos </th>
+          <td mat-cell *matCellDef="let element"> {{element.moras}} </td>
+        </ng-container>
       
         <!-- Symbol Column -->
         <ng-container matColumnDef="estado">
@@ -108,14 +236,16 @@
     </table>      
     </div>
     
+
+    <!--
     <div class="slider-container">
       <div class="slider">
         <img [src]="currentImage" alt="Slide {{ currentSlideIndex + 1 }}" class="img_Expediente"/>
       </div>
       <button (click)="prevSlide()" [disabled]="currentSlideIndex === 0">Anterior</button>
-      <button (click)="nextSlide()" [disabled]="currentSlideIndex === 2">Siguiente</button>
+      <button (click)="nextSlide()" [disabled]="currentSlideIndex === 3">Siguiente</button>
     </div>
-      
+      -->
     
 </div>
 

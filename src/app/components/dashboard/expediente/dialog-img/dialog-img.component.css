@@ -1,0 +1,27 @@
+.image-viewer {
+    display: flex; /* Flexbox para centrar */
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Oculta las partes que sobresalen */
+    background-color: rgb(0, 0, 0); /* Negro semi-transparente */
+}
+  
+  .image-viewer img {
+    width: 100%; /* Ancho completo por defecto */
+    height: 100%; /* Alto completo por defecto */
+    object-fit: cover; /* Cubre el contenedor sin deformarse */
+  }
+  
+  /* Media Query para pantallas pequeñas */
+  @media (max-width: 768px) {
+    .image-viewer img {
+      object-fit: contain; /* Ajusta la imagen completamente al área visible */
+      width: auto; /* Usa el ancho natural de la imagen */
+      height: auto; /* Usa el alto natural de la imagen */
+      max-width: 100%; /* Limita el ancho al contenedor */
+      max-height: 100%; /* Limita el alto al contenedor */
+    }
+  }
+  

@@ -29,3 +29,32 @@ table {
 .table-container {
   overflow-x: auto;
 }
+
+.toolbar {
+  display: flex;
+  flex-direction: column; /* Muestra los elementos en columnas para dispositivos móviles */
+  align-items: flex-start; /* Alinea los elementos al inicio */
+  margin-bottom: 20px;
+}
+
+.title {
+  margin-bottom: 10px; /* Espacio entre el título y los botones */
+}
+
+.example-spacer {
+  flex: 1 1 auto; /* Espacio flexible que empuja los botones a la derecha */
+}
+
+.button-container {
+  display: flex; /* Alinea los botones horizontalmente */
+  gap: 10px; /* Espacio entre los botones */
+}
+
+/* Estilo para dispositivos móviles */
+@media (min-width: 600px) {
+  .toolbar {
+    flex-direction: row; /* Cambia a fila en pantallas más grandes */
+    justify-content: space-between; /* Alinea los elementos a los extremos */
+    align-items: center; /* Centra verticalmente los elementos */
+  }
+}

@@ -3,14 +3,16 @@
         <span>Editar Informacion Cliente</span>
     </mat-toolbar>
 
-    <mat-card style="margin-top: 10px;">
+    <mat-card class="responsive-container" style="margin-top: 10px;">
 
         <form [formGroup]="form" (ngSubmit)="EnviarDatos()">
 
             <mat-grid-list  cols="2" rowHeight="70px">
-               
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
-                    <h3>Datos de cliente</h3>
+
+                <mat-grid-tile [colspan]="2" [rowspan]="3">
+                    <div class="image-container">
+                      <img src={{variableURL}}{{imgMostrar}} alt="Foto de perfil" class="profile-image">
+                    </div>
                 </mat-grid-tile>
 
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
@@ -34,35 +36,35 @@
                     </mat-form-field>
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Colonia</mat-label>
                         <input matInput autocomplete="off" formControlName="colonia">
                     </mat-form-field>
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Ciudad</mat-label>
                         <input matInput autocomplete="off" formControlName="ciudad">
                     </mat-form-field>
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Telefono Celular</mat-label>
                         <input type="number" matInput autocomplete="off" formControlName="celular">
                     </mat-form-field>
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Estado Civil</mat-label>
                         <input matInput autocomplete="off" formControlName="estadoCivil">
                     </mat-form-field>
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Tipo Vivienda</mat-label>
                         <mat-select formControlName="tipoVivienda">
@@ -73,23 +75,23 @@
                     </mat-form-field>
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
-                        <mat-label>Tiempo viviendo en el domicilio</mat-label>
+                        <mat-label>Tiemp. en vivienda</mat-label>
                         <input matInput autocomplete="off" formControlName="tiempoVivienda">
                     </mat-form-field>
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Pago de renta</mat-label>
-                        <input type="number" matInput autocomplete="off" formControlName="pagoRenta">
+                        <input matInput autocomplete="off" formControlName="pagoRenta">
                     </mat-form-field>
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
-                        <mat-label>Tiempo del negocio</mat-label>
+                        <mat-label>Tiemp. del negocio</mat-label>
                         <input matInput autocomplete="off" formControlName="tiempoNegocio">
                     </mat-form-field>
                 </mat-grid-tile>
@@ -108,14 +110,14 @@
                     </mat-form-field>
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Nombre del conyugue</mat-label>
                         <input matInput autocomplete="off" formControlName="conyugue">
                     </mat-form-field>
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Ingreso del solicitante</mat-label>
                         <input type="number" matInput autocomplete="off" formControlName="ingresoSolicitante">
@@ -144,13 +146,13 @@
                     <button type="button" mat-raised-button color="danger" class="ancho" (click)="openDialog()">Eliminar Cliente</button>
                 </mat-grid-tile>
                 <mat-grid-tile [colspan]="1" [rowspan]="1">
-                    <button type="submit" mat-raised-button color="primary" class="ancho" [disabled]="form.invalid">Modificar</button>
+                    <button type="submit" mat-raised-button color="primary" class="ancho" [disabled]="form.invalid || isLoading">Modificar</button>
                 </mat-grid-tile>
             </mat-grid-list>
         </form>
     </mat-card>
 
-    <mat-card style="margin-top: 10px;">
+    <mat-card class="responsive-container" style="margin-top: 10px;">
         <h2 style="text-align: center;">Subida de imagenes</h2>
         <mat-grid-list  cols="2" rowHeight="70px">
             
@@ -168,6 +170,17 @@
                 <button type="button" mat-raised-button (click)="openInput3()" class="ancho">Comprobante</button>
                 <input id="fileInput3" hidden type="file"   accept=".pdf,.jpg,.png" (change)="onFileSelected($event, 'comprobante')">
             </mat-grid-tile>
+
+            <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <button type="button" mat-raised-button (click)="openInput4()" class="ancho">Fachada</button>
+                <input id="fileInput4" hidden type="file"   accept=".pdf,.jpg,.png" (change)="onFileSelected($event, 'fachada')">
+            </mat-grid-tile>
+
+            <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <button type="button" mat-raised-button (click)="openInput5()" class="ancho">Perfil</button>
+                <input id="fileInput5" hidden type="file"   accept=".pdf,.jpg,.png" (change)="onFileSelected($event, 'perfil')">
+            </mat-grid-tile>
+
 
             <mat-grid-tile [colspan]="2" [rowspan]="2">
                 <mat-progress-spinner *ngIf="subiendoArchivo" mode="determinate" [value]="progreso"></mat-progress-spinner>

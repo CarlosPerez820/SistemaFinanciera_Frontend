@@ -1,6 +1,10 @@
 import { DatePipe } from '@angular/common';
 import { Component } from '@angular/core';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
+import { Dotacion } from 'src/app/interfaces/dotacion';
+import { Gasto } from 'src/app/interfaces/gasto';
+import { DotacionService } from 'src/app/services/dotacion.service';
+import { GastosService } from 'src/app/services/gastos.service';
 import { GestorServiceService } from 'src/app/services/gestor-service.service';
 import { PagoServiceService } from 'src/app/services/pago-service.service';
 import { PrestamoServiceService } from 'src/app/services/prestamo-service.service';
@@ -69,10 +73,31 @@ export class InformeGeneralComponent {
   porcentaje:any;
   mostrarResultados=false;
   pagosDelDia:any;
+  adeudosDelDia:any;
+
+
+
+  //nuevas variables
+  listaPrestamosGestor: any =[];
+  lista2: any =[];
+  listaGastos: Gasto[] = [];
+  listaGastosGeneral: Gasto[] = [];
+  valorGastos: number = 0;
+  totalAdeudos: number = 0;
+  listaPrestamosGeneral:any=[];
+  dotacionAgisnada: number=0;
+  listaDotacion : Dotacion[]=[];
+  listaGenericaDotacion: any=[];
+  fechaFormat: any;
+  listaGastosDia: Gasto[] = [];
+  _listaGastosDia: Gasto[] = [];
+
+  
 
   constructor(private gestorService:GestorServiceService, private sharedService:SharedService, 
               private pagoService:PagoServiceService, private prestamoService: PrestamoServiceService,
-              private solicitudeService: SolicitudServiceService
+              private solicitudeService: SolicitudServiceService, private gastoService: GastosService,
+              private dotacionService: DotacionService
     ) {
     
   }
@@ -80,6 +105,7 @@ export class InformeGeneralComponent {
   ngOnInit(): void{
     this.obtenerGestores();
     this.obtenerPrestamos();
+    this.obtenerGastos();
   }
 
   cambiarValores(){
@@ -89,12 +115,13 @@ export class InformeGeneralComponent {
   onDateChange(event: MatDatepickerInputEvent<Date>) {
     const datePipe = new DatePipe('en-US');
     this.valorDeFecha = datePipe.transform(event.value, 'd-M-yyyy');
+    this.fechaFormat =  datePipe.transform(event.value, 'yyyy-MM-dd');
   }
 
   onDateChangeGeneral(event: MatDatepickerInputEvent<Date>) {
     const datePipe = new DatePipe('en-US');
     this.valorDeFecha2 = datePipe.transform(event.value, 'd-M-yyyy');
-    console.log(this.valorDeFecha2);
+   // console.log(this.valorDeFecha2);
     this.mostrarResultados=true;
     
     //this.obtenerPagos(this.valorDeFecha2);
@@ -102,25 +129,28 @@ export class InformeGeneralComponent {
     this.sumarPagosGeneralDia(fechaDia);
     this.sumarPagosGeneral(this.valorDeFecha2);
     this.buscarSolicitudesGeneral(this.valorDeFecha2);
+    this.obtenerGastos();
   }
 
   buscar(){
-    console.log(this.valorDeFecha);
-    console.log(this.valorSeleccionado);
+ //   console.log(this.valorDeFecha);
+ //   console.log(this.valorSeleccionado);
     this.mostrarResultados=true;
 
     this.seleccionarPrestamosGestor(fechaDia,this.valorSeleccionado);
     this.buscarSolicitudesGestor(this.valorDeFecha, this.valorSeleccionado);
     this.sumarPagosGestor(this.valorDeFecha, this.valorSeleccionado);
+    this.obtenerGastosGestor( this.valorSeleccionado);
+    this.obtenerDotacionesFecha(this.fechaFormat, this.valorSeleccionado);
   }
   
   obtenerGestores(){
     this.gestorService.getGestorFinanciera(this.sharedService.getFinanciera())
     .subscribe( data => {
-      console.log(data);
+   //   console.log(data);
       this.lista = data;
       this.listaGestores = this.lista.gestores;
-      console.log(this.listaGestores);
+   //   console.log(this.listaGestores);
     })
   }
 
@@ -129,10 +159,10 @@ export class InformeGeneralComponent {
     return new Promise<void>((resolve, reject) => {
       this.pagoService.getPagosFinancieraFecha(this.sharedService.getFinanciera(), fechaPago)
       .subscribe((data) => {
-          console.log(data);
+       //   console.log(data);
           this.lisPago = data;
           this.listaPagos = this.lisPago.pagos;
-          console.log(this.listaPagos);
+       //   console.log(this.listaPagos);
           resolve(); 
         }, (error) => {
           reject(error); 
@@ -144,10 +174,11 @@ export class InformeGeneralComponent {
   obtenerPrestamos(){
     this.prestamoService.getPrestamosValidosFinanciera(this.sharedService.getFinanciera())
     .subscribe( data => {
-      console.log(data);
+    //  console.log(data);
       this.lisPrestamos = data;
       this.listaPrestamos = this.lisPrestamos.prestamos;
-      console.log(this.listaPrestamos);
+      this.listaPrestamosGeneral = this.listaPrestamos;
+    //  console.log(this.listaPrestamos);
     })
   }
 
@@ -155,10 +186,10 @@ export class InformeGeneralComponent {
     return new Promise<void>((resolve, reject) => {
     this.solicitudeService.getSolicitudesFinancieraDia(this.sharedService.getFinanciera(), fecha)
     .subscribe((data) => {
-      console.log(data);
+    //  console.log(data);
       this.lisSolicitudes = data;
       this.listaSolicitudes = this.lisSolicitudes.solicitudes;
-      console.log(this.listaSolicitudes);
+    //  console.log(this.listaSolicitudes);
       resolve(); 
     }, (error) => {
       reject(error); 
@@ -171,12 +202,14 @@ export class InformeGeneralComponent {
     this.listaCuentasPagadas=[];
     this.listaCuentasFaltantes=[];
     this.listaPrestamosDelDia=[];
+
     let contador=0;
     let contador1=0;    
     let contador2=0;
     let contador3=0;
     let contador4=0;
     let contador5=0;
+    let contadorAdeudo=0;
 
     for (let index = 0; index < this.listaPrestamos.length; index++) {   
             contador1 = contador1+this.listaPrestamos[index].pagoDiario;
@@ -188,8 +221,8 @@ export class InformeGeneralComponent {
             if (this.listaPrestamos[index].fechaPago==fechaDelDia) {
             this.listaCuentasPagadas.push(this.listaPrestamos[index]);
             contador4=contador4+this.listaPrestamos[index].pagoDiario;
-            console.log("Contador 4");
-            console.log(this.listaPrestamos[index]);
+          //  console.log("Contador 4");
+          //  console.log(this.listaPrestamos[index]);
             }
             if (this.listaPrestamos[index].fecha==fechaDelDia) {
               this.listaPrestamosDelDia.push(this.listaPrestamos[index]);
@@ -198,11 +231,20 @@ export class InformeGeneralComponent {
 
 
             contador2 = contador2 + this.listaPrestamos[index].totalRestante;
+            console.log(index+" - "+this.listaPrestamos[index].totalRestante+" - suma: "+contador2);
+           //         console.log(this.listaPrestamos[index].totalRestante);
+
+            contadorAdeudo = contadorAdeudo + this.listaPrestamos[index].adeudo;
+
     }
 
     this.totalCobrarDia = contador1;
     this.contadorNumeroPrestamos = this.listaPrestamos.length;
     this.totalCartera = contador2;
+    this.totalAdeudos = contadorAdeudo;
+
+    console.log(this.listaPrestamos.length);
+
 
     this.cuentasxCobrar=this.listaCuentasFaltantes.length;
     this.totalFaltante = contador3;
@@ -218,12 +260,16 @@ seleccionarPrestamosGestor(fechaDelDia: any, gestor:any){
   this.listaCuentasPagadas=[];
   this.listaCuentasFaltantes=[];
   this.listaPrestamosDelDia=[];
+
+  this.listaPrestamosGeneral = [];
   let contador=0;
   let contador1=0;    
   let contador2=0;
   let contador3=0;
   let contador4=0;
   let contador5=0;
+  let contadorAdeudo=0;
+
 
   for (let index = 0; index < this.listaPrestamos.length; index++) {   
 
@@ -231,6 +277,8 @@ seleccionarPrestamosGestor(fechaDelDia: any, gestor:any){
     {
       contador1 = contador1+this.listaPrestamos[index].pagoDiario;
       contador=contador+1;
+      this.listaPrestamosGeneral.push(this.listaPrestamos[index]);
+      contadorAdeudo = contadorAdeudo + this.listaPrestamos[index].adeudo;
 
       if (this.listaPrestamos[index].fechaPago!=fechaDelDia) {
        this.listaCuentasFaltantes.push(this.listaPrestamos[index]);
@@ -239,7 +287,7 @@ seleccionarPrestamosGestor(fechaDelDia: any, gestor:any){
       if (this.listaPrestamos[index].fechaPago==fechaDelDia) {
       this.listaCuentasPagadas.push(this.listaPrestamos[index]);
       contador4=contador4+this.listaPrestamos[index].pagoDiario;
-      console.log("El contador numero 4 muestra: "+contador4);
+    //  console.log("El contador numero 4 muestra: "+contador4);
       }
       if (this.listaPrestamos[index].fecha==fechaDelDia) {
         this.listaPrestamosDelDia.push(this.listaPrestamos[index]);
@@ -249,6 +297,8 @@ seleccionarPrestamosGestor(fechaDelDia: any, gestor:any){
     }
           
   }
+
+  this.totalAdeudos = contadorAdeudo;
 
   this.totalCobrarDia = contador1;
   this.contadorNumeroPrestamos = contador;
@@ -278,11 +328,11 @@ buscarSolicitudesGeneral(fecha:any){
       for (let index = 0; index < this.listaSolicitudes.length; index++) {
           if(this.listaSolicitudes[index].tipo=="Renovacion"){
             this.renovacionesEspecificas.push(this.listaSolicitudes[index]);
-            sumaSolicitud=sumaSolicitud+this.listaSolicitudes[index].montoSolicitado;  
+            sumaRenovacion=sumaRenovacion+this.listaSolicitudes[index].montoSolicitado;  
           }
           else{
             this.solicitudesEspecificas.push(this.listaSolicitudes[index]);
-            sumaRenovacion=sumaRenovacion+this.listaSolicitudes[index].montoSolicitado;
+            sumaSolicitud=sumaSolicitud+this.listaSolicitudes[index].montoSolicitado;
           }
       }
       this.totalSolicitudesDia=sumaSolicitud;
@@ -334,11 +384,16 @@ sumarPagosGeneral(fecha:any){
   this.obtenerPagos(fecha)
     .then(() => {
       let contador=0;
+      let contador2=0;
+
       this.listaPagosEspecificos=[];
       for (let index = 0; index < this.listaPagos.length; index++) { 
         contador=contador+this.listaPagos[index].abono;
+
+        contador2 = contador2 + this.listaPagos[index].pagosPendiente;
       }
       this.pagosDelDia=contador;
+      this.adeudosDelDia = contador2
 
       this.listaPagosEspecificos=this.listaPagos;
     })
@@ -370,16 +425,21 @@ sumarPagosGestor(fecha:any, gestor:any){
   this.obtenerPagos(fecha)
     .then(() => {
       let contador=0;
+      let contador2=0;
+
       this.listaPagosEspecificos=[];
       for (let index = 0; index < this.listaPagos.length; index++) { 
 
         if(this.listaPagos[index].gestor==gestor)
         {
           contador=contador+this.listaPagos[index].abono;
+          contador2=contador2+this.listaPagos[index].pagosPendiente;
+
           this.listaPagosEspecificos.push(this.listaPagos[index]);
         }
       }
       this.pagosDelDia=contador;
+      this.adeudosDelDia = contador2;
     })
     .catch(error => {
       console.error('Error al obtener Pagos:', error);
@@ -391,16 +451,21 @@ sumarPagosGestorDia(fecha:any, gestor:any){
   this.obtenerPagos(fecha)
     .then(() => {
       let contador=0;
+      let contador2=0;
+
       this.listaPagosEspecificos=[];
       for (let index = 0; index < this.listaPagos.length; index++) { 
 
         if(this.listaPagos[index].gestor==gestor)
         {
           contador=contador+this.listaPagos[index].abono;
+          contador2=contador2+this.listaPagos[index].pagosPendiente;
+
           this.listaPagosEspecificos.push(this.listaPagos[index]);
         }
       }
       this.pagosDelDia=contador;
+      this.adeudosDelDia = contador2;
     })
     .catch(error => {
       console.error('Error al obtener Pagos:', error);
@@ -409,8 +474,70 @@ sumarPagosGestorDia(fecha:any, gestor:any){
 
 calcularPorcentaje(cantidad:any, total:any){
   this.porcentaje= String(Math.round((cantidad*100)/total));
-  console.log("El porcentaje es: "+this.porcentaje);
+//  console.log("El porcentaje es: "+this.porcentaje);
 }
 
+obtenerGastos(){
+  const fechaInicioMes = new Date();
+  fechaInicioMes.setDate(1); // Establece el día 1 del mes actual
+  fechaInicioMes.setHours(0, 0, 0, 0); // Establece la hora a 00:00:00:000
+  
+  // Obtener la fecha de fin del mes actual
+  const fechaFinMes = new Date(fechaInicioMes);
+  fechaFinMes.setMonth(fechaFinMes.getMonth() + 1); // Mueve al siguiente mes
+  fechaFinMes.setDate(0); // Establece el día 0, que equivale al último día del mes anterior
+  fechaFinMes.setHours(23, 59, 59, 999); // Establece la hora a 23:59:59:999
+  
+  // Formatear fechas
+  const fechaInicioFormateada = this.funformatDate(fechaInicioMes);
+  const fechaFinFormateada = this.funformatDate(fechaFinMes);
+
+  this.gastoService.getGastosFinancieraFecha(this.sharedService.getFinanciera(), fechaInicioFormateada, fechaFinFormateada)
+  .subscribe( data => {
+  //  console.log(data);
+    this.lista2 = data;
+    this.listaGastos = this.lista2.gastos;
+    this.listaGastosGeneral = this.listaGastos;
+ //   console.log(this.listaGastos);
+
+    this.sumarGastos();
+  })
+}
+
+funformatDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Meses de 0-11
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+sumarGastos(){
+  const totalCantidad = this.listaGastosGeneral.reduce((acumulador, gasto) => acumulador + (gasto.monto ?? 0), 0);
+  this.valorGastos=totalCantidad;
+}
+
+obtenerGastosGestor(responsableBuscado: string){
+  this.listaGastosGeneral = this.listaGastos.filter(gasto => gasto.responsable === responsableBuscado);
+
+  this.sumarGastos();
+}
+
+
+obtenerDotacionesFecha(fecha: string, gestor:string){
+  this.listaDotacion=[];
+  this.dotacionService.getDotacionFecha(this.sharedService.getFinanciera(), fecha)
+  .subscribe( data => {
+  //  console.log(data);
+    this.listaGenericaDotacion = data;
+    this.listaDotacion = this.listaGenericaDotacion.dotaciones;
+  //  console.log(this.listaDotacion);
+
+    const totalCantidad = this.listaDotacion
+    .filter(dotacion => dotacion.gestor === gestor) // Filtrar por gestor
+    .reduce((acumulador, dotacion) => acumulador + (dotacion.monto ?? 0), 0); // Sumar los montos
+
+    this.dotacionAgisnada = totalCantidad;
+  })
+}
 
 }

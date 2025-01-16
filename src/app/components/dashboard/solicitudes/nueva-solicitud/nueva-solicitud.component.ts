@@ -48,6 +48,8 @@ export class NuevaSolicitudComponent {
   listaTasaDiaria: any =[];
   listaTasaSemanal: any =[];
 
+  isLoading = false;
+
   //barra de progeso
   subiendoArchivo: boolean = false; // Controla la visibilidad de la barra de progreso
   progreso: number = 0; // Valor de progreso para la barra
@@ -94,7 +96,6 @@ export class NuevaSolicitudComponent {
       totalPagar: ['',Validators.required],
       pagoDiario: ['',Validators.required],
       plazo: ['',Validators.required],
-      interes: ['',Validators.required],
       nombreSolicitante: ['',Validators.required],
       direccion: ['',Validators.required],
       colonia: ['',Validators.required],
@@ -335,9 +336,14 @@ export class NuevaSolicitudComponent {
 
 
   agregarUsuario(){
-     this.verificarCamposOpcionales();
+    if (this.isLoading) {
+      return;  
+    }
+    this.isLoading = true; 
 
-     this.numeroDeClienteID = this.eliminarAcentos2(this.form.value.nombreSolicitante).substring(0, 2)+year+month+day+hour+minutes+segundes+mili;
+    this.verificarCamposOpcionales();
+
+    this.numeroDeClienteID = this.eliminarAcentos2(this.form.value.nombreSolicitante).substring(0, 2)+year+month+day+hour+minutes+segundes+mili;
 
     const cliente: Clientes = {
       numeroCliente: this.numeroDeClienteID,
@@ -379,6 +385,8 @@ export class NuevaSolicitudComponent {
       numeroActivos: 0,
       prestamosActivos:false,
       clasificacion:"Pendiente",
+      adeudo: 0,
+      puntuacion: '0',
       sucursal: this.sharedService.getFinanciera()
     }
    console.log(cliente);
@@ -390,13 +398,17 @@ export class NuevaSolicitudComponent {
        const _idCliente = response.cliente._id;
        console.log("El id del nuevo cliente es "+_idCliente);
        this.mongoIdCliente = _idCliente;
-       this.activo=true;
        //Se manda a traer el metodo para registrar la solicitud solo cuando ya se registro el cliente
        this.registrarSolicitud();
+       this.activo=true;
+       this.isLoading = false; 
+
 
     },
     (error) => {
       console.error('Error al registrar cliente:', error);
+      this.activo=false;
+      this.isLoading = false; 
       this.openDialog("Lo sentimos, hubo un error y no se pudo registrar", "assets/img/error.png");
     }
   );
@@ -476,9 +488,29 @@ export class NuevaSolicitudComponent {
   openInput3(){ 
     document.getElementById("fileInput3")!.click();
   }
+  openInput4(){ 
+    document.getElementById("fileInput4")!.click();
+  }
+  openInput5(){ 
+    document.getElementById("fileInput5")!.click();
+  }
 
   eliminarAcentos2(n: any){
     return n.normalize('NFD').replace(/[\u0300-\u036f]/g,"");
+  }
+
+  avisoSMS(){
+    let texto="Hola "+ this.form.value.nombreSolicitante + ", nos comunicamos de "+  this.sharedService.getFinanciera() + " para informarte "+
+    "que su solicitud de un prestamo por el monto de :$"+this.form.value.montoSolicitado+" a un plazo de "+ this.form.value.plazo.dia+" dias, fue "+
+    "generada exitosamente y esta en espera de revisión";
+
+    let WhatsappNumero=this.form.value.celular;
+    let codigoPais: string ="52";
+    let urlWhats= "https://wa.me/"+ codigoPais+WhatsappNumero+"?text="+texto;
+  
+    
+    console.log("SMS....................." + urlWhats);
+    window.open(urlWhats, "_blank"); // Abre en una nueva pestaña o ventana
   }
 
 }

@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-//importaciones de librerias necesarias
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router'
@@ -13,10 +12,8 @@ import { UsuarioServiceService } from 'src/app/services/usuario-service.service'
   styleUrls: ['./registro-user.component.css']
 })
 export class RegistroUserComponent {
-  //variable formGroup
   form: FormGroup;
   errorMessage: any;
-  //loading = false;
 
   planes: any[] = [
     {value: 'Basico', viewValue: 'Basico'},
@@ -26,7 +23,8 @@ export class RegistroUserComponent {
 
   constructor(private fb: FormBuilder, private _snackBar: MatSnackBar, private router: Router,
               private usuarioService: UsuarioServiceService
-    ){
+              )
+  {
     this.form=this.fb.group({
       nombre: ['',Validators.required],
       correo: ['',Validators.required],
@@ -34,33 +32,29 @@ export class RegistroUserComponent {
       password: ['',Validators.required],
       sucursal: ['',Validators.required],
       membresia: ['',Validators.required]
-
     })
   }
 
-  ngOnInit(): void{
-    //console.log("HolaMundo");
-  }
+  ngOnInit(): void{}
 
   registrar(){
     console.log(this.form);
     const correo = this.form.value.correo.toLowerCase();
     const pass = this.form.value.password;
 
-    // Expresión regular para verificar si es una dirección de correo electrónico válida
     const regexCorreo = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
-    // Verifica si el correo coincide con la expresión regular
-    if (regexCorreo.test(correo)) {
-        if (pass.length < 6) {
-          this.error("La contraseña debe tener mas de 6 caracteres");
+    if (regexCorreo.test(correo)) 
+    {
+      if (pass.length > 6) {
+        this.registrarUsuario();
       }
       else{
-        this.registrarUsuario();
+        this.error("La contraseña debe tener mas de 6 caracteres");
       }
     } else {
         this.error("El correo no es valido");
-    }
+      }
   }
 
   registrarUsuario(){
@@ -73,8 +67,6 @@ export class RegistroUserComponent {
       sucursal: this.form.value.sucursal.toLowerCase(),
       membresia: this.form.value.membresia,
     }
-
-    console.log(user);
 
     this.usuarioService.guardarCliente(user).pipe(
       catchError((error) => {
@@ -92,11 +84,11 @@ export class RegistroUserComponent {
       })
     ).subscribe((data) => {
       if(data){
-        console.log("Se registro al usuario correctamente");
-        console.log(data);
+        alert("usuario "+ this.form.value.correo + " registrado exitosamente.");
         this.router.navigate(['/login']);
       }
     });
+
   }
 
   error(mensaje: string){

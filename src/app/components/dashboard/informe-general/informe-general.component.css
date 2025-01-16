@@ -66,27 +66,55 @@
   }
   
   .blue {
-    background: linear-gradient(to bottom right, #0c9174, #1864a3);
+    background: linear-gradient(to bottom right, #5d8976, #31863e);
     color: rgb(255, 255, 255);
     margin-bottom: 30px;
     border-radius: 15px;
   }
 
   .main-card {
-    align-content: center;
-    align-items: center;
-    text-align: center;
-    background: linear-gradient(to right, #0055FF, #1885b8);
-    width: 70%;
-    margin: 0 auto;
-    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.2);
-    margin-bottom: 20px;
-    color: aliceblue;
+    background: rgba(18, 46, 58, 0.856); /* Fondo con color #122A3A translúcido */
     border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37); /* Sombra oscura */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.18); /* Borde translúcido */
+    text-align: center;
+    color: #ffffff;
+    padding: 20px;
+    margin: 0 auto;
+    width: 70%;
+    margin-bottom: 20px;
   }
+  
+  h2 {
+    color: #ffffff;
+    margin-bottom: 10px;
+  }
+  
+  h4 {
+    color: #cccccc; /* Texto más claro para buen contraste */
+  }
+  
+  
+  
 
   .conenedorListas{
     width: 80%;
     margin: 0 auto;
     background-color: red;
   }
+
+
+  .centered-list {
+    display: flex;
+    flex-direction: column; /* Asegura que los elementos estén en columna */
+    align-items: center;    /* Centra los elementos horizontalmente */
+  }
+  
+  .centered-item {
+    width: 100%;           /* Asegura que los elementos ocupen todo el ancho */
+    max-width: 800px;       /* Si quieres limitar el ancho de los elementos */
+    text-align: center;     /* Centra el texto de los divs dentro del mat-list-item */
+  }
+  

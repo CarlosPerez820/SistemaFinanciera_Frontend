@@ -33,6 +33,12 @@ export class PrestamoServiceService {
     return this.http.get(`${ ApiURL }/prestamos/especifico/${id}`);
   }
 
+  getPrestamoPorDia(financiera:any, fechaInicio:any)
+  {
+    return this.http.get(`${ ApiURL }/prestamos/pordia/${financiera}/${fechaInicio}`);
+  }
+
+
   PutPrestamoFinanciera(id:any, data:any)
   {
     return this.http.put(`${ ApiURL }/prestamos/${id}`, data);

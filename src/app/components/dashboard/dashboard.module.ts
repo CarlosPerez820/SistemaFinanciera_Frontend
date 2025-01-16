@@ -32,6 +32,9 @@ import { DialogBodComponent } from './expediente/dialog-bod/dialog-bod.component
 
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { InformacionComponent } from './tabulador/informacion/informacion.component';
+import { GastosComponent } from './gastos/gastos.component';
+import { DotacionComponent } from './dotacion/dotacion.component';
+import { DialogImgComponent } from './expediente/dialog-img/dialog-img.component';
 //import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
@@ -64,7 +67,10 @@ import { InformacionComponent } from './tabulador/informacion/informacion.compon
     GestionGestoresComponent,
     ConfirmacionComponent,
     DialogBodComponent,
-    InformacionComponent
+    InformacionComponent,
+    GastosComponent,
+    DotacionComponent,
+    DialogImgComponent
   ],
   imports: [
     CommonModule,

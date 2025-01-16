@@ -18,5 +18,16 @@ export interface Pago {
     comentario?:string;
     abono?: Number;
     personasCobrador?: string;
+    estado?: string;
+    numeroPago?: number;
+
+    adeudo?: number;
+    pagosPendiente?: number;
+    mora?: number;
+    extra?: Number;
+    saldoExtra?:Number;
+    real?:Number,
     sucursal?: string;
+
+    metodo?:string;
 }

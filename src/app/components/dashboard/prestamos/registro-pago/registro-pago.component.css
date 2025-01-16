@@ -33,6 +33,7 @@
     z-index: 1;
   }
   
+  /*f6e0c2*/
   .timeline-content {
     align-items: center;
     background-color: #f4f4f4;
@@ -74,4 +75,34 @@
     z-index: 1;
   }
   
-  
+  /* Estilo por defecto para pantallas grandes */
+.responsive-container {
+
+  width: 70%;
+  margin: 0 auto; /* Centra el contenedor horizontalmente */
+}
+
+/* Estilo para pantallas pequeñas */
+@media (max-width: 768px) {
+  .responsive-container {
+    width: 100%;
+  }
+}
+
+.image-container {
+  display: flex;
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center; /* Centra verticalmente */
+}
+
+.profile-image {
+  width: 200px;  /* Ajusta el tamaño de la imagen */
+  height: 200px; /* Mantén proporción cuadrada para el borde redondeado */
+  border-radius: 50%;  /* Hace la imagen circular */
+  object-fit: cover;  /* Ajusta la imagen para que se vea bien dentro del contenedor */
+  border: 2px solid #ccc;  /* Añade un borde opcional alrededor de la imagen */
+}
+
+.documents{
+  margin-top: 50px;
+}

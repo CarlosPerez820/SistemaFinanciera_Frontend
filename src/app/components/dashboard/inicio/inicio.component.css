@@ -10,3 +10,63 @@
     max-width: 330px;
     text-align: center;
 }
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .toolbar {
+    background: linear-gradient(to right, #5d8976, #1885b8); /* Colores llamativos */
+    padding: 15px;
+    font-size: 24px;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .body {
+    text-align: center;
+    padding: 40px;
+  }
+  
+  .intro-text {
+    font-size: 20px;
+    color: #333;
+    line-height: 1.6;
+    max-width: 900px;
+    margin: 0 auto;
+    font-style: italic;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.8); /* Fondo con efecto de transparencia */
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .image-container {
+    margin: 30px auto;
+  }
+  
+  .btn-primary {
+    background-color: #5d8976;
+    color: white;
+    padding: 10px 30px;
+    font-size: 18px;
+    border-radius: 25px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background-color: #1885b8;
+  }
+  
+  img {
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+  

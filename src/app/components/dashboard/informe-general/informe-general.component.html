@@ -1,6 +1,6 @@
 <div class="container">
     <mat-toolbar>
-        <span>Informe de Financiera</span>
+        <span>Corte de Financiera</span>
         <br>
         <div class="example-spacer"></div>
         <mat-radio-group [(ngModel)]="selectedOption">
@@ -48,26 +48,61 @@
 
     <div *ngIf="mostrarResultados">
       <mat-card class="main-card">
-        <mat-card-title>Estadísticas de Cartera</mat-card-title>
+        <mat-card-title>Estadísticas de la Financiera</mat-card-title>
         <mat-card-content>
-          <p>Aqui se mostrara la información financiera de tu sucursal</p>
           <br>
+
+          <h2>Gastos del Mes</h2>
+          <h4>${{valorGastos}}</h4>
           <h2>Prestamos Activos</h2>
           <h4>{{contadorNumeroPrestamos}} Prestamos</h4>
-          <h2>Total a cobrar en el Dia</h2>
-          <h4>${{totalCobrarDia}} Por cobrar</h4>
           <h2>Valor Cartera</h2>
           <h4>${{totalCartera}}</h4>
+          <h2>Adeudos de Prestamos</h2>
+          <h4>${{totalAdeudos}}</h4>
+          <h2>Total a cobrar en el Dia</h2>
+          <h4>${{totalCobrarDia}} Por cobrar</h4>
+
           <h2>Cuentas Por Cobrar</h2>
           <h4>Faltan un total de {{cuentasxCobrar}} cuentas = ${{totalFaltante}}</h4>
           <h2>Cuentas Cobradas</h2>
           <h4>Se cobro un total de {{cuentasCobradas}} cuentas = ${{pagosDelDia}}</h4>
+          <h2>Adeudo de pagos en el dia</h2>
+          <h4>Hubo un adeudo de {{adeudosDelDia}} por pagos no completos</h4>
+          <h2 *ngIf="selectedOption === 'option2'">Se entrego una dotación de ${{dotacionAgisnada}} correspondiente al dia {{valorDeFecha}}</h2>
+<br>
+<h2 *ngIf="selectedOption === 'option2'">Se debe de entregar una cantidad de ${{pagosDelDia+dotacionAgisnada}}</h2>
 
         </mat-card-content>
       </mat-card>
 
       <div class="desplazamiento">
-      <h1>Información</h1>
+        <h1 style="text-align: center;">Prestamos Activos</h1>
+
+        <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Lista de los Prestamos Activos Actualmente
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          
+          <mat-list class="centered-list">
+            <mat-list-item *ngFor="let elemento of listaPrestamosGeneral" class="centered-item">
+              <div matListItemTitle>Fecha de inicio: {{elemento.fecha}}</div>
+              <div matListItemLine>Cliente: {{elemento.nombre}}, Pago:{{elemento.numeroPago}}</div>
+              <div matListItemLine>Cantidad Prestada: ${{elemento.cantidadPrestamo}}, Cantidad a Pagar: ${{elemento.cantidadPagar}}</div>
+              <div matListItemLine>Pago Diario: ${{elemento.pagoDiario}}, Total Restante: ${{elemento.totalRestante}}</div>
+              <div matListItemLine>Adeudo: {{elemento.adeudo}}</div>
+              <div matListItemLine>_____________________________________________________</div>
+              <br>
+            </mat-list-item>
+            <mat-divider></mat-divider>
+          </mat-list>
+        </mat-expansion-panel>
+        
+      
+        <br><br>
+        <h1 style="text-align: center;">Información</h1>
 
       <div class="card-container">
         
@@ -111,19 +146,18 @@
       (closed)="panelOpenState = false">
       <mat-expansion-panel-header>
       <mat-panel-title>
-      Lista pagos registrados
+      Lista pagos Cobrados
       </mat-panel-title>
 
       </mat-expansion-panel-header>
-      <mat-list>
-          <mat-list-item *ngFor="let elemento of listaPagosEspecificos">
+      <mat-list class="centered-list">
+          <mat-list-item *ngFor="let elemento of listaPagosEspecificos" class="centered-item">
             <mat-icon matListItemIcon>payments</mat-icon>
             <div matListItemTitle>{{elemento.fecha}}</div>
             <div matListItemLine>Cliente: {{elemento.nombreCliente}}</div>
             <div matListItemLine>Abono: ${{elemento.abono}}</div>
             <div matListItemLine>Hora de registro: {{elemento.horaPago}}</div>  
             <div matListItemLine>El cobro fue por: {{elemento.personasCobrador}}</div>  
-            <div matListItemLine>El restante es: {{elemento.totalRestante}}</div>  
             <div matListItemLine>_____________________________________________________</div>  
               <br>
 
@@ -136,12 +170,35 @@
       (closed)="panelOpenState = false">
       <mat-expansion-panel-header>
       <mat-panel-title>
-      Lista Solicitudes registrados
+      Lista cuentas faltantes
       </mat-panel-title>
 
       </mat-expansion-panel-header>
-      <mat-list>
-          <mat-list-item *ngFor="let elemento of solicitudesEspecificas">
+      <mat-list class="centered-list">
+          <mat-list-item *ngFor="let elemento of listaCuentasFaltantes" class="centered-item">
+            <div matListItemTitle>Fecha de inicio: {{elemento.fecha}}, Plazo: {{elemento.plazoPrestamo}} dias</div>
+            <div matListItemLine>Cliente: {{elemento.nombre}}, Pago:{{elemento.numeroPago}}</div>
+            <div matListItemLine>Cantidad Prestada: ${{elemento.cantidadPrestamo}}, Cantidad a Pagar: ${{elemento.cantidadPagar}}</div>
+            <div matListItemLine>Pago Diario: ${{elemento.pagoDiario}}, Total Restante: ${{elemento.totalRestante}}</div>
+            <div matListItemLine>Adeudo: {{elemento.adeudo}}</div>
+            <div matListItemLine>_____________________________________________________</div>  
+              <br>
+
+          </mat-list-item>
+          <mat-divider></mat-divider>   
+      </mat-list>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel (opened)="panelOpenState = true"
+      (closed)="panelOpenState = false">
+      <mat-expansion-panel-header>
+      <mat-panel-title>
+      Lista Solicitudes generadas
+      </mat-panel-title>
+
+      </mat-expansion-panel-header>
+      <mat-list class="centered-list">
+          <mat-list-item *ngFor="let elemento of solicitudesEspecificas" class="centered-item">
             <mat-icon matListItemIcon>payments</mat-icon>
             <div matListItemTitle>{{elemento.fechaSolicitud}}</div>
             <div matListItemLine>Monto Solicitado: {{elemento.montoSolicitado}}</div>  
@@ -159,12 +216,12 @@
       (closed)="panelOpenState = false">
       <mat-expansion-panel-header>
       <mat-panel-title>
-      Lista de Renovaciones registradas
+      Lista de Renovaciones generadas
       </mat-panel-title>
 
       </mat-expansion-panel-header>
-      <mat-list>
-          <mat-list-item *ngFor="let elemento of renovacionesEspecificas">
+      <mat-list class="centered-list">
+          <mat-list-item *ngFor="let elemento of renovacionesEspecificas" class="centered-item">
             <mat-icon matListItemIcon>payments</mat-icon>
             <div matListItemTitle>{{elemento.fechaSolicitud}}</div>
             <div matListItemLine>Monto Solicitado: {{elemento.montoSolicitado}}</div>  
@@ -182,12 +239,12 @@
       (closed)="panelOpenState = false">
       <mat-expansion-panel-header>
       <mat-panel-title>
-      Lista de Prestamos
+      Lista de Prestamos generados
       </mat-panel-title>
 
       </mat-expansion-panel-header>
-      <mat-list>
-          <mat-list-item *ngFor="let elemento of listaPrestamosDelDia">
+      <mat-list class="centered-list">
+          <mat-list-item *ngFor="let elemento of listaPrestamosDelDia" class="centered-item">
             <mat-icon matListItemIcon>payments</mat-icon>
             <div matListItemTitle>{{elemento.fecha}}</div>
             <div matListItemLine>Monto Prestado: {{elemento.cantidadPrestamo}}</div>  

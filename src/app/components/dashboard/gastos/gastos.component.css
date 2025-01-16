@@ -1,0 +1,24 @@
+table {
+    width: 100%;
+}
+
+.pointer{
+  cursor: pointer;
+}
+
+.mat-mdc-form-field {
+  font-size: 14px;
+  width: 100%;
+}
+
+.example-spacer {
+  flex: 1 1 auto;
+}
+
+.ancho{
+  width: 85%;
+}
+
+.table-container {
+  overflow-x: auto;
+}

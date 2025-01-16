@@ -36,7 +36,21 @@ import {MatListModule} from '@angular/material/list';
 import {MatChipsModule} from '@angular/material/chips';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 
+import { MatMomentDateModule, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
+import { MAT_DATE_FORMATS, DateAdapter } from '@angular/material/core';
 
+// Formato personalizado
+export const MY_FORMATS = {
+  parse: {
+    dateInput: 'YYYY-MM-DD',
+  },
+  display: {
+    dateInput: 'YYYY-MM-DD',
+    monthYearLabel: 'YYYY MMM',
+    dateA11yLabel: 'YYYY-MM-DD',
+    monthYearA11yLabel: 'YYYY MMMM',
+  },
+};
 
 
 @NgModule({
@@ -71,7 +85,9 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
     FormsModule,
     MatListModule,
     MatChipsModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatDatepickerModule,
+    MatMomentDateModule,  // Agrega este módulo si estás usando Moment.js
 //    MatRadioGroup
   ],
   exports:[

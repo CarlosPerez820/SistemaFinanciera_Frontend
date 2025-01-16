@@ -24,5 +24,15 @@ export interface Prestamo {
     urlPagare?: string;
     urlFachada?: string;
     estado?: boolean;
+    numeroPago?: Number;
+    adeudo?: Number;
+    pagosPendientes?:Number;
+    moras?:Number;
+    saldoExtra?: Number;
+    inciadoPor?: string;
     sucursal?: string;
 }
+
+export interface PrestamosResponse {
+    prestamos: Prestamo[];
+  }

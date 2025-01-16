@@ -29,6 +29,7 @@ export interface Clientes {
     ingresoConyugue?: Number;
     gastosTotales?: Number;
     gestorAsignado?: string;
+    fotoPerfil?: string;
     fotoComprobante?: string;
     fotoFachada?: string;
     fotoIneFrente?: string;
@@ -42,6 +43,7 @@ export interface Clientes {
     clasificacion?:string;
     sucursal?: string;
     puntuacion?: string;
+    adeudo?: Number;
     comentarios?: string;
 }
 

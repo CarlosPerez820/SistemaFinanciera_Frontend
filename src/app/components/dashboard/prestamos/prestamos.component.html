@@ -11,7 +11,7 @@
 
   
     <br>
-    <h2>Pendientes</h2>
+    <h2>Pendientes: {{contadorPendientes}}</h2>
     
     <div class="mat-elevation-z8">
       <table mat-table [dataSource]="dataSource2" matSort>
@@ -40,20 +40,14 @@
           <td mat-cell *matCellDef="let element"> ${{element.cantidadPagar}} </td>
         </ng-container>
       
-        <!-- Weight Column -->
-        <ng-container matColumnDef="totalRestante">
-          <th mat-header-cell *matHeaderCellDef> Restante </th>
-          <td mat-cell *matCellDef="let element"> ${{element.totalRestante}} </td>
-        </ng-container>
-      
-        <ng-container matColumnDef="fecha">
-          <th mat-header-cell *matHeaderCellDef> Fech Movimien </th>
-          <td mat-cell *matCellDef="let element"> {{element.fechaPago}} </td>
+        <ng-container matColumnDef="plazo">
+          <th mat-header-cell *matHeaderCellDef> Plazo </th>
+          <td mat-cell *matCellDef="let element"> {{element.plazoPrestamo}} dias </td>
         </ng-container>
 
-        <ng-container matColumnDef="tipo">
-          <th mat-header-cell *matHeaderCellDef> Movimiento </th>
-          <td mat-cell *matCellDef="let element"> {{element.tipoUltiPago}} </td>
+        <ng-container matColumnDef="diario">
+          <th mat-header-cell *matHeaderCellDef> Pagos de </th>
+          <td mat-cell *matCellDef="let element"> ${{element.pagoDiario}} </td>
         </ng-container>
 
         <!-- Symbol Column -->
@@ -80,7 +74,7 @@
     <br>
     <br>
    
-    <h2>Activos</h2>
+    <h2>Activos: {{contadorActivos}}</h2>
     <div class="table-container">
     <mat-form-field>
       <mat-label>Busqueda</mat-label>
@@ -112,6 +106,18 @@
         </ng-container>
 
         <!-- Name Column -->
+        <ng-container matColumnDef="retrasos">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Retrasos </th>
+          <td mat-cell *matCellDef="let element" [ngClass]="{'celda-mora': element.moras >= 5}"> {{element.moras}} </td>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="plazo">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Plazo </th>
+          <td mat-cell *matCellDef="let element"> {{element.numeroPago}} de {{element.plazoPrestamo}} </td>
+        </ng-container>
+
+        <!-- Name Column -->
         <ng-container matColumnDef="cantidadPagar">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>A Pagar </th>
           <td mat-cell *matCellDef="let element"> ${{element.cantidadPagar}} </td>
@@ -124,7 +130,7 @@
         </ng-container>
 
         <ng-container matColumnDef="fecha">
-          <th mat-header-cell *matHeaderCellDef> Ultim Movimien  </th>
+          <th mat-header-cell *matHeaderCellDef> Ult Movimien  </th>
           <td mat-cell *matCellDef="let element"> {{element.fechaPago}} </td>
         </ng-container>
 
@@ -147,14 +153,18 @@
         <!-- Symbol Column -->
         <ng-container matColumnDef="acciones">
           <th mat-header-cell *matHeaderCellDef>  </th>
-          <td mat-cell *matCellDef="let element"> <a [routerLink]="['/dashboard/registro-pago',element._id]">Pago</a> </td>
+          <td mat-cell *matCellDef="let element"> <a [routerLink]="['/dashboard/registro-pago',element._id]"><mat-icon>payments</mat-icon>
+          </a> </td>
         </ng-container>
     
       
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{
+        <tr mat-header-row *matHeaderRowDef="displayedColumns2"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns2;" [ngClass]="{
+          'fila-deudor': row.moras >= 3,
+          'fila-destiempo': row.numeroPago >= row.plazoPrestamo,
           'fila-activa': row.fechaPago === fechaActual,
-          'fila-inactiva': row.fechaPago !== fechaActual
+          'fila-inactiva': row.fechaPago !== fechaActual,
+          'fila-nueva': row.tipoUltiPago == 'Sin tipo' && row.fechaPago === fechaActual
           }"></tr>
       </table>
     

@@ -24,6 +24,8 @@ import { RevisarPrestamoComponent } from './prestamos/revisar-prestamo/revisar-p
 import { RegistroPagoComponent } from './prestamos/registro-pago/registro-pago.component';
 import { GestionGestoresComponent } from './gestion-gestores/gestion-gestores.component';
 import { AjustesComponent } from './ajustes/ajustes.component';
+import { GastosComponent } from './gastos/gastos.component';
+import { DotacionComponent } from './dotacion/dotacion.component';
 
 const routes: Routes = [
   {path: '', component: DashboardComponent, children: [
@@ -48,7 +50,10 @@ const routes: Routes = [
     {path: 'revisar-prestamo/:id', component: RevisarPrestamoComponent},
     {path: 'registro-pago/:id', component: RegistroPagoComponent},
     {path: 'gestion-gestores', component: GestionGestoresComponent},
-    {path: 'ajustes', component: AjustesComponent}
+    {path: 'ajustes', component: AjustesComponent},
+    {path: 'gastos', component: GastosComponent},
+    {path: 'dotacion', component: DotacionComponent}
+
 ]} ,
   {path: 'login', component: LoginComponent}
 ];

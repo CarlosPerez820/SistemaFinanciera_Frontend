@@ -1,3 +1,16 @@
 .ancho{
     width: 85%;
 }
+
+/* Estilo por defecto para pantallas grandes */
+.responsive-container {
+    width: 70%;
+    margin: 0 auto; /* Centra el contenedor horizontalmente */
+  }
+  
+  /* Estilo para pantallas pequeñas */
+  @media (max-width: 768px) {
+    .responsive-container {
+      width: 100%;
+    }
+  }

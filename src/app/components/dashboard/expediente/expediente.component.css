@@ -6,101 +6,199 @@
     width: 85%;
 }
   
-.img_Cliente {
-    max-width: 400px;
-    width: 100%;
-    height: 100%;
-    max-height: 300px;
-    border-radius: 10px;
+
+.expediente-cliente {
+  padding: 20px;
 }
 
-.img_Expediente {
-  max-width: 400px;
-  width: 300px;
-  height: 340px;
-  border-radius: 10px;
+.contenedor-cliente {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-/* Estilos para pantallas grandes */
-.slider-container {
-  width: 80%;
-  margin: auto;
-  padding-top: 30px;
+.titulo-cliente {
   text-align: center;
 }
 
-.slider {
-  overflow: hidden;
-  width: 450px;
-  margin: 0 auto;
+.titulo-cliente h1 {
+  font-size: 28px;
+  margin: 0;
 }
 
-img {
-  width: 100%;
-  height: auto;
-  transition: transform 0.5s ease-in-out;
+.titulo-cliente h2 {
+  font-size: 20px;
+  margin: 0;
+  color: #555;
 }
 
-.controls {
+.foto-y-info {
   display: flex;
-  justify-content: center;
-  margin-top: 20px;
+  gap: 30px;
+  align-items: flex-start;
+}
+
+.foto-cliente {
+  width: 300px;
+}
+
+.img-cliente {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.info-cliente {
+  display: flex;
+  gap: 40px;
+  flex: 1;
+}
+
+.columna1, .columna2 {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.dato-cliente {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.mat-icon {
+  margin-right: 8px;
+  color: #757575;
+}
+
+strong {
+  margin-right: 4px;
+}
+
+/* Estilos para la sección de resumen */
+.resumen-cliente {
+  display: flex;
+  justify-content: space-between;
+}
+
+.destacado {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Estilos Responsivos */
+@media (max-width: 768px) {
+  .foto-y-info {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .info-cliente {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .columna1, .columna2 {
+    width: 100%;
+  }
+
+  .resumen-cliente {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .titulo-cliente h1 {
+    font-size: 24px;
+  }
+
+  .titulo-cliente h2 {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .titulo-cliente h1 {
+    font-size: 22px;
+  }
+
+  .titulo-cliente h2 {
+    font-size: 16px;
+  }
+
+  .info-cliente {
+    gap: 15px;
+  }
+
+  .foto-cliente {
+    width: 150px;
+  }
+
+  .resumen-cliente {
+    text-align: center;
+  }
+}
+
+/*Descargas*/
+.descargas-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.descarga-card {
+  width: 23%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.imagen-descarga img {
+  width: 80px; /* Tamaño de la imagen de descarga */
+  margin-bottom: 10px;
+}
+
+.nombre-archivo {
+  margin: 10px 0;
+  font-size: 16px;
 }
 
 button {
-  margin: 0 10px;
-  padding: 5px 10px;
-  background-color: #007bff;
+  background-color: #4CAF50;
   color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
   border: none;
   cursor: pointer;
+  margin-bottom: 10px;
 }
 
-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+button:hover {
+  background-color: #45a049;
 }
 
-/* Estilos para pantallas pequeñas (móviles) */
+/* Estilos Responsivos */
 @media (max-width: 768px) {
-  .slider-container {
-    width: 100%;
-  }
-
-  .slider {
-    width: 100%;
-  }
-
-  .controls {
-    flex-direction: column;
-  }
-
-  button {
-    margin: 10px auto;
+  .descarga-card {
+    width: 48%; /* Dos cards por fila */
   }
 }
 
-
-table {
-  width: 100%;
+@media (max-width: 480px) {
+  .descarga-card {
+    width: 100%; /* Un card por fila */
+  }
 }
-
-.informacion{
-  margin-bottom: 50px;
-}
-
 
 .table-container {
   overflow-x: auto;
 }
 
-/* Aplicar reglas de estilo responsivas para dispositivos móviles */
-@media only screen and (max-width: 600px) {
-  .mat-grid-list {
-    grid-template-columns: 100%; /* Cambia a una columna para dispositivos móviles */
-  }
-
-  .mat-grid-tile {
-    width: 100%; /* Ajusta el ancho al 100% para dispositivos móviles */
-  }
+.boton{
+  color: white;
 }

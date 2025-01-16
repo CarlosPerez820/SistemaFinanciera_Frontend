@@ -59,8 +59,11 @@ export class RevisaRenovacionComponent {
    listaParametros: any =[];
    listaTasaDiaria: any =[];
    listaTasaSemanal:any=[];
+   clienteEspecifico: any = [];
+   isLoading = false;
 
    imageURL: string = 'http&rs=1';
+   variableURL = url_server;
    pdfFileName: string = 'mi_pdf';
 
   form: FormGroup;
@@ -89,7 +92,6 @@ export class RevisaRenovacionComponent {
               private http: HttpClient){
     this.form = this.fb.group({
 
-       numeroCliente: ['',Validators.required],
       fecha: [this.fecha_Solicitud,Validators.required],
       montoSolicitado: ['',Validators.required],
       montoAutorizado: ['',Validators.required],
@@ -172,6 +174,7 @@ export class RevisaRenovacionComponent {
       this.lista4 = data;
       this.listaClientes = this.lista4.clientes;
       console.log(this.listaClientes[0]);
+      this.clienteEspecifico = this.listaClientes[0];
     })
   }
 
@@ -186,12 +189,11 @@ export class RevisaRenovacionComponent {
     }
 
     this.form.patchValue({
-      plazo: this.SolicitudEspecifica.plazo,
+
       fecha : this.SolicitudEspecifica.fechaSolicitud,
       montoSolicitado: this.SolicitudEspecifica.montoSolicitado,
       totalPagar: this.SolicitudEspecifica.totalPagar,
       pagoDiario: this.SolicitudEspecifica.pagoDiario,
-      numeroCliente: this.SolicitudEspecifica.numeroCliente,
       nombreSolicitante: this.SolicitudEspecifica.nombre,
       edad: this.SolicitudEspecifica.edad,
       direccion:  this.SolicitudEspecifica.direccion,
@@ -329,8 +331,12 @@ export class RevisaRenovacionComponent {
   }
 
   EnviarDatos(){ 
-    this.GenerarPrestamo();
-
+    if(this.form.invalid){
+      this.openDialog("Por favor rellene todos los datos", "assets/img/info.png");
+    }
+    else{
+      this.GenerarPrestamo();
+    }
   }
 
   actualizarDatosCliente(){
@@ -353,6 +359,19 @@ export class RevisaRenovacionComponent {
   }
 
   GenerarPrestamo() {
+    if (this.isLoading) {
+      return;  
+    }
+    this.isLoading = true;  
+
+    today = new Date();
+    day = today.getDate();
+    month = today.getMonth() + 1;
+    year = today.getFullYear();
+    hour = today.getHours();
+    minutes =  today.getMinutes();
+    segundes =  today.getSeconds();
+    
     try {
       let folioPrestamo = "PR" + this.eliminarAcentos2(this.form.value.nombreSolicitante).substring(0, 2) + year + month + day + hour + minutes + segundes;
       
@@ -382,10 +401,16 @@ export class RevisaRenovacionComponent {
         tipoUltiPago: 'Sin tipo',
         estatus: 'Pendiente',
         nota: 'Sin Nota',
-        numeroCliente: this.form.value.numeroCliente,
+        numeroCliente: this.SolicitudEspecifica.numeroCliente,
         urlDinero: 'URL',
         urlPagare: 'URL',
         urlFachada: 'URL',
+        numeroPago: 0,
+        adeudo: 0,
+        pagosPendientes:0,
+        moras:0,
+        saldoExtra:0,
+        inciadoPor: 'vacio',
         sucursal: this.sharedService.getFinanciera(),
       };
   
@@ -398,19 +423,21 @@ export class RevisaRenovacionComponent {
 
             this.EditarSolicitud();
             this.actualizarDatosCliente();
-  
-            console.log("Registro de prestamo exitoso");
+            this.avisoSMS();
+            this.isLoading = false;  
             this.openDialog("El Prestamo se genero exitosamente", "assets/img/exito.png");
             //this.router.navigate(['dashboard/clientes']);
           }
         },
         (error) => {
+          this.isLoading = false;  
           this.openDialog("El Prestamo no se pudo generar", "assets/img/error.png");
           console.log(error);
         }
       );
     } catch (error) {
       console.error("Ocurrió un error al generar el préstamo:", error);
+      this.isLoading = false;  
       this.openDialog("Ocurrió un error inesperado."+error, "assets/img/error.png");
     }
   }
@@ -468,6 +495,11 @@ export class RevisaRenovacionComponent {
   }
 
   rechazoDeSolicitud(){
+    if (this.isLoading) {
+      return;  
+    }
+    this.isLoading = true;  
+
     const solicitud: Solicitudes = {
       estatus: "Rechazada",
     }
@@ -478,12 +510,16 @@ export class RevisaRenovacionComponent {
       if(data){
         console.log(data);
         //alert("Solicitud Actualizado");
+        this.isLoading = true;  
         this.openDialog("La Solicitud fue rechada", "assets/img/info.png");
+        this.avisoSMSRechazo();
         this.router.navigate(['dashboard/clientes']);
       }
     }, (error: any) => {
       console.log(error);
     //  alert("Problemas al actualizar, intente mas tarde");
+      this.isLoading = true;  
+
       this.openDialog("Problemas al actualizar, intente mas tarde", "assets/img/error.png");
     })
   }
@@ -498,21 +534,22 @@ export class RevisaRenovacionComponent {
 
   //Generar EL archivo PDF
   generarPDF() {
-
-    if(this.listaParametros.length==0){
-      this.openDialog("Es necesario subir primero su logo para generar un PDF", "assets/img/error.png");
-    }
+    console.log("tacos de salsa");
+    try {
+      if(this.listaParametros.length==0){
+        this.openDialog("Es necesario subir primero su logo para generar un PDF", "assets/img/error.png");
+      }
 
     console.log(this.listaParametros);
     let objetoSolicitud = this.SolicitudEspecifica;
   
     this.imageURL= url_server+ this.listaParametros[0].urlLogo;
 
-    console.log(this.imageURL);
-        // Realizar la solicitud HTTP para obtener la imagen
-        this.http.get(this.imageURL, { responseType: 'blob' }).subscribe(
-          (imageBlob) => {
-            // Convertir la imagen en base64
+      console.log(this.imageURL);
+      // Realizar la solicitud HTTP para obtener la imagen
+      this.http.get(this.imageURL, { responseType: 'blob' }).subscribe(
+        (imageBlob) => {
+        // Convertir la imagen en base64
             const reader = new FileReader();
             reader.onloadend = () => {
               const imageBase64 = reader.result as string;
@@ -653,7 +690,44 @@ export class RevisaRenovacionComponent {
             alert("Hace falta su logo para crear su documento");
             // Aquí puedes manejar el error, por ejemplo, mostrar un mensaje al usuario
           });
+    } catch (error) {
+      this.openDialog("Ocurrió un error, verifique que tenga una imagen."+error, "assets/img/error.png");
     }
+  }
+
+  avisoSMS(){
+    let texto="Hola "+ this.clienteEspecifico.nombre + ", nos comunicamos de "+ this.clienteEspecifico.sucursal + " para informarte "+
+    "que su solicitud de una renovacion por el monto de :$"+this.form.value.montoSolicitado+" a un plazo de "+ this.form.value.plazo.dia+" dias, fue "+
+    "aprobada por un monto de: $" +this.form.value.montoAutorizado;
+
+    let WhatsappNumero=this.form.value.celular;
+    let codigoPais: string ="52";
+    let urlWhats= "https://wa.me/"+ codigoPais+WhatsappNumero+"?text="+texto;
+  
+    
+    console.log("SMS....................." + urlWhats);
+    window.open(urlWhats, "_blank"); // Abre en una nueva pestaña o ventana
+  }
+
+  avisoSMSRechazo(){
+    let texto="Hola "+ this.clienteEspecifico.nombre + ", nos comunicamos de "+ this.clienteEspecifico.sucursal + " para informarte "+
+    "que su solicitud de una renovacion por el monto de :$"+this.form.value.montoSolicitado+" a un plazo de "+ this.form.value.plazo.dia+" dias, lamentablemente fue "+
+    "rechazado.";
+
+    let WhatsappNumero=this.form.value.celular;
+    let codigoPais: string ="52";
+    let urlWhats= "https://wa.me/"+ codigoPais+WhatsappNumero+"?text="+texto;
+  
+    
+    console.log("SMS....................." + urlWhats);
+    window.open(urlWhats, "_blank"); // Abre en una nueva pestaña o ventana
+  }
+
+  navegarExpediente(clienteId: any) {
+    
+      this.router.navigate(['/dashboard/expediente', clienteId]);
+    
+  }
 
 }
 

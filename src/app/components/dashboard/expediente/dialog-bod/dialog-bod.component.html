@@ -1,49 +1,95 @@
 <mat-toolbar>
-    <span>Informacion Prestamos</span>
-    <div class="example-spacer"></div>
+  <span>Información del Préstamo</span>
+  <div class="example-spacer"></div>
 </mat-toolbar>
 
-<div>
-  <mat-expansion-panel (opened)="panelOpenState = true"
-  (closed)="panelOpenState = false">
-      <mat-expansion-panel-header>
-      <mat-panel-title>
-      Lista pagos registrados
-      </mat-panel-title>
+<!-- Información del Préstamo -->
+<mat-card class="prestamo-card">
 
-      </mat-expansion-panel-header>
+  <mat-card-content>
+    <div class="prestamo-info">
+      <p><strong>Fecha de Inicio:</strong> {{ prestamoEspecifico.fecha }}</p>
+      <p><strong>Tipo de Préstamo:</strong> {{ prestamoEspecifico.tipoPrestamo }}</p>
+      <p><strong>Monto Aprobado:</strong> ${{ prestamoEspecifico.cantidadPrestamo }}</p>
+      <p><strong>Plazo:</strong> {{ prestamoEspecifico.plazoPrestamo }} dias</p>
+      <p><strong>Total a Pagar:</strong> ${{ prestamoEspecifico.cantidadPagar }}</p>
+      <br>
+      <p><strong>Adeudo:</strong> ${{ prestamoEspecifico.adeudo }}</p>
+      <p><strong>Numero de retrasos:</strong> ${{ prestamoEspecifico.moras }}</p>
+      <p><strong>Saldo extra:</strong> ${{ prestamoEspecifico.saldoExtra }}</p>
+      <p><strong>Pago numero {{prestamoEspecifico.numeroPago}} de {{prestamoEspecifico.plazoPrestamo}}</strong></p>
 
-      <div class="timeline">
-        <div class="timeline-item" *ngFor="let payment of listaPagos">
-        <mat-icon matListItemIcon>paid</mat-icon>
-        <br>
-          <div class="timeline-dot" [ngStyle]="{'background-color': payment.tipo == 'Mora' ? 'orange' : 'green'}"></div>
-          <div class="timeline-content">
-            <p class="timeline-date">{{payment.fecha}}</p>
-            <p class="timeline-description">Hora del Movimiento: {{payment.horaPago}}</p>
-            <p class="timeline-amount">Tipo de movimiento: {{payment.tipo}}</p>
-            <p class="timeline-description">Monto a pagar: ${{payment.pagoDiario}}</p>
-            <p class="timeline-amount">Monto registrado: ${{payment.abono}}</p>
-            <p class="timeline-description">Fue registrado por: {{payment.personasCobrador}}<p>
+
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<br />
+
+
+<div class="descargas-container">
+
+  <!-- Primera tarjeta -->
+  <mat-card class="descarga-card">
+    <div class="nombre-archivo">
+      <strong>Cliente con dinero en mano</strong>
+    </div>
+    <button mat-button class="boton" (click)="generarPDF(prestamoEspecifico.urlDinero,'Dinero en mano')">
+      Descargar
+    </button>
+  </mat-card>
+
+  <!-- Segunda tarjeta -->
+  <mat-card class="descarga-card">      
+    <div class="nombre-archivo">
+      <strong>Documento comprobatorio</strong>
+    </div>
+    <button mat-button class="boton" (click)="generarPDF(prestamoEspecifico.urlPagare,'Comprobante Prestamo')">
+      Descargar
+    </button>
+  </mat-card>
+
+</div>
+
+<!-- Lista de Pagos Registrados -->
+<mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      Lista de Pagos Registrados
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+
+  <div class="timeline">
+    <div class="timeline-item" *ngFor="let payment of listaPagos">
+    <mat-icon matListItemIcon>paid</mat-icon>
+    <br>
+    <div class="timeline-dot" 
+    [ngStyle]="{'background-color': payment.estado == 'Incompleto' ? 'orange' : 
+                                    payment.estado == 'Extra' ? 'cyan' : 
+                                    payment.estado == 'Completo' ? 'green' : 
+                                    payment.mora > 0 ? 'red' : 
+                                    'red'}">
+    </div>                  
+    <div class="timeline-content"
+    [ngStyle]="{
+        'background-color': payment.tipo == 'Mora' ? '#f6e0c2' : 
+                            payment.mora > 0 ? '#f6e0c2' : 
+                           payment.tipo == 'Pago' ? '#f4f4f4' : 
+                           '#808080'  
+                            }">
+        <p class="timeline-date">Pago:{{payment.numeroPago}}, {{payment.fecha}} , {{payment.horaPago}} Hrs</p>
+        <p class="timeline-amount">Tipo de movimiento: {{payment.tipo}} {{payment.estado}}</p>
+        <p class="timeline-description">Monto a pagar: ${{payment.pagoDiario}}, Se recibio: ${{payment.real}}</p>
+        <p class="timeline-amount">Registrado en pago: ${{payment.abono}}</p>
+        <p class="timeline-description">Adeudo del pago: ${{payment.pagosPendiente}} - Saldo Extra: ${{payment.extra}}<p>
+        <p class="timeline-amount">Mora registrada: ${{payment.mora}}</p>
+        <p class="timeline-description">_________________________________________________<p>
             <p class="timeline-description">El nuevo monto restante es: ${{payment.totalRestante}}<p>
-          </div>
-        </div>
+        <p class="timeline-description">Adeudo Total: ${{payment.adeudo}}<p>
+        <p class="timeline-description">SaldoExtra Total: ${{payment.saldoExtra}}<p>
+        <p class="timeline-description">Fue registrado por: {{payment.personasCobrador}}<p>
+
       </div>
-
-  </mat-expansion-panel>
-    
-</div>
-
-
-
-<br><br>
-<h3 style="text-align: center;">Documentos</h3>
-
-<div class="slider-container">
-  <div class="slider">
-    <img [src]="currentImage" alt="Slide {{ currentSlideIndex + 1 }}" />
+    </div>
   </div>
-  <button (click)="prevSlide()" [disabled]="currentSlideIndex === 0">Anterior</button>
-  <button (click)="nextSlide()" [disabled]="currentSlideIndex === 2">Siguiente</button>
-</div>
-  
+</mat-expansion-panel>

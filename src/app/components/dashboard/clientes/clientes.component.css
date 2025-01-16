@@ -2,10 +2,6 @@ table {
     width: 100%;
 }
 
-.pointer{
-  cursor: pointer;
-}
-
 .mat-mdc-form-field {
   font-size: 14px;
   width: 100%;
@@ -28,3 +24,95 @@ table {
 .fila-buro {
   background-color: rgb(253, 125, 125);  /* Puedes ajustar el color según tus preferencias */
 }
+
+
+/*  Nuevo diseño para las card´s*/
+.results {
+  padding: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.property-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Define columnas automáticas */
+  gap: 20px;
+  width: 100%;
+}
+
+.property-card {
+  position: relative; /* Para que el menú se posicione relativo a la tarjeta */
+  cursor: pointer; /* Para indicar que se puede hacer clic */
+
+  width: 200px;
+
+  background-color: #daeee5;
+  border: 1px solid #05072986;
+  border-radius: 50px;
+  padding: 20px;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.property-card.selected {
+  border-color: #007bff; /* Cambia el color del borde cuando la tarjeta está seleccionada */
+  box-shadow: 0 0 15px rgba(23, 159, 255, 0.3); /* Aumenta la sombra para resaltar la tarjeta */
+}
+
+.property-card img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 30px;
+}
+
+.property-details {
+  display: flex; /* Aplica Flexbox */
+  flex-direction: column; /* Alinea elementos verticalmente */
+  align-items: center; /* Centra los elementos horizontalmente */
+  justify-content: center; /* Centra los elementos verticalmente */
+  padding: 20px;
+  margin-bottom: 10px;
+  text-align: center; /* Alinea el texto al centro */
+}
+
+.property-details h2 {
+  margin-top: 0;
+  font-weight: bold;
+  color: #333;
+}
+
+.property-details p {
+  margin-bottom: 10px;
+  color: #090909;
+  font-size: medium;
+}
+
+.menu {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 90%;
+  z-index: 10; /* Para asegurarse de que el menú esté por encima del contenido */
+  display: flex;
+  justify-content: space-around;
+  padding: 10px;
+  border-radius: 60px;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.vip-cliente {
+  background-color: #84e2ff; /* Dorado */
+}
+
+.regular-cliente {
+  background-color: #f2f7a6; /* Verde claro */
+}
+
+.nuevo-cliente {
+  background-color: #ffbd8d; /* Azul claro */
+}
+

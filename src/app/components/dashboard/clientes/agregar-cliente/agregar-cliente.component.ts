@@ -40,6 +40,8 @@ export class AgregarClienteComponent {
   lista2:any = [];
   listaDeInteres: any = [];
 
+  isLoading = false;
+
   //barra de progeso
   subiendoArchivo: boolean = false; // Controla la visibilidad de la barra de progreso
   progreso: number = 0; // Valor de progreso para la barra
@@ -95,9 +97,14 @@ export class AgregarClienteComponent {
   }
 
   agregarUsuario(){
-      this.verificarCamposOpcionales();
+    if (this.isLoading) {
+      return;  
+    }
+    this.isLoading = true; 
 
-     this.numeroDeClienteID = this.eliminarAcentos2(this.form.value.nombreSolicitante).substring(0, 2)+year+month+day+hour+minutes+segundes;
+    this.verificarCamposOpcionales();
+
+    this.numeroDeClienteID = this.eliminarAcentos2(this.form.value.nombreSolicitante).substring(0, 2)+year+month+day+hour+minutes+segundes;
 
     const cliente: Clientes = {
       numeroCliente: this.numeroDeClienteID,
@@ -139,6 +146,8 @@ export class AgregarClienteComponent {
       numeroActivos: 0,
       prestamosActivos:false,
       clasificacion:"Pendiente",
+      adeudo: 0,
+      puntuacion:'0',
       sucursal: this.sharedService.getFinanciera()
     }
     console.log(cliente);
@@ -151,9 +160,11 @@ export class AgregarClienteComponent {
        console.log("El id del nuevo cliente es "+_idCliente);
        this.mongoIdCliente = _idCliente;
        this.activo=true;
+       this.isLoading = false; 
     },
     (error) => {
       console.error('Error al registrar cliente:', error);
+      this.isLoading = false; 
       this.openDialog("Lo sentimos ocurrio un problema y no se pudo registrar", "assets/img/exito.png");
     });
   }
@@ -163,7 +174,7 @@ export class AgregarClienteComponent {
 
     if (file) {
       console.log("tipo en Seleccionar el archivo "+tipo);
-      this.compressImage(file, tipo);
+      this.subirArchivo(file, tipo);
     }
   }
 
@@ -261,6 +272,12 @@ export class AgregarClienteComponent {
   }
   openInput3(){ 
     document.getElementById("fileInput3")!.click();
+  }
+  openInput4(){ 
+    document.getElementById("fileInput4")!.click();
+  }
+  openInput5(){ 
+    document.getElementById("fileInput5")!.click();
   }
 
   eliminarAcentos2(n: any){

@@ -1,0 +1,128 @@
+<div class="container">
+
+    <mat-toolbar>
+      <span>Registro de Gastos</span>
+      <div class="example-spacer"></div>
+    </mat-toolbar>
+
+    <br>
+
+    <mat-card style="margin-top: 10px;">
+
+      <form [formGroup]="form" (ngSubmit)="registrarDotacion()">
+          <mat-grid-list  cols="2" rowHeight="70px">
+
+              <mat-grid-tile [colspan]="2" [rowspan]="1">
+                  <h3>Asignacion de Dotacion a Gestores</h3>
+              </mat-grid-tile>
+
+              <mat-grid-tile [colspan]="1" [rowspan]="1">
+                <mat-form-field class="ancho">
+                  <input matInput [matDatepicker]="picker1" placeholder="seleccione fecha" (dateChange)="onDateChange($event)" formControlName="fecha">
+                  <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                  <mat-datepicker #picker1></mat-datepicker>
+                </mat-form-field>
+              </mat-grid-tile>
+
+            <mat-grid-tile [colspan]="1" [rowspan]="1">
+                <mat-form-field class="ancho">
+                    <mat-label>Monto</mat-label>
+                    <input matInput type="number" autocomplete="off" formControlName="monto">
+                </mat-form-field>
+            </mat-grid-tile>
+
+              <mat-grid-tile [colspan]="1" [rowspan]="1">
+                <mat-form-field class="ancho">
+                  <mat-label>Gestor</mat-label>
+                  <mat-select formControlName="gestor">
+                      <mat-option *ngFor="let elemento of listaGestores" [value]="elemento.usuario">
+                      {{elemento.nombre}}
+                      </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </mat-grid-tile>
+            
+            </mat-grid-list>
+
+            <h2 style="text-align: right;">
+              <button type="submit" *ngIf="guardarActivo" mat-raised-button color="primary" [disabled]="form.invalid || isLoading">Agregar</button>
+            </h2>
+      </form>
+    </mat-card>
+
+    <mat-grid-list  cols="2" rowHeight="70px">
+      <mat-grid-tile [colspan]="2" [rowspan]="1">
+        <h2></h2>
+      </mat-grid-tile>
+      <mat-grid-tile [colspan]="2" [rowspan]="1">
+          <h3>Seleccione una ficha de inicio y una fecha de fin para obtener los gastos realizados en ese periodo</h3>
+      </mat-grid-tile>
+      
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+        <mat-form-field class="ancho">
+          <input matInput [matDatepicker]="picker2" placeholder="fecha inicio" (dateChange)="onDateChange2($event)">
+          <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+          <mat-datepicker #picker2></mat-datepicker>
+        </mat-form-field>
+      </mat-grid-tile>
+
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+        <button mat-raised-button color="primary" (click)="buscar()">Buscar</button>
+      </mat-grid-tile>
+
+
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+        <mat-form-field class="ancho">
+          <mat-label>Gestor</mat-label>
+          <!-- Usa [(ngModel)] para el enlace bidireccional y asegúrate de que tiene 'name' -->
+          <mat-select [(ngModel)]="gestorSeleccionado" name="gestor">
+            <mat-option *ngFor="let elemento of listaGestores" [value]="elemento.usuario">
+              {{ elemento.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </mat-grid-tile>
+      
+
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+        <button mat-raised-button color="primary" (click)="buscar2()">Buscar</button>
+      </mat-grid-tile>
+
+    </mat-grid-list>
+    
+
+    <mat-form-field>
+        <mat-label>Busqueda</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Nombre" #input autocomplete="off">
+    </mat-form-field>
+
+    <div class="table-container">
+    
+      <div class="mat-elevation-z8">
+        <table mat-table [dataSource]="dataSource" matSort>
+        
+          <!-- Position Column -->
+          <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Fecha </th>
+            <td mat-cell *matCellDef="let element"> {{element.fecha}} </td>
+          </ng-container>
+        
+          <!-- Weight Column -->
+          <ng-container matColumnDef="monto">
+            <th mat-header-cell *matHeaderCellDef> Monto </th>
+            <td mat-cell *matCellDef="let element"> {{element.monto}} </td>
+          </ng-container>
+
+          <!-- Weight Column -->
+          <ng-container matColumnDef="gestor">
+            <th mat-header-cell *matHeaderCellDef> Gestor </th>
+            <td mat-cell *matCellDef="let element"> {{element.gestor}} </td>
+          </ng-container>
+        
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>    
+      </div>
+    </div>
+
+</div>

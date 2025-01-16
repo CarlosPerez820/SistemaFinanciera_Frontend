@@ -32,11 +32,21 @@ table {
 }
 
 .fila-activa {
-  background-color: #7fdd82;  /* Puedes ajustar el color según tus preferencias */
+  background-color: #a5fba7;  /* Puedes ajustar el color según tus preferencias */
 }
 .fila-inactiva {
-  background-color: #faea5a;  /* Puedes ajustar el color según tus preferencias */
+  background-color: #f7f59b;  /* Puedes ajustar el color según tus preferencias */
+}
+.fila-nueva {
+  background-color: #adfeff;  /* Puedes ajustar el color según tus preferencias */
+}
+.fila-deudor {
+  background-color: #f8caa2;  /* Puedes ajustar el color según tus preferencias */
+}
+.fila-destiempo {
+  background-color: #cbc9c9;  /* Puedes ajustar el color según tus preferencias */
 }
 .celda-mora {
+  font-weight: bold;
   color: red; /* Puedes ajustar el color según tus preferencias */
 }

@@ -12,6 +12,12 @@ import { UploadService } from 'src/app/services/upload.service';
 import { ConfirmacionComponent } from '../../informe-rutas/confirmacion/confirmacion.component';
 import { InfoDialogComponent } from 'src/app/components/info-dialog/info-dialog.component';
 
+import { environment } from 'src/environments/environment';
+import { Prestamo } from 'src/app/interfaces/prestamo';
+import { PrestamoServiceService } from 'src/app/services/prestamo-service.service';
+
+const url_server = environment.url+"/";
+
 //Obtener datos de fecha y hora
 var today = new Date();
 var day = today.getDate();
@@ -41,6 +47,12 @@ export class EditarClienteComponent {
   activo = false;
   lista2:any = [];
   clienteEspecifico: any = [];
+  lista3: any = [];
+  lista4: Prestamo[] = [];
+  listaPrestamos: Prestamo[] = [];
+  
+
+  isLoading = false;
   
   //barra de progeso
   subiendoArchivo: boolean = false; // Controla la visibilidad de la barra de progreso
@@ -52,11 +64,13 @@ export class EditarClienteComponent {
     {value: 'Familiar', viewValue: 'Familiar'},
   ];
 
+  variableURL = url_server;
+  imgMostrar = "";
 
   constructor(private fb: FormBuilder, private gestorService: GestorServiceService, private sharedService: SharedService,
               private clienteService: ClienteServiceService, private route: ActivatedRoute, private dialog: MatDialog,
               private imageCompress: NgxImageCompressService, private uploadService: UploadService,
-              private matDialog: MatDialog,  private router: Router)
+              private matDialog: MatDialog,  private router: Router, private prestamoService: PrestamoServiceService)
               {
     this.form = this.fb.group({
       numeroCliente: ['',Validators.required],
@@ -103,12 +117,17 @@ export class EditarClienteComponent {
       this.lista2 = data;
       this.clienteEspecifico = this.lista2.cliente;
       console.log(this.clienteEspecifico);
+      this.imgMostrar = this.clienteEspecifico.fotoPerfil;
       this.llenarFormulario();
+      this.obtenerPrestamos();
     })
   }
 
   llenarFormulario(){
     console.log(this.clienteEspecifico.nombre);
+    console.log(this.clienteEspecifico.numeroCliente);
+    this.numeroDeClienteID = this.clienteEspecifico.numeroCliente;
+
     this.form.patchValue({
       numeroCliente: this.clienteEspecifico.numeroCliente,
       nombreSolicitante: this.clienteEspecifico.nombre,
@@ -135,7 +154,12 @@ export class EditarClienteComponent {
   }
 
   editarUsuario(){
-      this.verificarCamposOpcionales();
+    if (this.isLoading) {
+      return;  
+    }
+    this.isLoading = true;  
+
+    this.verificarCamposOpcionales();
 
     const cliente: Clientes = {
       nombre: this.eliminarAcentos2(this.form.value.nombreSolicitante),
@@ -159,13 +183,60 @@ export class EditarClienteComponent {
     this.clienteService.PutClienteFinanciera(this.mongoIdCliente, cliente).subscribe(data => {
       if(data){
         console.log(data);
+        this.actualizarPrestamo();
+        this.isLoading = false;
         this.openDialogInfo("Se edito la información correctamente", "assets/img/exito.png");
       }
     }, (error: any) => {
       console.log(error);
+      this.isLoading = false;  
       this.openDialogInfo("Lo sentimos, hubo un error y no se actualizo la información", "assets/img/error.png");
     })
   }
+
+  
+  obtenerPrestamos(){
+    this.prestamoService.getPrestamosCliente(this.sharedService.getFinanciera(), this.clienteEspecifico.numeroCliente)
+      .subscribe( data => {
+        console.log("Los prestamos del cliente");
+        console.log(data);
+        this.lista3 = data;
+        this.lista4 = this.lista3.prestamos;
+
+        // Filtrar los préstamos cuyo estatus sea diferente a "Finalizado"
+        this.listaPrestamos = this.lista4.filter(prestamo => prestamo.estatus !== "Finalizado");
+        console.log("Los prestamos Seleccionados del cliente");
+        console.log(this.listaPrestamos);
+      });
+  }
+  
+  actualizarPrestamo() {
+    const prestamo: Prestamo = {
+      gestor: this.form.value.gestor,
+      nombre: this.form.value.nombreSolicitante,
+      direccion: this.form.value.direccion,
+      colonia: this.form.value.colonia,
+      telefono: this.form.value.celular,
+    };
+  
+    let actualizacionesCompletadas = 0;
+    let errores = 0;
+  
+    this.listaPrestamos.forEach(prestamoItem => {
+      this.prestamoService.PutPrestamoFinanciera(prestamoItem._id, prestamo).subscribe(
+        data => {
+          actualizacionesCompletadas++;
+          console.log(`Prestamo con ID ${prestamoItem._id} actualizado con éxito:`, data);
+        },
+        error => {
+          errores++;
+          console.log(`Error al actualizar el préstamo con ID ${prestamoItem._id}:`, error);
+          alert(`Problemas al actualizar el préstamo con ID ${prestamoItem._id}. Intente más tarde.`);
+        }
+      );
+    });
+  }
+  
 
   onFileSelected(event: any, tipo:any) {
     const file = event.target.files[0];
@@ -244,7 +315,9 @@ export class EditarClienteComponent {
       }).then((response) => {
         console.log("Documento subido");
         console.log(response);
+        this.imgMostrar="";
         this.subiendoArchivo = false; // Ocultar la barra de progreso
+        this.imgMostrar= response.fotoPerfil;
         this.openDialogInfo("La imagen se subio exitosamente", "assets/img/exito.png");
       }).catch((error) => {
         console.error('Error al cargar el archivo:', error);
@@ -286,6 +359,13 @@ export class EditarClienteComponent {
   openInput3(){ 
     document.getElementById("fileInput3")!.click();
   }
+  openInput4(){ 
+    document.getElementById("fileInput4")!.click();
+  }
+  openInput5(){ 
+    document.getElementById("fileInput5")!.click();
+  }
+
 
   eliminarAcentos2(n: any){
     return n.normalize('NFD').replace(/[\u0300-\u036f]/g,"");
