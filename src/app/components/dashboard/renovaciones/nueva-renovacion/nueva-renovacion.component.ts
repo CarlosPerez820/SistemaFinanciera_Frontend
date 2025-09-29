@@ -57,6 +57,11 @@ export class NuevaRenovacionComponent {
    isLoading = false;
    variableURL = url_server;
 
+   onSemanal = false;
+   listaInteres: any;
+   tasaSemanal: any[] = [];
+   plazoSemanal: any[] = [];
+ 
 
    //------------------------Nuevo calculo de montos y tasas
    tasasTradicional: any[] = [];
@@ -66,6 +71,9 @@ export class NuevaRenovacionComponent {
    tipoPrestamo: any;
  
    listaPlazo: any;
+
+   sucursalCliente=false;
+
 
  constructor(private fb: FormBuilder, private gestorService: GestorServiceService, private sharedService: SharedService,
               private route: ActivatedRoute, private clienteService: ClienteServiceService, private interesService: InteresServiceService,
@@ -91,18 +99,26 @@ export class NuevaRenovacionComponent {
       pagoRenta: [''],
       tiempoNegocio: [''],
       numeroINE: ['',Validators.required],
-      RFC: ['',Validators.required],
       conyugue: ['',Validators.required],
       ingresoSolicitante: ['',Validators.required],
       creditosActuales: [''],
       motivos: ['',Validators.required],
+      tipoNegocio:[''],
+      telefono:[''],
+      direccionNegocio:[''],
+      creditosGenerales:[''],
       gestor: ['',Validators.required],
-      tipoPrestamo: ['', Validators.required],
+      tipoPrestamo: ['tradicional', Validators.required],
+      interesSemanal:['']
+
     })
   }
 
 
   ngOnInit(): void{
+    if(this.sharedService.getFinanciera()==this.sharedService.getSucursalCliente()){
+      this.sucursalCliente = true;
+    }
     this.obtenerGestores();
     this.mongoIdCliente = this.route.snapshot.paramMap.get("id");
     console.log(this.mongoIdCliente);
@@ -110,7 +126,8 @@ export class NuevaRenovacionComponent {
     this.obtenerListaDeInteres();
 
     this.tasasTradicional = this.tasasService.getTasasTradicional();
-    this.tasasBlindage = this.tasasService.getTasasBlindage();
+    this.tasaSemanal = this.tasasService.getTasasSemanal();   
+    this.plazoSemanal = this.tasasService.getPlazoSemanal();     
     this.prestamos = this.tasasService.getTipoPrestamos();
   }
 
@@ -158,7 +175,6 @@ export class NuevaRenovacionComponent {
       tipoNegocio:  this.clienteEspecifico.tipoNegocio,
       tiempoNegocio:  this.clienteEspecifico.tiempoNegocio,
       numeroINE:  this.clienteEspecifico.numeroIdentificacion,
-      RFC:  this.clienteEspecifico.RFC,
       conyugue:  this.clienteEspecifico.nombreConyugue,
       trabajoConyugue:  this.clienteEspecifico.trabajoConyugue,
       domicilioConyugue:  this.clienteEspecifico.domicilioConyugue,
@@ -166,6 +182,9 @@ export class NuevaRenovacionComponent {
       ingresoSolicitante:  this.clienteEspecifico.ingresoSolicitante,
       ingresosConyugue:  this.clienteEspecifico.ingresoConyugue,
       gastos:  this.clienteEspecifico.gastosTotales,
+      telefono:this.clienteEspecifico.telefonoFijo,
+      direccionNegocio:this.clienteEspecifico.direccionNegocio,
+      creditosGenerales:this.clienteEspecifico.creditosGenerales,
       creditosActuales:  this.clienteEspecifico.numeroPrestamos,
       gestor:  this.clienteEspecifico.gestorAsignado
     });
@@ -207,18 +226,35 @@ export class NuevaRenovacionComponent {
     }
   }
 
+
   onTipoChange(){
-    console.log(this.prestamos);
+    console.log(this.tipoPrestamo);
     if(this.tipoPrestamo=="tradicional"){
       this.tasaSeleccionada = this.tasasTradicional;
+      this.onSemanal = false;
+
+
     }
-    else if(this.tipoPrestamo=="blindaje"){
-      this.tasaSeleccionada = this.tasasBlindage;
+    else if(this.tipoPrestamo=="semanal"){
+      this.tasaSeleccionada = this.plazoSemanal;
+      this.onSemanal= true;
+
     }
   }
 
   onPlazoChange(){
-    this.interes = this.listaPlazo.interes;
+
+    if(this.tipoPrestamo=="tradicional"){
+      this.interes = this.listaPlazo.interes;
+    }
+    else if(this.tipoPrestamo=="semanal"){
+
+    }
+  }
+
+  onTasaChange(){
+    this.interes = this.listaInteres;
+    console.log(this.interes);
   }
 
 
@@ -228,13 +264,48 @@ export class NuevaRenovacionComponent {
     let plazoNumber = this.form.value.plazo;
     let montoNumber =this.form.value.montoSolicitado;
 
-    //console.log(plazoNumber);
+    if(this.tipoPrestamo=='semanal'){
+          let meses=0; //almacena el equivalente a meses de las semanas
+          let pagoMes=0; //el pago por mes
 
-    total = Math.round((montoNumber * this.interes)/100)+montoNumber;
-    pagoDia = Math.round(total/plazoNumber.dia);
+          meses = plazoNumber.dia/4;
+          
+          pagoMes = Math.round((montoNumber * this.interes)/100);
+          total = montoNumber+(pagoMes * meses);
+          pagoDia = Math.round(total/plazoNumber.dia);
+    }
+
+    if(this.tipoPrestamo=='tradicional'){
+            total = Math.round((montoNumber * this.interes)/100)+montoNumber;
+            pagoDia = Math.round(total/plazoNumber.dia);
+    }
+
+
+    /*
+      total = Math.round((montoNumber * this.interes)/100)+montoNumber;
+      pagoDia = Math.round(total/plazoNumber.dia);
+    */
+
+    
 
     this.form.get('totalPagar')?.setValue(total);
     this.form.get('pagoDiario')?.setValue(pagoDia);
+  }
+
+  calcularNuevosMontos2(){
+    let total=0;
+    let pagoDia = 0;
+    let plazoNumber = this.form.value.plazo;
+    let montoNumber =this.form.value.montoSolicitado;
+    let interes =this.form.value.interesSemanal;
+
+    total = Math.round((montoNumber * interes)/100)+montoNumber;
+    pagoDia = Math.round(total/plazoNumber);
+
+    this.form.get('totalPagar')?.setValue(total);
+    this.form.get('pagoDiario')?.setValue(pagoDia);
+
+
   }
 
   calcularMontos(){
@@ -291,13 +362,21 @@ export class NuevaRenovacionComponent {
     }
     this.isLoading = true;  
 
+
+    let plazoPrestamo =  this.form.value.plazo.dia;
+    
+    if(this.sharedService.getFinanciera()==this.sharedService.getSucursalCliente()){
+      plazoPrestamo = this.form.value.plazo;
+    }
+
+
     const solicitud: Solicitudes = {
       fechaSolicitud: this.form.value.fecha,
       montoSolicitado: this.form.value.montoSolicitado,
       montoAutorizado: 0,
       totalPagar: this.form.value.totalPagar,
       pagoDiario: this.form.value.pagoDiario,
-      plazo: this.form.value.plazo.dia,
+      plazo: plazoPrestamo,
 
       numeroCliente: this.form.value.numeroCliente,
       nombre: this.eliminarAcentos2(this.form.value.nombreSolicitante),
@@ -308,7 +387,7 @@ export class NuevaRenovacionComponent {
       entrecalles: "desabilitado",
       ciudad: this.form.value.ciudad,
       celular: this.form.value.celular,
-      telefonoFijo: "desabilitado",
+      telefonoFijo: this.form.value.telefono,
       telefonoAdicional:"desabilitado",
       estadoCivil: this.form.value.estadoCivil,
       tiempoCasados: "desabilitado",
@@ -316,10 +395,11 @@ export class NuevaRenovacionComponent {
       tipoVivienda: this.form.value.tipoVivienda,
       tiempoViviendo: this.form.value.tiempoVivienda,
       pagoRenta: this.form.value.pagoRenta,
-      tipoNegocio: "desabilitado",
+      tipoNegocio: this.form.value.tipoNegocio,
+      direccionNegocio: this.form.value.direccionNegocio,
       tiempoNegocio: this.form.value.tiempoNegocio,
       numeroIdentificacion: this.form.value.numeroINE,
-      RFC: this.form.value.RFC,
+      RFC: 'desabilitado',
       nombreConyugue: this.form.value.conyugue,
       trabajoConyugue: "desabilitado",
       domicilioConyugue: "desabilitado",
@@ -344,6 +424,9 @@ export class NuevaRenovacionComponent {
         console.log(response);
         this.isLoading = false;  
         this.openDialog("La renovación se genero exitosamente", "assets/img/exito.png");
+        if(this.sharedService.getFinanciera()!==this.sharedService.getSucursalCliente()){
+          this.avisoSMS();
+        }
         this.router.navigate(['dashboard/clientes']);
       }
     }, error => {

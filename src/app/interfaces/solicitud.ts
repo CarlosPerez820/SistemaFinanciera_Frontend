@@ -24,6 +24,7 @@ export interface Solicitudes {
     tiempoViviendo?: string;
     pagoRenta?: string;
     tipoNegocio?: string;
+    direccionNegocio?: String;
     tiempoNegocio?: string;
     numeroIdentificacion?: string;
     RFC?: string;

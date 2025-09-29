@@ -21,6 +21,7 @@ import { saveAs } from 'file-saver';
 
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+import { TasasService } from 'src/app/services/tasas.service';
 
 (<any>pdfMake).vfs = pdfFonts.pdfMake.vfs;
 
@@ -85,6 +86,20 @@ export class RegistroPagoComponent {
   imageURL: string = 'http&rs=1';
   pdfFileName: string = 'mi_pdf';
 
+     
+  onSemanal = false;
+  listaInteres: any;
+  tasaSemanal: any[] = [];
+  plazoSemanal: any[] = [];
+  tasaSeleccionada: any;
+  onBonificacion = false;
+  tasasTradicional: any[] = [];
+  NuevoMonto = 0;
+  dotacionVar = 0;
+
+  //ProximoPagoVariable
+  proximoPagoVar: any;
+
   //barra de progeso
   subiendoArchivo: boolean = false; // Controla la visibilidad de la barra de progreso
   progreso: number = 0; // Valor de progreso para la barra
@@ -100,13 +115,22 @@ export class RegistroPagoComponent {
     {value: 'Transferencia', viewValue: 'Transferencia'},
   ];
 
+  tiposPago: any[] = [
+    {value: 'Adelantar', viewValue: 'Adelantar'},
+    {value: 'Liquidar', viewValue: 'Liquidar'},
+    {value: 'Extra', viewValue: 'Usar Extra'},
+
+  ];
+
   constructor(private fb: FormBuilder,  private route: ActivatedRoute, private gestorService: GestorServiceService, 
               private prestamoService: PrestamoServiceService, private sharedService: SharedService, private pagoService:PagoServiceService,
               private router: Router, private clienteService:ClienteServiceService, private dialog:MatDialog,
-              private uploadService: UploadService, private parametroService: ParametroServiceService, private http: HttpClient){
+              private uploadService: UploadService, private parametroService: ParametroServiceService, private http: HttpClient,
+              private tasasService: TasasService,){
     this.form = this.fb.group({
       totalRestante: ['',Validators.required], 
-      metodo: ['Efectivo',Validators.required],           
+      metodo: ['Efectivo',Validators.required],    
+      tipoPago:['Liquidar', Validators.required],       
       montoPagado: ['',Validators.required],      
       numeroCliente: ['',Validators.required],
       montoAutorizado: ['',Validators.required],
@@ -118,6 +142,9 @@ export class RegistroPagoComponent {
       colonia: ['',Validators.required],
       celular: ['',Validators.required], 
       gestor: ['',Validators.required],
+
+      direccionNegocio:[''],
+      telefonoAdicional:['']
     })
   }
 
@@ -127,6 +154,36 @@ export class RegistroPagoComponent {
     this.obtenerGestores();
     this.obtenerPrestamo();
     this.obtenerParametos();
+  }
+
+  bonificacion(){
+    this.onBonificacion=true;
+
+    this.tasasTradicional = this.tasasService.getTasasTradicional();
+  }
+
+  aplicarBonificacion(){
+    this.form.patchValue({
+
+      montoPagado: this.dotacionVar,
+      tipoPago: 'Liquidar'});
+
+      this.registrarPagos('Bonificacion');
+  }
+
+  onPlazoChange(){
+    console.log("gola");
+    console.log(this.tasaSeleccionada);
+
+    let total=0;
+    let interes = this.tasaSeleccionada.interes;
+    let montoNumber =this.form.value.montoAutorizado;
+
+    //console.log(plazoNumber);
+
+    total = Math.round((montoNumber * interes)/100)+montoNumber;
+    this.NuevoMonto = total;
+    this.dotacionVar = this.form.value.totalPagar - this.NuevoMonto;
   }
 
   obtenerParametos(){
@@ -141,7 +198,9 @@ export class RegistroPagoComponent {
       });
   }
 
-  generarFolioPago() {
+  
+
+  generarFolioPago(tipo: string) {
     const now = new Date();
 
     // Formatea día, mes, hora, minutos y segundos para que siempre tengan dos dígitos
@@ -154,7 +213,7 @@ export class RegistroPagoComponent {
     const mili = now.getMilliseconds();
 
     // Crear el folio de pago
-    const folioPago = `PAG-${year}${month}${day}${hour}${minutes}${seconds}${mili}`;
+    const folioPago = `${tipo}-${year}${month}${day}${hour}${minutes}${seconds}${mili}`;
     
     // Crear la hora actual en formato HH:MM
     const _horaActual = `${hour}:${minutes}`;
@@ -162,131 +221,58 @@ export class RegistroPagoComponent {
     return { folioPago, _horaActual };
 }
 
-  registrarPagos(){
+  registrarPagos(tipoPago: string){
     if (this.isLoading) {
       return;  
     }
     this.isLoading = true;  
 
-    let estadoPago = "Completo"; //completo-incompleto-extra
-    let abonoActual = Number(this.form.value.montoPagado);
-    let abonoEsperado = Number(this.prestamoEspecifico.pagoDiario);
-    let moraPago = 0;
-    let contador = this.adeudoTotal;
-    this.totalRestante = this.prestamoEspecifico.totalRestante;
+    let pagoDiario = this.prestamoEspecifico.pagoDiario;
+    this.morasPrestamo = this.prestamoEspecifico.moras;
+    let numeroDePago = this.prestamoEspecifico.numeroPago;
+    let aCubrir = this.prestamoEspecifico.totalRestante;
+    let cantidadPagada = this.form.value.montoPagado;
+    let tipo = this.form.value.tipoPago;
+    let saldo = 0;
+    let extra = this.prestamoEspecifico.saldoExtra
+    let tipoMovimiento = tipoPago;
 
-    if(this.totalRestante<abonoEsperado && this.adeudoTotal>0){
-    //  console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++Tacos');
-      if(abonoActual>=this.totalRestante){
+    if(this.prestamoEspecifico.numeroPago == 0){
+      numeroDePago = 1;
+    }
+    else if(this.prestamoEspecifico.fechaPago!=this.fecha_Solicitud){
+      numeroDePago = numeroDePago+1;
+    }
+
+    if(tipo=="Liquidar"){
+      saldo = aCubrir - cantidadPagada;
+    }
+    else if(tipo=="Adelantar"){
+      if(cantidadPagada>pagoDiario){
         
-        this.totalRestante = this.totalRestante >= 0 ? this.totalRestante : 0;
-        this.extraPago = abonoActual - this.totalRestante;
-        this.saldoExtra = this.saldoExtra+this.extraPago;
-
-        if(this.saldoExtra>=this.adeudoTotal){
-          this.saldoExtra = this.saldoExtra-this.adeudoTotal;
-          this.adeudoTotal=0;
-          estadoPago="Extra";
-
-        }
-        else{
-          this.adeudoTotal = this.adeudoTotal-this.saldoExtra;
-          this.saldoExtra = 0;
-  
-          this.adeudoCliente = this.adeudoCliente - this.extraPago;
-  
-        }
-        this.totalRestante = 0;
-
+        extra = extra+(cantidadPagada-pagoDiario);
+        cantidadPagada = pagoDiario;
+        saldo = aCubrir - cantidadPagada;
       }
       else{
-        this.openDialog("El abono minimo debe de ser de $"+this.totalRestante, "assets/img/info.png");
         this.isLoading = false;  
+        alert("Cantidad insufiente para adelantar");
         return;
       }
-      
     }
-
-    //Es igual
-    if(abonoActual==abonoEsperado && this.totalRestante>=abonoEsperado){
-      this.totalRestante = this.prestamoEspecifico.totalRestante - abonoActual;
-    }
-
-    //Aqui inicia el bloque de si la cantidad es mayor al pago diario
-
-    if(abonoActual>abonoEsperado && this.totalRestante>=abonoEsperado){
-   //   console.log('--------------------------------------------------------------Tacos');
-
-      this.extraPago = abonoActual - abonoEsperado;
-      this.saldoExtra = this.saldoExtra + this.extraPago;
-
-      if(this.saldoExtra>=this.adeudoTotal){
-        this.saldoExtra = this.saldoExtra-this.adeudoTotal;
-        this.adeudoTotal=0;
-        estadoPago="Extra";
-      }
-      else{
-        this.adeudoTotal = this.adeudoTotal-this.saldoExtra;
-        this.saldoExtra = 0;
-
-        this.adeudoCliente = this.adeudoCliente - this.extraPago;
-
-      }
-      abonoActual = abonoActual-this.extraPago;
-      this.totalRestante = this.prestamoEspecifico.totalRestante - abonoActual;
-
-    }
-
-    //Aqui inicia el bloque de si la cantidad es menor al pago diario
-    else if(abonoActual<abonoEsperado && this.totalRestante>=abonoEsperado){
-    //  console.log('**********************************************************************Tacos');
-
-      this.adeudoPago = abonoEsperado-abonoActual;
-
-      if(this.saldoExtra>=this.adeudoPago){
-        abonoActual=abonoActual+this.adeudoPago;
-        this.saldoExtra=this.saldoExtra-this.adeudoPago;
-        this.adeudoPago=0;
-
-      }else{
-        abonoActual=abonoActual+this.saldoExtra;
-        this.saldoExtra = 0
-        this.adeudoPago = abonoEsperado - abonoActual;
-        estadoPago="Incompleto";
-      }
-      
-      
-      let mitad = Math.round(abonoEsperado/2);
-      if(abonoActual<mitad && this.numeroPago<=this.prestamoEspecifico.plazoPrestamo){
-
-        moraPago=this.prestamoEspecifico.cobranza;
-        this.puntuacion = this.puntuacion +1;
-        this.morasPrestamo = this.morasPrestamo +1;
-      }
-      this.adeudoTotal = this.adeudoTotal+ this.adeudoPago + moraPago ;
-     // console.log("--------------------------------------------------------------------");
-     // console.log("Cliente: "+this.adeudoCliente +" adeudoPAgo: "+ this.adeudoPago +" mora:"+ moraPago);
-      this.adeudoCliente = this.adeudoCliente + this.adeudoPago + moraPago;
-      this.totalRestante = this.prestamoEspecifico.totalRestante - abonoActual;
-     // console.log("Cliente: "+this.adeudoCliente +" adeudoPAgo: "+ this.adeudoPago +" mora:"+ moraPago);
-
+    else if(tipo=="Extra"){
+      cantidadPagada = cantidadPagada + extra;
+      saldo = aCubrir - cantidadPagada;
+      extra = 0;
     }
 
 
-    if(this.prestamoEspecifico.fechaPago!=this.fecha_Solicitud || this.prestamoEspecifico.tipoUltiPago=='Sin tipo'){
-      this.numeroPago = this.prestamoEspecifico.numeroPago+1;
-    }
 
-    if(this.adeudoTotal==0){
-      this.puntuacion=this.puntuacion-this.morasPrestamo;
-      this.morasPrestamo = 0;
-      this.adeudoCliente = this.adeudoCliente - contador;
-    }
+    this.totalRestante = saldo;
+    this.numeroPago = numeroDePago;
+    this.saldoExtra = extra;
 
-    const { folioPago, _horaActual } = this.generarFolioPago();
-
-
-    //this.totalRestante = this.prestamoEspecifico.totalRestante - abonoActual;
+    const { folioPago, _horaActual } = this.generarFolioPago('PAG');
 
     //Aqui inicia el registro del pago en la base de datos
     const pago: Pago ={
@@ -298,39 +284,40 @@ export class RegistroPagoComponent {
       cantidadPrestamo: this.prestamoEspecifico.cantidadPrestamo,
       plazo: this.prestamoEspecifico.plazoPrestamo,
       totalPagar: this.prestamoEspecifico.cantidadPagar,
-      totalRestante: this.totalRestante,
+      totalRestante: saldo,
       pagoDiario: this.prestamoEspecifico.pagoDiario,
       folioPrestamo: this.prestamoEspecifico.folio,
       fechaPago: this.fecha_Solicitud,
       horaPago: _horaActual,
       gestor: this.form.value.gestor,
-      tipo: 'Pago',
+      tipo: tipoMovimiento,
       comentario: 'Vacio',
-      abono: abonoActual,
+      abono: cantidadPagada,
       personasCobrador: 'Oficina',
       
-      estado: estadoPago,
-      numeroPago:this.numeroPago,
-      adeudo:this.adeudoTotal,
-      pagosPendiente: this.adeudoPago,
-      mora:moraPago,
-      extra:this.extraPago,
+      estado: 'general',
+      numeroPago: numeroDePago,
+      adeudo: aCubrir, //a cubrir
+      pagosPendiente: 0,
+      mora:0,
+      extra:0,
       saldoExtra: this.saldoExtra,
-      real: this.form.value.montoPagado,
+      real: 0,
       metodo: this.form.value.metodo,
       sucursal: this.sharedService.getFinanciera(),
     }
 
-    //console.log(pago);
 
     this.pagoService.postPago(pago).subscribe(
       (response) => {
       this.actualizarPrestamo();
       this.actualizarCliente();
-     // console.log('Pago registrado con éxito:');
-     // console.log(response);
+
       this.openDialog("Pago registrado con éxito", "assets/img/exito.png");
-      this.avisoSMS();
+
+      if(this.sharedService.getFinanciera()!==this.sharedService.getSucursalCliente()){
+        this.avisoSMS();
+      }
 
       this.form.reset();
 
@@ -364,14 +351,28 @@ export class RegistroPagoComponent {
   actualizarCliente(){
     let activos=this.clienteEspecifico[0].numeroActivos;
 
-    if(this.totalRestante<=0 && this.adeudoTotal<=0){
+    if(this.totalRestante<=0){
       activos=activos-1;
     }
 
     const cliente: Clientes={
       puntuacion: this.puntuacion.toString(),
       numeroActivos: activos,
-      adeudo: this.adeudoCliente,
+      //adeudo: this.adeudoCliente,
+    }
+    this.clienteService.PutClienteFinanciera(this.clienteEspecifico[0]._id, cliente).subscribe(data => {
+      if(data){
+
+      }
+    }, (error: any) => {
+      alert("Problemas al actualizar al cliente, intente mas tarde");
+    });
+  }
+
+    actualizarClienteMora(){
+
+    const cliente: Clientes={
+      puntuacion: (this.puntuacion + 1).toString(),
     }
     this.clienteService.PutClienteFinanciera(this.clienteEspecifico[0]._id, cliente).subscribe(data => {
       if(data){
@@ -416,10 +417,34 @@ export class RegistroPagoComponent {
     });
   }
 
+  calcularProximoPago(): string {
+    //let fechaInicia: Date = new Date(this.fecha_Solicitud); 
+    const [d, m, a] = this.proximoPagoVar.split('-').map(Number);
+    const ultimaFechaPago = new Date(a, m - 1, d);
+
+    const proximoPago = new Date(ultimaFechaPago);
+    proximoPago.setDate(ultimaFechaPago.getDate() + 7);
+
+    const dia = proximoPago.getDate();
+    const mes = proximoPago.getMonth() + 1;
+    const anio = proximoPago.getFullYear();
+
+    const fechaFormateada = `${dia}-${mes}-${anio}`;
+
+    return fechaFormateada;
+  }
+
   actualizarPrestamo(){
+    let pagoSiguiente='Diario';
+
     let estatusPrestamo = "Activo";
-    if(this.totalRestante<=0 && this.adeudoTotal<=0){
+    if(this.totalRestante<=0){
       estatusPrestamo="Finalizado";
+   
+    }
+
+    if(this.prestamoEspecifico.tipoPrestamo=="semanal"){
+      pagoSiguiente = this.calcularProximoPago();
     }
 
     const prestamo: Prestamo = {
@@ -429,17 +454,34 @@ export class RegistroPagoComponent {
       tipoUltiPago: 'Pago',
 
       numeroPago: this.numeroPago,
-      adeudo: this.adeudoTotal,
       saldoExtra: this.saldoExtra,
-      moras: this.morasPrestamo
+      proximoPago: pagoSiguiente
     }
-    //(prestamo);
 
     this.prestamoService.PutPrestamoFinanciera(this.mongoIdPrestamo, prestamo).subscribe(data => {
       if(data){
         console.log(data);
-       // this.router.navigate(['dashboard/prestamos']);
+      }
+    }, (error: any) => {
+      console.log(error);
+      alert("Problemas al actualizar el prestamo, intente mas tarde");
+    });
+  }
 
+  actualizarPrestamoMora(){
+    const prestamo: Prestamo = {
+      fechaPago: this.fecha_Solicitud,
+      totalRestante:this.totalRestante,
+      tipoUltiPago: 'Mora',
+
+      numeroPago: this.numeroPago,
+      saldoExtra: this.saldoExtra,
+      moras: this.morasPrestamo + 50
+    }
+
+    this.prestamoService.PutPrestamoFinanciera(this.mongoIdPrestamo, prestamo).subscribe(data => {
+      if(data){
+        console.log(data);
       }
     }, (error: any) => {
       console.log(error);
@@ -484,6 +526,8 @@ export class RegistroPagoComponent {
       this.adeudoTotal = this.prestamoEspecifico.adeudo;
       this.saldoExtra = this.prestamoEspecifico.saldoExtra;
       this.morasPrestamo = this.prestamoEspecifico.moras;
+      this.totalRestante = this.prestamoEspecifico.totalRestante;
+      this.proximoPagoVar = this.prestamoEspecifico.proximoPago;
     })
   }
 
@@ -502,6 +546,8 @@ export class RegistroPagoComponent {
       colonia: this.prestamoEspecifico.colonia,
       celular: this.prestamoEspecifico.telefono, 
       gestor: this.prestamoEspecifico.gestor,
+      direccionNegocio: this.prestamoEspecifico.direccionNegocio,
+      telefonoAdicional: this.prestamoEspecifico.telefonoAdicional
     });
   }
 
@@ -580,7 +626,7 @@ export class RegistroPagoComponent {
 
   avisoSMS(){
     let texto="Hola "+ this.prestamoEspecifico.nombre + ", nos comunicamos de "+ this.prestamoEspecifico.sucursal + " para informarte que tu pago de $"+ 
-    this.form.value.montoPagado+ "fue registrado exitosamente. Tu monto restante a pagar es de $"+this.totalRestante+" y Tienes un adeudo para ponerte al corriente de: $"+this.adeudoTotal 
+    this.form.value.montoPagado+ "fue registrado exitosamente. Tu monto restante a pagar es de $"+this.totalRestante;
 
     let WhatsappNumero=this.form.value.celular;
     let codigoPais: string ="52";
@@ -596,6 +642,8 @@ export class RegistroPagoComponent {
   }
 
   generarPDF() {
+    console.log("Aqui viene la lista de pagos");
+    console.log(this.listaPagos);
    // console.log("Generando PDF...");
 
     let nombreCliente = this.form.value.nombreSolicitante;
@@ -631,11 +679,11 @@ export class RegistroPagoComponent {
                 bold: true,
               },
               {
-                text: "Presmo Aprobado de :$ " + cantidadPrestamo + " - con un total a pagar de $"+cantidadPagar+ '\n' ,
+                text: "Prestamo Aprobado "+ this.prestamoEspecifico.tipoPrestamo +", de :$ " + cantidadPrestamo + " - con un total a pagar de $"+cantidadPagar+ '\n' ,
                 style: 'header',
               },
               {
-                text: "Plazo del prestamo: "+plazo + "dias, Pago Diario de: $"+ pagoDiario+ '\n' + '\n' +'\n' ,
+                text: "Plazo del prestamo: "+plazo + ", Pagos de: $"+ pagoDiario+ '\n' + '\n' +'\n' ,
                 style: 'header',
               },
               {
@@ -649,32 +697,26 @@ export class RegistroPagoComponent {
                 style: 'tableExample',
                 table: {
                   body: [
-                    ['Num', 'Fecha', 'Estado', 'Recibido', 'Registra', 'Adeudo del pago', 'Extra', 'Mora', 'Total Restan', 'Adeudo Total', 'Saldo Extra Total', 'Registrado por'],
+                    ['Numero', 'Fecha', 'A cubrir', 'Pago', 'Mora', 'Extra', 'Saldo','Tipo' ,'Registrado por'],
                     ...this.listaPagos.map((payment: { 
                       numeroPago: any; 
                       fecha: any; 
-                      estado: any; 
-                      real: any; 
-                      abono: any; 
-                      pagosPendiente: any; 
-                      extra: any; 
-                      mora: any; 
-                      totalRestante: any; 
-                      adeudo: any; 
-                      saldoExtra: any; 
+                      adeudo: any;
+                      abono:any;
+                      mora: any;
+                      saldoExtra: any;
+                      totalRestante: any;
+                      tipo:any;
                       personasCobrador: any;
                     }) => [
                       payment.numeroPago ?? 'N/A', // Valor por defecto para numeroPago
                       payment.fecha ?? 'N/A',        // Valor por defecto para fecha
-                      payment.estado ?? 'N/A',       // Valor por defecto para estado
-                      '$' + (payment.real ?? 0),     // Valor por defecto para recibido
+                      '$' + (payment.adeudo ?? 0),     // Valor por defecto para recibido
                       '$' + (payment.abono ?? 0),    // Valor por defecto para registrado en pago
-                      payment.pagosPendiente ?? 'N/A', // Valor por defecto para adeudo del pago
-                      payment.extra ?? 'N/A',        // Valor por defecto para saldo extra
-                      payment.mora ?? 'N/A',         // Valor por defecto para mora registrada
-                      '$' + (payment.totalRestante ?? 0), // Valor por defecto para total restante
-                      '$' + (payment.adeudo ?? 0),   // Valor por defecto para adeudo total
-                      '$' + (payment.saldoExtra ?? 0), // Valor por defecto para saldo extra total
+                      '$' + (payment.mora ?? 0),         // Valor por defecto para mora registrada
+                      '$' + (payment.saldoExtra ?? 0), // Valor por defecto para total restante
+                      '$' + (payment.totalRestante ?? 0),   // Valor por defecto para adeudo total
+                      payment.tipo ?? 'N/A', // Valor por defecto para registrado por
                       payment.personasCobrador ?? 'N/A' // Valor por defecto para registrado por
                     ])
                   ]
@@ -709,7 +751,291 @@ export class RegistroPagoComponent {
       this.openDialog("Ocurrió un error, verifique que tenga una imagen." + error, "assets/img/error.png");
     }
   }
+
+
+    registrarMora(tipoPago: string){
+    if (this.isLoading) {
+      return;  
+    }
+    this.isLoading = true;  
+
+    this.morasPrestamo = this.prestamoEspecifico.moras;
+    let numeroDePago = this.prestamoEspecifico.numeroPago;
+    let aCubrir = this.prestamoEspecifico.totalRestante;
+    let cantidadPagada = this.form.value.montoPagado;
+    let saldo = 0;
+    let extra = this.prestamoEspecifico.saldoExtra
+    let tipoMovimiento = tipoPago;
+
+    let cantidadMora = this.prestamoEspecifico.cobranza;
+
+    if(this.prestamoEspecifico.numeroPago == 0){
+      numeroDePago = 1;
+    }
+    else if(this.prestamoEspecifico.fechaPago!=this.fecha_Solicitud){
+      numeroDePago = numeroDePago+1;
+    }
+
+    saldo = aCubrir + cantidadMora;
+
+    this.totalRestante = saldo;
+    this.numeroPago = numeroDePago;
+    this.saldoExtra = extra;
+
+    const { folioPago, _horaActual } = this.generarFolioPago('MOR');
+
+    //Aqui inicia el registro del pago en la base de datos
+    const pago: Pago ={
+      fecha: this.fecha_Solicitud,
+      folio: folioPago,
+      nombreCliente: this.prestamoEspecifico.nombre,
+      numCliente: this.prestamoEspecifico.numeroCliente,
+      cobranza: this.prestamoEspecifico.cobranza,
+      cantidadPrestamo: this.prestamoEspecifico.cantidadPrestamo,
+      plazo: this.prestamoEspecifico.plazoPrestamo,
+      totalPagar: this.prestamoEspecifico.cantidadPagar,
+      
+      totalRestante: saldo,
+
+      pagoDiario: this.prestamoEspecifico.pagoDiario,
+      folioPrestamo: this.prestamoEspecifico.folio,
+      fechaPago: this.fecha_Solicitud,
+      horaPago: _horaActual,
+      gestor: this.form.value.gestor,
+      tipo: tipoMovimiento,
+      comentario: 'Vacio',
+      abono: 0,
+      personasCobrador: 'Oficina',
+      
+      estado: 'general',
+      numeroPago: numeroDePago,
+
+      adeudo: aCubrir, //a cubrir
+
+      pagosPendiente: 0,
+      mora:cantidadMora,
+      extra:0,
+      saldoExtra: this.saldoExtra,
+      real: 0,
+      metodo: 'Digital',
+      sucursal: this.sharedService.getFinanciera(),
+    }
+
+
+    this.pagoService.postPago(pago).subscribe(
+      (response) => {
+      this.openDialog("Mora Aplicada con éxito", "assets/img/exito.png");
+
+      this.actualizarPrestamoMora();
+        this.actualizarClienteMora();
+
+      if(this.sharedService.getFinanciera()!==this.sharedService.getSucursalCliente()){
+        this.avisoSMS();
+      }
+
+      this.form.reset();
+
+      this.router.navigateByUrl('/dummyRoute', { skipLocationChange: true }).then(() => {
+        this.router.navigate(['dashboard/prestamos']);
+      });
+    },
+    (error) => {
+      console.error('Error al registrar Pago:', error);
+      alert("Hay problemas al registrar el pago");
+      this.router.navigateByUrl('/dummyRoute', { skipLocationChange: true }).then(() => {
+        this.router.navigate(['dashboard/prestamos']);
+      });
+    });
+  }
   
 
 }
 
+
+
+/*registrarPagosAntiguo(){
+  if (this.isLoading) {
+    return;  
+  }
+  this.isLoading = true;  
+
+  let estadoPago = "Completo"; //completo-incompleto-extra
+  let abonoActual = Number(this.form.value.montoPagado);
+  let abonoEsperado = Number(this.prestamoEspecifico.pagoDiario);
+  let moraPago = 0;
+  let contador = this.adeudoTotal;
+  this.totalRestante = this.prestamoEspecifico.totalRestante;
+
+  if(this.totalRestante<abonoEsperado && this.adeudoTotal>0){
+  //  console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++Tacos');
+    if(abonoActual>=this.totalRestante){
+      
+      this.totalRestante = this.totalRestante >= 0 ? this.totalRestante : 0;
+      this.extraPago = abonoActual - this.totalRestante;
+      this.saldoExtra = this.saldoExtra+this.extraPago;
+
+      if(this.saldoExtra>=this.adeudoTotal){
+        this.saldoExtra = this.saldoExtra-this.adeudoTotal;
+        this.adeudoTotal=0;
+        estadoPago="Extra";
+
+      }
+      else{
+        this.adeudoTotal = this.adeudoTotal-this.saldoExtra;
+        this.saldoExtra = 0;
+
+        this.adeudoCliente = this.adeudoCliente - this.extraPago;
+
+      }
+      this.totalRestante = 0;
+
+    }
+    else{
+      this.openDialog("El abono minimo debe de ser de $"+this.totalRestante, "assets/img/info.png");
+      this.isLoading = false;  
+      return;
+    }
+    
+  }
+
+  //Es igual
+  if(abonoActual==abonoEsperado && this.totalRestante>=abonoEsperado){
+    this.totalRestante = this.prestamoEspecifico.totalRestante - abonoActual;
+  }
+
+  //Aqui inicia el bloque de si la cantidad es mayor al pago diario
+
+  if(abonoActual>abonoEsperado && this.totalRestante>=abonoEsperado){
+ //   console.log('--------------------------------------------------------------Tacos');
+
+    this.extraPago = abonoActual - abonoEsperado;
+    this.saldoExtra = this.saldoExtra + this.extraPago;
+
+    if(this.saldoExtra>=this.adeudoTotal){
+      this.saldoExtra = this.saldoExtra-this.adeudoTotal;
+      this.adeudoTotal=0;
+      estadoPago="Extra";
+    }
+    else{
+      this.adeudoTotal = this.adeudoTotal-this.saldoExtra;
+      this.saldoExtra = 0;
+
+      this.adeudoCliente = this.adeudoCliente - this.extraPago;
+
+    }
+    abonoActual = abonoActual-this.extraPago;
+    this.totalRestante = this.prestamoEspecifico.totalRestante - abonoActual;
+
+  }
+
+  //Aqui inicia el bloque de si la cantidad es menor al pago diario
+  else if(abonoActual<abonoEsperado && this.totalRestante>=abonoEsperado){
+  //  console.log('**********************************************************************Tacos');
+
+    this.adeudoPago = abonoEsperado-abonoActual;
+
+    if(this.saldoExtra>=this.adeudoPago){
+      abonoActual=abonoActual+this.adeudoPago;
+      this.saldoExtra=this.saldoExtra-this.adeudoPago;
+      this.adeudoPago=0;
+
+    }else{
+      abonoActual=abonoActual+this.saldoExtra;
+      this.saldoExtra = 0
+      this.adeudoPago = abonoEsperado - abonoActual;
+      estadoPago="Incompleto";
+    }
+    
+    
+    let mitad = Math.round(abonoEsperado/2);
+    if(abonoActual<mitad && this.numeroPago<=this.prestamoEspecifico.plazoPrestamo){
+
+      moraPago=this.prestamoEspecifico.cobranza;
+      this.puntuacion = this.puntuacion +1;
+      this.morasPrestamo = this.morasPrestamo +1;
+    }
+    this.adeudoTotal = this.adeudoTotal+ this.adeudoPago + moraPago ;
+   // console.log("--------------------------------------------------------------------");
+   // console.log("Cliente: "+this.adeudoCliente +" adeudoPAgo: "+ this.adeudoPago +" mora:"+ moraPago);
+    this.adeudoCliente = this.adeudoCliente + this.adeudoPago + moraPago;
+    this.totalRestante = this.prestamoEspecifico.totalRestante - abonoActual;
+   // console.log("Cliente: "+this.adeudoCliente +" adeudoPAgo: "+ this.adeudoPago +" mora:"+ moraPago);
+
+  }
+
+
+  if(this.prestamoEspecifico.fechaPago!=this.fecha_Solicitud || this.prestamoEspecifico.tipoUltiPago=='Sin tipo'){
+    this.numeroPago = this.prestamoEspecifico.numeroPago+1;
+  }
+
+  if(this.adeudoTotal==0){
+    this.puntuacion=this.puntuacion-this.morasPrestamo;
+    this.morasPrestamo = 0;
+    this.adeudoCliente = this.adeudoCliente - contador;
+  }
+
+  const { folioPago, _horaActual } = this.generarFolioPago();
+
+
+  //this.totalRestante = this.prestamoEspecifico.totalRestante - abonoActual;
+
+  //Aqui inicia el registro del pago en la base de datos
+  const pago: Pago ={
+    fecha: this.fecha_Solicitud,
+    folio: folioPago,
+    nombreCliente: this.prestamoEspecifico.nombre,
+    numCliente: this.prestamoEspecifico.numeroCliente,
+    cobranza: 0,
+    cantidadPrestamo: this.prestamoEspecifico.cantidadPrestamo,
+    plazo: this.prestamoEspecifico.plazoPrestamo,
+    totalPagar: this.prestamoEspecifico.cantidadPagar,
+    totalRestante: this.totalRestante,
+    pagoDiario: this.prestamoEspecifico.pagoDiario,
+    folioPrestamo: this.prestamoEspecifico.folio,
+    fechaPago: this.fecha_Solicitud,
+    horaPago: _horaActual,
+    gestor: this.form.value.gestor,
+    tipo: 'Pago',
+    comentario: 'Vacio',
+    abono: abonoActual,
+    personasCobrador: 'Oficina',
+    
+    estado: estadoPago,
+    numeroPago:this.numeroPago,
+    adeudo:this.adeudoTotal,
+    pagosPendiente: this.adeudoPago,
+    mora:moraPago,
+    extra:this.extraPago,
+    saldoExtra: this.saldoExtra,
+    real: this.form.value.montoPagado,
+    metodo: this.form.value.metodo,
+    sucursal: this.sharedService.getFinanciera(),
+  }
+
+  //console.log(pago);
+
+  this.pagoService.postPago(pago).subscribe(
+    (response) => {
+    this.actualizarPrestamo();
+    this.actualizarCliente();
+   // console.log('Pago registrado con éxito:');
+   // console.log(response);
+    this.openDialog("Pago registrado con éxito", "assets/img/exito.png");
+    this.avisoSMS();
+
+    this.form.reset();
+
+    this.router.navigateByUrl('/dummyRoute', { skipLocationChange: true }).then(() => {
+      this.router.navigate(['dashboard/prestamos']);
+    });
+  },
+  (error) => {
+    console.error('Error al registrar Pago:', error);
+    alert("Hay problemas al registrar el pago");
+    this.router.navigateByUrl('/dummyRoute', { skipLocationChange: true }).then(() => {
+      this.router.navigate(['dashboard/prestamos']);
+    });
+  });
+}
+
+*/

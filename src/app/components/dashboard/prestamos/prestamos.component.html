@@ -106,12 +106,6 @@
         </ng-container>
 
         <!-- Name Column -->
-        <ng-container matColumnDef="retrasos">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Retrasos </th>
-          <td mat-cell *matCellDef="let element" [ngClass]="{'celda-mora': element.moras >= 5}"> {{element.moras}} </td>
-        </ng-container>
-
-        <!-- Name Column -->
         <ng-container matColumnDef="plazo">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Plazo </th>
           <td mat-cell *matCellDef="let element"> {{element.numeroPago}} de {{element.plazoPrestamo}} </td>
@@ -141,7 +135,9 @@
       
         <ng-container matColumnDef="proximo">
           <th mat-header-cell *matHeaderCellDef> Proximo Pago </th>
-          <td mat-cell *matCellDef="let element"> {{element.proximoPago}} </td>
+<td mat-cell *matCellDef="let element">
+  {{element.proximoPago}} ({{getNombreDia(element.proximoPago)}})
+</td>
         </ng-container>
         
         <!-- Symbol Column -->
@@ -160,12 +156,13 @@
       
         <tr mat-header-row *matHeaderRowDef="displayedColumns2"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns2;" [ngClass]="{
-          'fila-deudor': row.moras >= 3,
-          'fila-destiempo': row.numeroPago >= row.plazoPrestamo,
-          'fila-activa': row.fechaPago === fechaActual,
-          'fila-inactiva': row.fechaPago !== fechaActual,
-          'fila-nueva': row.tipoUltiPago == 'Sin tipo' && row.fechaPago === fechaActual
-          }"></tr>
+         'fila-deudor': row.moras >= 3,
+      'fila-destiempo': row.numeroPago >= row.plazoPrestamo,
+      'fila-activa': row.fechaPago === fechaActual,
+      'fila-inactiva': (row.tipoPrestamo === 'tradicional' && row.fechaPago !== fechaActual) || 
+                       (row.tipoPrestamo === 'semanal' && row.proximoPago === fechaActual),
+      'fila-nueva': row.tipoUltiPago === 'Sin tipo' && row.fechaPago === fechaActual
+    }">
       </table>
     
     </div>

@@ -37,7 +37,7 @@ export class PrestamosComponent {
   contadorPendientes: number = 0;
 
   displayedColumns: string[] = ['nombre','comienzo','tipoPrestamo', 'cantidadPagar','plazo','diario','gestor','acciones'];
-  displayedColumns2: string[] = ['nombre','comienzo','tipoPrestamo','retrasos','plazo' ,'cantidadPagar', 'totalRestante','fecha','tipo','gestor','acciones'];
+  displayedColumns2: string[] = ['nombre','comienzo','tipoPrestamo','plazo' ,'cantidadPagar', 'totalRestante','fecha','tipo','proximo','gestor','acciones'];
 
   dataSource = new MatTableDataSource(this.listaPrestamosActivos);
   dataSource2 = new MatTableDataSource(this.listaPrestamosPendiente);
@@ -109,5 +109,24 @@ export class PrestamosComponent {
     console.log(`Iniciando préstamo para ${prestamo.nombre}`);
     // Lógica para iniciar el préstamo aquí
   }
+
+  getNombreDia(fechaStr: string): string {
+  if (!fechaStr) return '';
+
+  const partes = fechaStr.split('-');
+  const dia = parseInt(partes[0], 10);
+  const mes = parseInt(partes[1], 10) - 1; // los meses en JS empiezan en 0
+  const anio = parseInt(partes[2], 10);
+
+  const fecha = new Date(anio, mes, dia);
+
+  const diasSemana = [
+    'Domingo', 'Lunes', 'Martes', 'Miércoles',
+    'Jueves', 'Viernes', 'Sábado'
+  ];
+
+  return diasSemana[fecha.getDay()];
+}
+
 
 }

@@ -12,6 +12,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { ClienteServiceService } from 'src/app/services/cliente-service.service';
 
 import { environment } from 'src/environments/environment';
+import { MatDatepickerInputEvent } from '@angular/material/datepicker';
+import { DatePipe } from '@angular/common';
 
 const url_server = environment.url+"/";
 
@@ -46,6 +48,7 @@ export class RevisarPrestamoComponent {
   clienteEspecifico: any = [];
   isLoading = false;
 
+  fecha:any;
   variableURL = url_server;
 
   //barra de progeso
@@ -83,6 +86,9 @@ export class RevisarPrestamoComponent {
       gestor: ['',Validators.required],
       comentario: ['',Validators.required],
       tipoPrestamo: ['', Validators.required],
+      telefonoFijo: [''],
+      direccionNegocio:[''],
+      proximoPagoFech: ['', Validators.required]
     })
   }
 
@@ -145,6 +151,8 @@ export class RevisarPrestamoComponent {
       gestor: this.prestamoEspecifico.gestor,
       comentario: this.prestamoEspecifico.nota,
       tipoPrestamo: this.prestamoEspecifico.tipoPrestamo,
+      telefonoFijo: this.prestamoEspecifico.telefonoAdicional,
+      direccionNegocio: this.prestamoEspecifico.direccionNegocio,
     });
   }
 
@@ -156,15 +164,17 @@ export class RevisarPrestamoComponent {
 
     let fechSiguiente='xx-xx-xx';
 
-    if(this.form.value.tipoPrestamo=='Semanal'){
+   /* if(this.form.value.tipoPrestamo=='Semanal'){
       fechSiguiente=this.calcularProximoPago();
     }
+      */
 
     const prestamo: Prestamo = {
+      fecha: this.fecha_Solicitud,
       fechaPago: this.fecha_Solicitud,
       gestor: this.form.value.gestor,
       estatus: 'Activo',
-      proximoPago: fechSiguiente,
+      proximoPago: this.fecha,
       inciadoPor: 'Oficina'
     }
     console.log(prestamo);
@@ -183,6 +193,41 @@ export class RevisarPrestamoComponent {
       this.openDialog("Sucedio un error: "+error, "assets/img/error.png");
     })
   }
+
+  cancelarPrestamo(){
+
+    if (this.isLoading) {
+      return;  
+    }
+    this.isLoading = true;  
+
+    const prestamo: Prestamo = {
+      estatus: 'Finalizado',
+      inciadoPor: 'Oficina'
+    }
+    console.log(prestamo);
+
+    this.prestamoService.PutPrestamoFinanciera(this.mongoIdPrestamo, prestamo).subscribe(data => {
+      if(data){
+        console.log(data);
+        this.isLoading = false;  
+        this.openDialog("El Prestamo fue eliminado exitosamente de la lista", "assets/img/exito.png");
+        this.router.navigate(['dashboard/prestamos']);
+
+      }
+    }, (error: any) => {
+      console.log(error);
+      this.isLoading = false;
+      this.openDialog("Sucedio un error: "+error, "assets/img/error.png");
+    })
+
+  }
+
+filtrarDiasPermitidos = (date: any): boolean => {
+  if (!date) return false; // <- evita el error
+  return date.day() >= 1 && date.day() <= 3; // lunes a miércoles
+};
+
 
   calcularProximoPago(): string {
     //let fechaInicia: Date = new Date(this.fecha_Solicitud); 
@@ -242,6 +287,13 @@ export class RevisarPrestamoComponent {
       },
       disableClose: true // Deshabilita el cierre al hacer clic fuera del diálogo
     });
+  }
+
+  onDateChange(event: MatDatepickerInputEvent<Date>) {
+    const datePipe = new DatePipe('en-US');
+    this.fecha = datePipe.transform(event.value, 'd-M-yyyy');
+    console.log(this.fecha);
+    
   }
 
 

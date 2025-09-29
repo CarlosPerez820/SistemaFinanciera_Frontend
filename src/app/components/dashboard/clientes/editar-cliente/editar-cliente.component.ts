@@ -41,6 +41,9 @@ export class EditarClienteComponent {
   fecha_Solicitud: string =fechaDia;
   lista: any =[];
   listaGestores: Gestor[] = [];
+  listaClasificaciones: string[] = ['A'];
+  clasificacionSeleccionada: string = '';
+
   form: FormGroup;
   numeroDeClienteID: any;
   mongoIdCliente: any;
@@ -79,16 +82,19 @@ export class EditarClienteComponent {
       colonia: ['',Validators.required],
       ciudad: ['',Validators.required],
       celular: ['',Validators.required],
+      telefono: [''],
       estadoCivil: ['',Validators.required],
       tipoVivienda: ['',Validators.required],
       tiempoVivienda: [''],
       pagoRenta: [''],
       tiempoNegocio: [''],
+      tipoNegocio: [''],
+      direccionNegocio: [''],
       numeroINE: ['',Validators.required],
-      RFC: ['',Validators.required],
       conyugue: ['',Validators.required],
       ingresoSolicitante: ['',Validators.required],
       creditosActuales: [''],
+      creditosGenerales:[''],
       gestor: ['',Validators.required],
     })
   }
@@ -135,13 +141,16 @@ export class EditarClienteComponent {
       colonia:  this.clienteEspecifico.colonia,
       ciudad:  this.clienteEspecifico.ciudad,
       celular:  this.clienteEspecifico.celular,
+      telefono:this.clienteEspecifico.telefonoAdicional,
+      tipoNegocio:this.clienteEspecifico.tipoNegocio,
+      direccionNegocio:this.clienteEspecifico.direccionNegocio,
+      creditosGenerales:this.clienteEspecifico.creditosGenerales,
       estadoCivil:  this.clienteEspecifico.estadoCivil,
       tipoVivienda:  this.clienteEspecifico.tipoVivienda,
       tiempoVivienda:  this.clienteEspecifico.tiempoViviendo,
       pagoRenta:  this.clienteEspecifico.pagoRenta,
       tiempoNegocio:  this.clienteEspecifico.tiempoNegocio,
       numeroINE:  this.clienteEspecifico.numeroIdentificacion,
-      RFC:  this.clienteEspecifico.RFC,
       conyugue:  this.clienteEspecifico.nombreConyugue,
       ingresoSolicitante:  this.clienteEspecifico.ingresoSolicitante,
       creditosActuales:  this.clienteEspecifico.numeroPrestamos,
@@ -173,9 +182,12 @@ export class EditarClienteComponent {
       pagoRenta: this.form.value.pagoRenta,
       tiempoNegocio: this.form.value.tiempoNegocio,
       numeroIdentificacion: this.form.value.numeroINE,
-      RFC: this.form.value.RFC,
       nombreConyugue: this.form.value.conyugue,
       ingresoSolicitante: this.form.value.ingresoSolicitante,
+      telefonoFijo:this.form.value.telefono,
+      tipoNegocio:this.form.value.tipoNegocio,
+      direccionNegocio:this.form.value.direccionNegocio,
+      creditosGenerales:this.form.value.creditosGenerales,
       gestorAsignado: this.form.value.gestor,
     }
     console.log(cliente);
@@ -194,6 +206,30 @@ export class EditarClienteComponent {
     })
   }
 
+  cambiarClasificacion(){
+       if (this.isLoading) {
+      return;  
+    }
+    this.isLoading = true;  
+
+    const cliente: Clientes = {
+      clasificacion: this.clasificacionSeleccionada,
+      puntuacion: '0',
+    }
+
+    this.clienteService.PutClienteFinanciera(this.mongoIdCliente, cliente).subscribe(data => {
+      if(data){
+        console.log(data);
+        this.actualizarPrestamo();
+        this.isLoading = false;
+        this.openDialogInfo("Se cambio la clasificacion correctamente", "assets/img/exito.png");
+      }
+    }, (error: any) => {
+      console.log(error);
+      this.isLoading = false;  
+      this.openDialogInfo("Lo sentimos, hubo un error y no se actualizo la información", "assets/img/error.png");
+    }) 
+  }
   
   obtenerPrestamos(){
     this.prestamoService.getPrestamosCliente(this.sharedService.getFinanciera(), this.clienteEspecifico.numeroCliente)

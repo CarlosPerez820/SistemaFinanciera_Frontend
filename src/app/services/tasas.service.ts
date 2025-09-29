@@ -23,10 +23,20 @@ export class TasasService {
     { dia: 24, interes: 20 },
     { dia: 30, interes: 25 }
   ];
+
+  tasasSemanal: Number[]=[0,5,10,15,20]
+  plazoSemanal: any[]=[
+    {dia:4},
+    {dia:8},
+    {dia:12},
+    {dia:16},
+    {dia:20}
+  ];
+
   
   prestamos: any[] = [
     {value: 'tradicional', viewValue: 'Tradicional'},
-    {value: 'blindaje', viewValue: 'Blindaje'},
+    {value: 'semanal', viewValue: 'Semanal'},
   ];
 
   getTasasTradicional() {
@@ -39,6 +49,14 @@ export class TasasService {
 
   getTipoPrestamos() {
     return this.prestamos;
+  }
+
+  getTasasSemanal(){
+    return this.tasasSemanal;
+  }
+
+  getPlazoSemanal(){
+    return this.plazoSemanal;
   }
 
 }

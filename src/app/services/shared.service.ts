@@ -14,6 +14,7 @@ export class SharedService {
   public nombre: string | undefined;
   public financiera: string | undefined;
   public _idUsuario: string | undefined;
+  public nombreCliente: string = "dinero facil";
 
   decodificar(){
     const token = this.authService.getToken();
@@ -45,6 +46,10 @@ export class SharedService {
 
   getID() {
     return this._idUsuario;
+  }
+
+  getSucursalCliente(){
+    return this.nombreCliente;
   }
 
 }

@@ -5,7 +5,7 @@
 
     <mat-card class="responsive-container" style="margin-top: 10px;">
 
-        <form [formGroup]="form" (ngSubmit)="registrarPagos()">
+        <form [formGroup]="form" (ngSubmit)="registrarPagos('Pago')">
 
             <mat-grid-list  cols="2" rowHeight="70px">
 
@@ -16,7 +16,11 @@
                 </mat-grid-tile>
 
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
-                    <h3>Datos de prestamo {{prestamoEspecifico.fecha}}</h3>
+                    <h3>Datos de prestamo {{prestamoEspecifico.tipoPrestamo}} {{prestamoEspecifico.fecha}}</h3>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1" *ngIf="prestamoEspecifico.tipoPrestamo==='semanal'">
+                    <h3>Fecha de Pago:{{prestamoEspecifico.proximoPago}}</h3>
                 </mat-grid-tile>
 
                 <mat-grid-tile [colspan]="1" [rowspan]="1">
@@ -65,6 +69,22 @@
                     </mat-form-field>
                 </mat-grid-tile>
 
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                  
+                </mat-grid-tile>
+
+                
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Tipo de Pago</mat-label>
+                        <mat-select formControlName="tipoPago">
+                            <mat-option *ngFor="let tipo of tiposPago" [value]="tipo.value">
+                            {{tipo.viewValue}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </mat-grid-tile>
+
 
                 <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
@@ -77,18 +97,22 @@
                     <button type="submit" mat-raised-button class="my-custom-button" [disabled]="form.invalid || isLoading">Registrar</button>
                 </mat-grid-tile>
 
+
                 <mat-grid-tile [colspan]="1" [rowspan]="1">
-                    <h3>Adeudo del Prestamo: ${{adeudoTotal}}</h3>
+                    <h3>Saldo: ${{totalRestante - morasPrestamo}}</h3>
+                </mat-grid-tile>
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <h3>Moras: ${{morasPrestamo}}</h3>
+                </mat-grid-tile>
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <h3>A cubrir: ${{totalRestante}}</h3>
                 </mat-grid-tile>
                 <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <h3>Saldo Extra: ${{saldoExtra}}</h3>
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="1" [rowspan]="1">
-                    <h3>Pago {{prestamoEspecifico.numeroPago}} de {{prestamoEspecifico.plazoPrestamo}} dias</h3>
-                </mat-grid-tile>
-                <mat-grid-tile [colspan]="1" [rowspan]="1">
-                    <h3>Retrasos vigentes {{prestamoEspecifico.moras}}</h3>
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <h3>Pago {{prestamoEspecifico.numeroPago}} de {{prestamoEspecifico.plazoPrestamo}}</h3>
                 </mat-grid-tile>
 
 
@@ -121,6 +145,20 @@
                     <mat-form-field class="ancho">
                         <mat-label>Colonia</mat-label>
                         <input matInput autocomplete="off" formControlName="colonia" readonly="true">
+                    </mat-form-field>
+                </mat-grid-tile>
+                
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Direccion Negocio</mat-label>
+                        <input matInput autocomplete="off" formControlName="direccionNegocio" readonly="true">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Telefono Adicional</mat-label>
+                        <input matInput autocomplete="off" formControlName="telefonoAdicional" readonly="true">
                     </mat-form-field>
                 </mat-grid-tile>
 
@@ -203,18 +241,17 @@
                     'background-color': payment.tipo == 'Mora' ? '#f6e0c2' : 
                                         payment.mora > 0 ? '#f6e0c2' : 
                                        payment.tipo == 'Pago' ? '#f4f4f4' : 
-                                       '#808080'  
+                                       '#f4f4f4'  
                                         }">
-                    <p class="timeline-date">Pago:{{payment.numeroPago}}, {{payment.fecha}} , {{payment.horaPago}} Hrs</p>
+                    <p class="timeline-date">Pago:{{payment.numeroPago}}</p>
+                    <p class="timeline-amount">{{payment.fecha}} , {{payment.horaPago}} Hrs</p>
                     <p class="timeline-amount">Tipo de movimiento: {{payment.tipo}} {{payment.estado}}</p>
-                    <p class="timeline-description">Monto a pagar: ${{payment.pagoDiario}}, Se recibio: ${{payment.real}}</p>
-                    <p class="timeline-amount">Registrado en pago: ${{payment.abono}}</p>
-                    <p class="timeline-description">Adeudo del pago: ${{payment.pagosPendiente}} - Saldo Extra: ${{payment.extra}}<p>
-                    <p class="timeline-amount">Mora registrada: ${{payment.mora}}</p>
+                    <p class="timeline-description">A cubrir: ${{payment.adeudo}}</p>
+                    <p class="timeline-amount">Pago: ${{payment.abono}}, Mora:${{payment.mora}}</p>
+                    <p class="timeline-description">Saldo Extra: ${{payment.saldoExtra}}</p>
+                    <p class="timeline-amount">Saldo: ${{payment.totalRestante}}</p>
+
                     <p class="timeline-description">_________________________________________________<p>
-                        <p class="timeline-description">El nuevo monto restante es: ${{payment.totalRestante}}<p>
-                    <p class="timeline-description">Adeudo Total: ${{payment.adeudo}}<p>
-                    <p class="timeline-description">SaldoExtra Total: ${{payment.saldoExtra}}<p>
                     <p class="timeline-description">Fue registrado por: {{payment.personasCobrador}}<p>
 
                   </div>
@@ -247,6 +284,51 @@
                     <mat-progress-spinner *ngIf="subiendoArchivo" mode="determinate" [value]="progreso"></mat-progress-spinner>
                 </mat-grid-tile>
                 
+                <br>
+                <mat-grid-tile [colspan]="2" [rowspan]="1" *ngIf="prestamoEspecifico.tipoPrestamo=='tradicional'">
+                    <button type="button" mat-raised-button color="primary" class="ancho" (click)="bonificacion()">Bonificación</button>
+                </mat-grid-tile>
+
+
+
+
+                <div  *ngIf="onBonificacion">
+
+                    <mat-grid-tile [colspan]="1" [rowspan]="1">
+                            <mat-label>Plazo: {{prestamoEspecifico.plazoPrestamo}}</mat-label>
+                    </mat-grid-tile>
+
+                    <mat-grid-tile [colspan]="1" [rowspan]="1">
+                            <mat-label>Total a pagar: ${{prestamoEspecifico.cantidadPagar}}</mat-label>
+                    </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Plazo</mat-label>
+                        <mat-select [(ngModel)]="tasaSeleccionada" (selectionChange)="onPlazoChange()">
+                            <mat-option *ngFor="let tipo of tasasTradicional" [value]="tipo">
+                            {{tipo.dia}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-label>A pagar: ${{NuevoMonto}} - Dotacion de: ${{dotacionVar}}</mat-label>
+            </mat-grid-tile>
+
+            <mat-grid-tile [colspan]="1" [rowspan]="1">
+            </mat-grid-tile>
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <button type="button" mat-raised-button color="primary" class="ancho" (click)="aplicarBonificacion()">Aplicar</button>
+                </mat-grid-tile>
+
+            </div>
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1" *ngIf="prestamoEspecifico.tipoPrestamo==='semanal'">
+                    <button type="button" mat-raised-button color="primary" class="ancho" (click)="registrarMora('Mora')">Agregar Mora</button>
+                </mat-grid-tile>
+
                 <br>
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
                     <button type="button" mat-raised-button color="warn" class="ancho" (click)="openDialog2()">Finalizar</button>

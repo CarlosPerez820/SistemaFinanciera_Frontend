@@ -37,6 +37,14 @@
                 <mat-icon>person_outline</mat-icon>
                 <strong>Conyugue:</strong> {{clienteEspecifico.nombreConyugue}}
               </div>
+              <div class="dato-cliente">
+                <mat-icon>phone</mat-icon>
+                <strong>Telefono </strong> {{clienteEspecifico.telefonoFijo}}
+              </div>
+              <div class="dato-cliente">
+                <mat-icon>home</mat-icon>
+                <strong>Dirección de Negocio:</strong> {{clienteEspecifico.direccionNegocio}}
+              </div>
             </div>
     
             <!-- Columna 2: Información adicional -->
@@ -56,6 +64,10 @@
               <div class="dato-cliente">
                 <mat-icon>payments</mat-icon>
                 <strong>Pago de renta:</strong> {{clienteEspecifico.pagoRenta}}
+              </div>
+              <div class="dato-cliente">
+                <mat-icon>payments</mat-icon>
+                <strong>Creditos Externos:</strong> {{clienteEspecifico.creditosGenerales}}
               </div>
             </div>
           </div>

@@ -16,6 +16,10 @@
                 </mat-grid-tile>
 
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <h2 style="text-align: center;">Clasificacion: {{clienteEspecifico.clasificacion}} / Moras:{{clienteEspecifico.puntuacion}}</h2>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Numero de Cliente</mat-label>
                         <input matInput autocomplete="off" formControlName="numeroCliente" readonly>
@@ -59,6 +63,13 @@
 
                 <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
+                        <mat-label>Telefono Adicional</mat-label>
+                        <input type="number" matInput autocomplete="off" formControlName="telefono">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
                         <mat-label>Estado Civil</mat-label>
                         <input matInput autocomplete="off" formControlName="estadoCivil">
                     </mat-form-field>
@@ -96,17 +107,25 @@
                     </mat-form-field>
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
-                        <mat-label>Numero de identificacion</mat-label>
-                        <input matInput autocomplete="off" formControlName="numeroINE">
+                        <mat-label>Tipo de negocio</mat-label>
+                        <input matInput autocomplete="off" formControlName="tipoNegocio">
+                    </mat-form-field>
+                </mat-grid-tile>
+                
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Direccion del negocio</mat-label>
+                        <input matInput autocomplete="off" formControlName="direccionNegocio">
                     </mat-form-field>
                 </mat-grid-tile>
 
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
                     <mat-form-field class="ancho">
-                        <mat-label>RFC</mat-label>
-                        <input matInput autocomplete="off" formControlName="RFC">
+                        <mat-label>Numero de identificacion</mat-label>
+                        <input matInput autocomplete="off" formControlName="numeroINE">
                     </mat-form-field>
                 </mat-grid-tile>
 
@@ -130,6 +149,15 @@
                         <input type="number" matInput autocomplete="off" formControlName="creditosActuales">
                     </mat-form-field>
                 </mat-grid-tile>
+
+                                
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Creditos Externos</mat-label>
+                        <input matInput autocomplete="off" formControlName="creditosGenerales">
+                    </mat-form-field>
+                </mat-grid-tile>
+
 
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
                     <mat-form-field class="ancho">
@@ -185,6 +213,22 @@
             <mat-grid-tile [colspan]="2" [rowspan]="2">
                 <mat-progress-spinner *ngIf="subiendoArchivo" mode="determinate" [value]="progreso"></mat-progress-spinner>
             </mat-grid-tile>
+        
+
+            <mat-grid-tile [colspan]="1" [rowspan]="1">
+                <mat-form-field class="ancho">
+                    <mat-label>Clasificacion</mat-label>
+                        <mat-select [(ngModel)]="clasificacionSeleccionada">
+                        <mat-option *ngFor="let elemento of listaClasificaciones" [value]="elemento">
+                            {{elemento}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>   
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="1" [rowspan]="1">
+                <button type="button" mat-raised-button color="warn" class="ancho" (click)="cambiarClasificacion()">Cambiar Clasificacion</button>
+            </mat-grid-tile>
+
 
             <mat-grid-tile [colspan]="2" [rowspan]="1">
                 <button type="button" mat-raised-button color="primary" class="ancho" routerLink="/dashboard/clientes">Finalizar</button>

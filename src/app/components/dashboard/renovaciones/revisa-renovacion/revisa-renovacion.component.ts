@@ -62,6 +62,12 @@ export class RevisaRenovacionComponent {
    clienteEspecifico: any = [];
    isLoading = false;
 
+   
+    onSemanal = false;
+    listaInteres: any;
+    tasaSemanal: any[] = [];
+    plazoSemanal: any[] = [];
+
    imageURL: string = 'http&rs=1';
    variableURL = url_server;
    pdfFileName: string = 'mi_pdf';
@@ -83,6 +89,8 @@ export class RevisaRenovacionComponent {
   interes: any;
   tipoPrestamo: any;
   listaPlazo: any;
+
+  sucursalCliente=false;
 
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private gestorService: GestorServiceService,
               private solicitudService: SolicitudServiceService, private sharedService: SharedService,
@@ -110,25 +118,36 @@ export class RevisaRenovacionComponent {
       pagoRenta: [''],
       tiempoNegocio: [''],
       numeroINE: ['',Validators.required],
-      RFC: ['',Validators.required],
       conyugue: ['',Validators.required],
       ingresoSolicitante: ['',Validators.required],
       creditosActuales: [''],
       motivos: ['',Validators.required],
       gestor: ['',Validators.required],
       tipoPrestamo: ['', Validators.required],
+
+      telefonoFijo:[''],
+      tipoNegocio:[''],
+      direccionNegocio:[''],
+      interesSemanal:['']
+
     })
   }
 
   ngOnInit(): void{
     this.mongoIdSolicitud = this.route.snapshot.paramMap.get("id");
+
+    if(this.sharedService.getFinanciera()==this.sharedService.getSucursalCliente()){
+      this.sucursalCliente = true;
+    }
+
     console.log(this.mongoIdSolicitud);
     this.obtenerGestores();
     this.obtenerSolicitud();
     this.obtenerListaDeInteres();
     this.obtenerParametos();
     this.tasasTradicional = this.tasasService.getTasasTradicional();
-    this.tasasBlindage = this.tasasService.getTasasBlindage();
+    this.tasaSemanal = this.tasasService.getTasasSemanal();   
+    this.plazoSemanal = this.tasasService.getPlazoSemanal(); 
     this.prestamos = this.tasasService.getTipoPrestamos();
   }
 
@@ -164,6 +183,18 @@ export class RevisaRenovacionComponent {
   //    console.log("Este es el numero de cliente "+this.SolicitudEspecifica.numeroCliente);
       this.llenarFormulario();
       this.obtenerClientes();
+
+      this.tipoPrestamo=this.SolicitudEspecifica.tipoPrestamo;
+      if(this.tipoPrestamo=="tradicional"){
+        this.tasaSeleccionada = this.tasasTradicional;
+        this.onSemanal = false;
+  
+  
+      }
+      else if(this.tipoPrestamo=="semanal"){
+        this.tasaSeleccionada = this.plazoSemanal;
+        this.onSemanal= true;
+      }
     })
   }
 
@@ -184,9 +215,13 @@ export class RevisaRenovacionComponent {
     if(this.SolicitudEspecifica.tipoPrestamo=="tradicional"){
       this.tasaSeleccionada = this.tasasTradicional;
     }
-    else if(this.SolicitudEspecifica.tipoPrestamo=="blindaje"){
-      this.tasaSeleccionada = this.tasasBlindage;
+    else if(this.SolicitudEspecifica.tipoPrestamo=="semanal"){
+      this.tasaSeleccionada = this.plazoSemanal;
     }
+
+    console.log("Tasa seleccioanda");
+
+    console.log(this.tasaSeleccionada);
 
     this.form.patchValue({
 
@@ -212,7 +247,6 @@ export class RevisaRenovacionComponent {
       tipoNegocio:  this.SolicitudEspecifica.tipoNegocio,
       tiempoNegocio:  this.SolicitudEspecifica.tiempoNegocio,
       numeroINE:  this.SolicitudEspecifica.numeroIdentificacion,
-      RFC:  this.SolicitudEspecifica.RFC,
       conyugue:  this.SolicitudEspecifica.nombreConyugue,
       trabajoConyugue:  this.SolicitudEspecifica.trabajoConyugue,
       domicilioConyugue:  this.SolicitudEspecifica.domicilioConyugue,
@@ -223,7 +257,8 @@ export class RevisaRenovacionComponent {
       motivos: this.SolicitudEspecifica.infoCredito,
       creditosActuales:  this.SolicitudEspecifica.numeroPrestamos,
       gestor:  this.SolicitudEspecifica.gestorAsignado,
-      tipoPrestamo: this.SolicitudEspecifica.tipoPrestamo
+      tipoPrestamo: this.SolicitudEspecifica.tipoPrestamo,
+      direccionNegocio:this.SolicitudEspecifica.direccionNegocio,
     });
   }
 
@@ -254,32 +289,83 @@ export class RevisaRenovacionComponent {
 
   
   onTipoChange(){
+    console.log(this.tipoPrestamo);
     if(this.tipoPrestamo=="tradicional"){
       this.tasaSeleccionada = this.tasasTradicional;
+      this.onSemanal = false;
+
+
     }
-    else if(this.tipoPrestamo=="blindaje"){
-      this.tasaSeleccionada = this.tasasBlindage;
+    else if(this.tipoPrestamo=="semanal"){
+      this.tasaSeleccionada = this.plazoSemanal;
+      this.onSemanal= true;
     }
   }
 
   onPlazoChange(){
-    this.interes = this.listaPlazo.interes;
+console.log(this.tipoPrestamo);
+    if(this.tipoPrestamo=="tradicional"){
+      this.interes = this.listaPlazo.interes;
+    }
+    else if(this.tipoPrestamo=="semanal"){
+
+    }
   }
 
+  onTasaChange(){
+    this.interes = this.listaInteres;
+    console.log(this.interes);
+  }
 
   calcularMontosNuevo(){
+
+
+    let total=0;
+    let pagoDia = 0;
+    let plazoNumber = this.form.value.plazo.dia;
+    let montoNumber =this.form.value.montoAutorizado;
+
+    if(this.tipoPrestamo=='semanal'){
+          let meses=0; //almacena el equivalente a meses de las semanas
+          let pagoMes=0; //el pago por mes
+
+          meses = plazoNumber/4;
+          
+          pagoMes = Math.round((montoNumber * this.interes)/100);
+          total = montoNumber+(pagoMes * meses);
+          pagoDia = Math.round(total/plazoNumber);
+
+    }
+
+    if(this.tipoPrestamo=='tradicional'){
+            total = Math.round((montoNumber * this.interes)/100)+montoNumber;
+            pagoDia = Math.round(total/plazoNumber);
+    }
+    /*
+    total = Math.round((montoNumber * this.interes)/100)+montoNumber;
+    pagoDia = Math.round(total/plazoNumber);
+    */
+
+    this.form.get('totalPagar')?.setValue(total);
+    this.form.get('pagoDiario')?.setValue(pagoDia);
+  }
+
+  calcularNuevosMontos2(){
     let total=0;
     let pagoDia = 0;
     let plazoNumber = this.form.value.plazo;
     let montoNumber =this.form.value.montoAutorizado;
+    let interes =this.form.value.interesSemanal;
 
-    //console.log(plazoNumber);
 
-    total = Math.round((montoNumber * this.interes)/100)+montoNumber;
-    pagoDia = Math.round(total/plazoNumber.dia);
+
+    total = Math.round((montoNumber * interes)/100)+montoNumber;
+    pagoDia = Math.round(total/plazoNumber);
 
     this.form.get('totalPagar')?.setValue(total);
     this.form.get('pagoDiario')?.setValue(pagoDia);
+
+
   }
 
 
@@ -377,10 +463,17 @@ export class RevisaRenovacionComponent {
       
       let valorDeMora = this.listaParametros[0].montoMora;
 
-      if (this.form.value.tipoPrestamo == 'Semanal') {
+      if (this.form.value.tipoPrestamo == 'semanal') {
         valorDeMora = this.listaParametros[0].MoraSemanal;
       }
   
+      let plazoPrestamo =  this.form.value.plazo.dia;
+    
+      if(this.sharedService.getFinanciera()==this.sharedService.getSucursalCliente()){
+        plazoPrestamo = this.form.value.plazo;
+      }
+
+      
       const prestamo: Prestamo = {
         fecha: this.fecha_Solicitud,
         folio: folioPrestamo,
@@ -392,7 +485,7 @@ export class RevisaRenovacionComponent {
         cobranza: valorDeMora,
         cantidadPrestamo: this.form.value.montoAutorizado,
         cantidadPagar: this.form.value.totalPagar,
-        plazoPrestamo: this.form.value.plazo.dia,
+        plazoPrestamo: plazoPrestamo,
         totalRestante: this.form.value.totalPagar,
         pagoDiario: this.form.value.pagoDiario,
         fechaPago: 'xxxx',
@@ -410,6 +503,10 @@ export class RevisaRenovacionComponent {
         pagosPendientes:0,
         moras:0,
         saldoExtra:0,
+        aCubrir:this.form.value.totalPagar,
+        telefonoAdicional:this.form.value.telefonoFijo,
+        direccionNegocio: this.form.value.direccionNegocio,
+        tipoSolicitud:this.SolicitudEspecifica.tipo,
         inciadoPor: 'vacio',
         sucursal: this.sharedService.getFinanciera(),
       };
@@ -423,7 +520,12 @@ export class RevisaRenovacionComponent {
 
             this.EditarSolicitud();
             this.actualizarDatosCliente();
-            this.avisoSMS();
+
+            if(this.sharedService.getFinanciera()!==this.sharedService.getSucursalCliente()){
+              this.avisoSMS();
+            }
+    
+
             this.isLoading = false;  
             this.openDialog("El Prestamo se genero exitosamente", "assets/img/exito.png");
             //this.router.navigate(['dashboard/clientes']);
@@ -455,12 +557,18 @@ export class RevisaRenovacionComponent {
   }
 
   EditarSolicitud(){
+    let plazoPrestamo =  this.form.value.plazo.dia;
+    
+    if(this.sharedService.getFinanciera()==this.sharedService.getSucursalCliente()){
+      plazoPrestamo = this.form.value.plazo;
+    }
+
     const solicitud: Solicitudes = {
       montoSolicitado: this.form.value.montoSolicitado,
       montoAutorizado: this.form.value.montoAutorizado,
       totalPagar: this.form.value.totalPagar,
       pagoDiario: this.form.value.pagoDiario,
-      plazo: this.form.value.plazo.dia,
+      plazo: plazoPrestamo,
       nombre: this.eliminarAcentos2(this.form.value.nombreSolicitante),
       direccion: this.form.value.direccion,
       colonia: this.form.value.colonia,
@@ -472,12 +580,15 @@ export class RevisaRenovacionComponent {
       pagoRenta: this.form.value.pagoRenta,
       tiempoNegocio: this.form.value.tiempoNegocio,
       numeroIdentificacion: this.form.value.numeroINE,
-      RFC: this.form.value.RFC,
       nombreConyugue: this.form.value.conyugue,
       ingresoSolicitante: this.form.value.ingresoSolicitante,
       gestorAsignado: this.form.value.gestor,
       infoCredito: this.form.value.motivos,
       estatus: "Finalizada",
+      tipoPrestamo: this.form.value.tipoPrestamo,
+      direccionNegocio:this.form.value.direccionNegocio,
+      telefonoFijo: this.form.value.telefonoFijo,
+
     }
 
     console.log(solicitud);
@@ -558,7 +669,7 @@ export class RevisaRenovacionComponent {
               const documentDefinition = {
                 content: [
                   {
-                    text: objetoSolicitud.sucursal+'\n'+'Solicitud Para Prestamo'+'\n'+'\n'+'\n'+'\n',
+                    text: objetoSolicitud.sucursal+'\n'+'Solicitud Para Prestamo '+objetoSolicitud.tipoPrestamo+'\n'+'\n',
                     style: 'header',
                     bold: true,
                   },
@@ -615,7 +726,9 @@ export class RevisaRenovacionComponent {
                     table: {
                       widths: ['*'],
                       body: [
-                        ['Celular:'+objetoSolicitud.celular]                      
+                        ['Celular:'+objetoSolicitud.celular]   ,
+                        ['Telefono secundario:'+objetoSolicitud.telefonoFijo]                      
+                   
                       ]
                     }
                   },
@@ -629,6 +742,10 @@ export class RevisaRenovacionComponent {
                         ['Tiempo viviendo en su domicilio: '+objetoSolicitud.tiempoViviendo], 
                         ['Pago de renta:'+objetoSolicitud.pagoRenta],
                         ['Tiempo del negocio: '+objetoSolicitud.tiempoNegocio],
+                        ['Tipo del negocio: '+objetoSolicitud.tipoNegocio],
+
+                        ['Direccion del negocio: '+objetoSolicitud.direccionNegocio],
+
                         ['Numero de identificación: '+objetoSolicitud.numeroIdentificacion],
                         ['RFC: '+objetoSolicitud.RFC],
                         ['Nombre del conyugue: '+objetoSolicitud.nombreConyugue], 
@@ -697,7 +814,7 @@ export class RevisaRenovacionComponent {
 
   avisoSMS(){
     let texto="Hola "+ this.clienteEspecifico.nombre + ", nos comunicamos de "+ this.clienteEspecifico.sucursal + " para informarte "+
-    "que su solicitud de una renovacion por el monto de :$"+this.form.value.montoSolicitado+" a un plazo de "+ this.form.value.plazo.dia+" dias, fue "+
+    "que su solicitud por el monto de :$"+this.form.value.montoSolicitado+" a un plazo de "+ this.form.value.plazo.dia+" dias, fue "+
     "aprobada por un monto de: $" +this.form.value.montoAutorizado;
 
     let WhatsappNumero=this.form.value.celular;

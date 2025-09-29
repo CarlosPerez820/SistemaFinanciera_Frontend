@@ -46,10 +46,19 @@ export class TabuladorComponent {
   prestamos: any[] = [];
 
   tasasTradicional: any[] = [];
-  tasasBlindage: any[] = [];
+  tasaSemanal: any[] = [];
+  plazoSemanal: any[] = [];
   tasaSeleccionada: any = [];
 
+  onSemanal = false;
+
   listaPlazo: any;
+  listaInteres: any;
+
+  sucursalCliente=false;
+  interesCliente: any
+  plazoCliente: any;
+
 
   displayedColumns: string[] = ['nombre', 'direccion', 'telefono','identificacion','clasificacion','creditos','acciones'];
   dataSource = new MatTableDataSource(this.listaClientes);
@@ -63,10 +72,15 @@ export class TabuladorComponent {
 
 
   ngOnInit(): void{
+    console.log(this.sharedService.getFinanciera());
+    if(this.sharedService.getFinanciera()==this.sharedService.getSucursalCliente()){
+      this.sucursalCliente = true;
+    }
     this.obtenerListaDeInteres();
     this.obtenerBuro();
     this.tasasTradicional = this.tasasService.getTasasTradicional();
-    this.tasasBlindage = this.tasasService.getTasasBlindage();
+    this.tasaSemanal = this.tasasService.getTasasSemanal();   
+    this.plazoSemanal = this.tasasService.getPlazoSemanal(); 
     this.prestamos = this.tasasService.getTipoPrestamos();
   }
 
@@ -109,15 +123,33 @@ export class TabuladorComponent {
     console.log(this.tipoPrestamo);
     if(this.tipoPrestamo=="tradicional"){
       this.tasaSeleccionada = this.tasasTradicional;
+      this.onSemanal = false;
+
+      this.apagar=0;
+      this.pagoDiario=0;
     }
-    else if(this.tipoPrestamo=="blindaje"){
-      this.tasaSeleccionada = this.tasasBlindage;
+    else if(this.tipoPrestamo=="semanal"){
+      this.tasaSeleccionada = this.plazoSemanal;
+      this.onSemanal= true;
+
+      this.apagar=0;
+      this.pagoDiario=0;
     }
   }
 
   onPlazoChange(){
-    this.interes = this.listaPlazo.interes;
-    this.plazo = this.listaPlazo.dia;
+    if(this.tipoPrestamo=="tradicional"){
+      this.interes = this.listaPlazo.interes;
+      this.plazo = this.listaPlazo.dia;
+    }
+    else if(this.tipoPrestamo=="semanal"){
+      this.plazo = this.listaPlazo.dia;
+
+    }
+  }
+
+  onTasaChange(){
+    this.interes = this.listaInteres;
   }
 
 
@@ -188,8 +220,37 @@ export class TabuladorComponent {
     let total=0;
     let pagoDia = 0;
 
+    if(this.tipoPrestamo=='semanal'){
+      let meses=0; //almacena el equivalente a meses de las semanas
+      let pagoMes=0; //el pago por mes
+
+      meses = this.plazo/4;
+      
+      pagoMes = Math.round((this.prestado * this.interes)/100);
+      total = this.prestado+(pagoMes * meses);
+      pagoDia = Math.round(total/this.plazo);
+    }
+
+    if(this.tipoPrestamo=='tradicional'){
+      total = Math.round((this.prestado * this.interes)/100)+this.prestado;
+      pagoDia = Math.round(total/this.plazo);
+    }    
+/*
     total = Math.round((this.prestado * this.interes)/100)+this.prestado;
     pagoDia = Math.round(total/this.plazo);
+    */
+
+    this.apagar = total;
+    this.pagoDiario = pagoDia;
+
+  }
+
+  calcularNuevosMontos2(){
+    let total=0;
+    let pagoDia = 0;
+
+    total = Math.round((this.prestado * this.interesCliente)/100)+this.prestado;
+    pagoDia = Math.round(total/this.plazoCliente);
 
     this.apagar = total;
     this.pagoDiario = pagoDia;

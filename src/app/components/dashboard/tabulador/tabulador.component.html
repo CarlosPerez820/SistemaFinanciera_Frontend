@@ -158,25 +158,57 @@
               <input matInput type="number" placeholder="Ejem: $5000" [(ngModel)]="prestado" name="prestado">
             </mat-form-field>
 
-            <mat-form-field class="ancho">
-              <mat-label>Plazo del prestamo (en dias)</mat-label>
-              <mat-select [(ngModel)]="listaPlazo" name="listaPlazo" (selectionChange)="onPlazoChange()">
-                  <mat-option *ngFor="let tipo of tasaSeleccionada" [value]="tipo">
-                  {{tipo.dia}}
-                  </mat-option>
-              </mat-select>
-            </mat-form-field>
+            
+        <div *ngIf="!sucursalCliente">
+          <mat-form-field class="ancho">
+            <mat-label>Plazo del prestamo (en dias/semanas)</mat-label>
+            <mat-select [(ngModel)]="listaPlazo" name="listaPlazo" (selectionChange)="onPlazoChange()">
+                <mat-option *ngFor="let tipo of tasaSeleccionada" [value]="tipo">
+                {{tipo.dia}}
+                </mat-option>
+            </mat-select>
+          </mat-form-field>
 
-            <mat-form-field class="ancho">
-                  <mat-label>Tipo Prestamo</mat-label>
-                  <mat-select [(ngModel)]="tipoPrestamo" name="tipoPrestamo" (selectionChange)="onTipoChange()">
-                      <mat-option *ngFor="let tipo of prestamos" [value]="tipo.value">
-                      {{tipo.viewValue}}
-                      </mat-option>
-                  </mat-select>
-            </mat-form-field>
-                    
-            <button mat-raised-button color="primary" (click)="calcularNuevosMontos()">Calcular</button>
+          <mat-form-field class="ancho" *ngIf="onSemanal">
+            <mat-label>Lista de Intereces (%)</mat-label>
+            <mat-select [(ngModel)]="listaInteres" name="listaInteres" (selectionChange)="onTasaChange()">
+                <mat-option *ngFor="let tipo of tasaSemanal" [value]="tipo">
+                {{tipo}}
+                </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+
+
+
+          <mat-form-field class="ancho">
+                <mat-label>Tipo Prestamo</mat-label>
+                <mat-select [(ngModel)]="tipoPrestamo" name="tipoPrestamo" (selectionChange)="onTipoChange()">
+                    <mat-option *ngFor="let tipo of prestamos" [value]="tipo.value">
+                    {{tipo.viewValue}}
+                    </mat-option>
+                </mat-select>
+          </mat-form-field>
+                  
+          <button mat-raised-button color="primary" (click)="calcularNuevosMontos()">Calcular</button>
+
+        </div>
+           
+         <div *ngIf="sucursalCliente">
+              <mat-form-field class="example-full-width">
+                <mat-label>Ingresa el plazo de tiempo (dias)</mat-label>
+                <input matInput type="number" placeholder="Ejem: $5000" [(ngModel)]="plazoCliente" name="plazoCliente">
+              </mat-form-field>
+
+              <mat-form-field class="example-full-width">
+                <mat-label>Ingresa la cantidad de interes</mat-label>
+                <input matInput type="number" placeholder="Ejem: $5000" [(ngModel)]="interesCliente" name="interesCliente">
+              </mat-form-field>
+
+              <button mat-raised-button color="primary" (click)="calcularNuevosMontos2()">Calcular Montos</button>
+
+          </div>
+
        
               <br>
               <br>

@@ -27,6 +27,10 @@
                     </mat-form-field>
                 </mat-grid-tile>
 
+
+
+                <div *ngIf="!sucursalCliente">
+                    
                 <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Plazo</mat-label>
@@ -36,6 +40,17 @@
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1" *ngIf="onSemanal">
+                <mat-form-field class="ancho" >
+                    <mat-label>Lista de Intereces (%)</mat-label>
+                    <mat-select formControlName="interesSemanal" [(ngModel)]="listaInteres" name="listaInteres" (selectionChange)="onTasaChange()">
+                        <mat-option *ngFor="let tipo of tasaSemanal" [value]="tipo">
+                        {{tipo}}
+                        </mat-option>
+                    </mat-select>
+                  </mat-form-field>
                 </mat-grid-tile>
 
                 <mat-grid-tile [colspan]="1" [rowspan]="1">
@@ -49,6 +64,34 @@
                     </mat-form-field>
                 </mat-grid-tile>
 
+            </div>
+
+            <div *ngIf="sucursalCliente">
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+
+                <mat-form-field class="example-full-width">
+                    <mat-label>plazo de (dias)</mat-label>
+                    <input matInput type="number" formControlName="plazo">
+                  </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                  <mat-form-field class="example-full-width">
+                    <mat-label>Tasa de interes</mat-label>
+                    <input matInput type="number"  formControlName="interesSemanal">
+                  </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                  <button type="button" mat-button color="primary" (click)="calcularNuevosMontos2()">Calcular Montos</button>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+
+                </mat-grid-tile>
+                </div>
+                
                 <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Total a pagar</mat-label>
@@ -66,7 +109,7 @@
                 <mat-grid-tile [colspan]="1" [rowspan]="1">
                 </mat-grid-tile>
 
-                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                <mat-grid-tile [colspan]="1" [rowspan]="1" *ngIf="!sucursalCliente">
                     <button type="button" mat-button color="primary" (click)="calcularMontosNuevo()">Calcular</button>
                 </mat-grid-tile>
 
@@ -109,6 +152,14 @@
                     </mat-form-field>
                 </mat-grid-tile>
 
+                
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Telefono Secundario</mat-label>
+                        <input type="number" matInput autocomplete="off" formControlName="telefono">
+                    </mat-form-field>
+                </mat-grid-tile>
+
                 <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Estado Civil</mat-label>
@@ -141,6 +192,22 @@
                     </mat-form-field>
                 </mat-grid-tile>
 
+                
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Tipo del negocio</mat-label>
+                        <input matInput autocomplete="off" formControlName="tipoNegocio">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Direccion del negocio</mat-label>
+                        <input matInput autocomplete="off" formControlName="direccionNegocio">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+
                 <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Tiemp. del negocio</mat-label>
@@ -152,13 +219,6 @@
                     <mat-form-field class="ancho">
                         <mat-label>Numero de identificacion</mat-label>
                         <input matInput autocomplete="off" formControlName="numeroINE">
-                    </mat-form-field>
-                </mat-grid-tile>
-
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
-                    <mat-form-field class="ancho">
-                        <mat-label>RFC</mat-label>
-                        <input matInput autocomplete="off" formControlName="RFC">
                     </mat-form-field>
                 </mat-grid-tile>
 
@@ -178,11 +238,18 @@
 
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
                     <mat-form-field class="ancho">
-                        <mat-label>Creditos Actuales</mat-label>
+                        <mat-label>Creditos Actuales Con La Financiera</mat-label>
                         <input type="number" matInput autocomplete="off" formControlName="creditosActuales">
                     </mat-form-field>
                 </mat-grid-tile>
    
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Creditos en otras financieras</mat-label>
+                        <input matInput autocomplete="off" formControlName="creditosGenerales">
+                    </mat-form-field>
+                </mat-grid-tile>
+
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
                     <mat-form-field class="ancho">
                         <mat-label>Motivos</mat-label>

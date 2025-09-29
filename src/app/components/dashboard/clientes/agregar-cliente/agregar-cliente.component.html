@@ -49,6 +49,13 @@
 
                 <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
+                        <mat-label>Telefono Adicional</mat-label>
+                        <input type="number" matInput autocomplete="off" formControlName="telefono">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
                         <mat-label>Estado Civil</mat-label>
                         <input matInput autocomplete="off" formControlName="estadoCivil">
                     </mat-form-field>
@@ -81,8 +88,23 @@
 
                 <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
+                        <mat-label>Tipo de negocio</mat-label>
+                        <input matInput autocomplete="off" formControlName="tipoNegocio">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
                         <mat-label>Tiemp. del negocio</mat-label>
                         <input matInput autocomplete="off" formControlName="tiempoNegocio">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Direccion del negocio</mat-label>
+                        <input matInput autocomplete="off" formControlName="direccionNegocio">
                     </mat-form-field>
                 </mat-grid-tile>
 
@@ -90,13 +112,6 @@
                     <mat-form-field class="ancho">
                         <mat-label>Numero de identificacion</mat-label>
                         <input matInput autocomplete="off" formControlName="numeroINE">
-                    </mat-form-field>
-                </mat-grid-tile>
-
-                <mat-grid-tile [colspan]="2" [rowspan]="1">
-                    <mat-form-field class="ancho">
-                        <mat-label>RFC</mat-label>
-                        <input matInput autocomplete="off" formControlName="RFC">
                     </mat-form-field>
                 </mat-grid-tile>
 
@@ -118,6 +133,13 @@
                     <mat-form-field class="ancho">
                         <mat-label>Creditos Actuales</mat-label>
                         <input type="number" matInput autocomplete="off" formControlName="creditosActuales">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="2" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Creditos en otras Financieras</mat-label>
+                        <input matInput autocomplete="off" formControlName="creditosGenerales">
                     </mat-form-field>
                 </mat-grid-tile>
 

@@ -46,32 +46,35 @@
           </h2>
     </div>
 
+    <button mat-raised-button color="accent" (click)="generarPDFCorteDeCaja()">Generar PDF</button>
+
+
     <div *ngIf="mostrarResultados">
       <mat-card class="main-card">
-        <mat-card-title>Estadísticas de la Financiera</mat-card-title>
         <mat-card-content>
-          <br>
-
-          <h2>Gastos del Mes</h2>
+          <h2>Gastos del Dia</h2>
           <h4>${{valorGastos}}</h4>
           <h2>Prestamos Activos</h2>
           <h4>{{contadorNumeroPrestamos}} Prestamos</h4>
+          <h4>Semanales: {{totalSemanal}}, ${{sumaSemanal}}</h4>
+          <h4>Tradicionales: {{totalTradicional}}, ${{sumaTradicional}}</h4>
+
           <h2>Valor Cartera</h2>
           <h4>${{totalCartera}}</h4>
-          <h2>Adeudos de Prestamos</h2>
-          <h4>${{totalAdeudos}}</h4>
           <h2>Total a cobrar en el Dia</h2>
           <h4>${{totalCobrarDia}} Por cobrar</h4>
+          <h2>Cobrado  por oficina: ${{cobradoOficina}}</h2>
+          <h3>Tranferencias: ${{transferenciaGeneral}}  y en Efectivo :${{efectivoGeneral}}</h3>
 
           <h2>Cuentas Por Cobrar</h2>
           <h4>Faltan un total de {{cuentasxCobrar}} cuentas = ${{totalFaltante}}</h4>
           <h2>Cuentas Cobradas</h2>
           <h4>Se cobro un total de {{cuentasCobradas}} cuentas = ${{pagosDelDia}}</h4>
-          <h2>Adeudo de pagos en el dia</h2>
-          <h4>Hubo un adeudo de {{adeudosDelDia}} por pagos no completos</h4>
-          <h2 *ngIf="selectedOption === 'option2'">Se entrego una dotación de ${{dotacionAgisnada}} correspondiente al dia {{valorDeFecha}}</h2>
+          <h3>{{_contadorTransferencia}} Tranferencias: ${{_totalTransferencia}}  y {{_contadorEfectivo}} en Efectivo :${{_totalEfectivo}}</h3>
+          <br>
+          <h2>Se entrego una dotación de ${{dotacionAgisnada}}</h2>
 <br>
-<h2 *ngIf="selectedOption === 'option2'">Se debe de entregar una cantidad de ${{pagosDelDia+dotacionAgisnada}}</h2>
+<h2>Se debe de entregar una cantidad de ${{pagosDelDia+dotacionAgisnada-valorGastos-_totalTransferencia}}</h2>
 
         </mat-card-content>
       </mat-card>
@@ -111,7 +114,7 @@
           <mat-card-title>Pagos Recolectados</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-          Se recolectaron {{listaPagosEspecificos.length}} pagos y un total de ${{pagosDelDia}}
+          Se recolectaron {{listaPagosEspecificos.length}} pagos en {{cuentasCobradas}} cuentas y un total de ${{pagosDelDia}}
         </mat-card-content>
       </mat-card>
       <mat-card class="card blue">
@@ -128,14 +131,6 @@
         </mat-card-header>
         <mat-card-content>
           Se generaron {{numeroRenovaciones}} solicitudes con un valor de ${{totalRenovacionesDia}}
-        </mat-card-content>
-      </mat-card>
-      <mat-card class="card blue">
-        <mat-card-header>
-          <mat-card-title>Prestamos Generados</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          Se generaron {{numeroPrestamos}} Prestamos con un valor de ${{totalPrestamos}}
         </mat-card-content>
       </mat-card>
     </div>
@@ -235,28 +230,6 @@
       </mat-list>
       </mat-expansion-panel>
 
-      <mat-expansion-panel (opened)="panelOpenState = true"
-      (closed)="panelOpenState = false">
-      <mat-expansion-panel-header>
-      <mat-panel-title>
-      Lista de Prestamos generados
-      </mat-panel-title>
-
-      </mat-expansion-panel-header>
-      <mat-list class="centered-list">
-          <mat-list-item *ngFor="let elemento of listaPrestamosDelDia" class="centered-item">
-            <mat-icon matListItemIcon>payments</mat-icon>
-            <div matListItemTitle>{{elemento.fecha}}</div>
-            <div matListItemLine>Monto Prestado: {{elemento.cantidadPrestamo}}</div>  
-            <div matListItemLine>Total a Pagar: {{elemento.cantidadPagar}}</div>  
-            <div matListItemLine>Solicitante: {{elemento.nombre}}</div>  
-            <div matListItemLine>_____________________________________________________</div>  
-              <br>
-
-          </mat-list-item>
-          <mat-divider></mat-divider>   
-      </mat-list>
-      </mat-expansion-panel>
     </div>
     </div>
 

@@ -18,6 +18,8 @@ export interface Clientes {
     tiempoViviendo?: string;
     pagoRenta?: string;
     tipoNegocio?: string;
+    direccionNegocio?: String;
+
     tiempoNegocio?: string;
     numeroIdentificacion?: string;
     RFC?: string;
@@ -38,6 +40,8 @@ export interface Clientes {
     fechaRegistro?: string;
     numeroPrestamos?: Number;
     
+    creditosGenerales?: string;
+
     numeroActivos?:Number;
     prestamosActivos?:Boolean;
     clasificacion?:string;

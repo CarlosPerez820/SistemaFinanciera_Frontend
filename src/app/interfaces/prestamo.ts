@@ -30,6 +30,11 @@ export interface Prestamo {
     moras?:Number;
     saldoExtra?: Number;
     inciadoPor?: string;
+
+    aCubrir?:Number;
+    telefonoAdicional?:string;
+    direccionNegocio?: string;
+    tipoSolicitud?:string;
     sucursal?: string;
 }
 

@@ -61,6 +61,22 @@
                     </mat-form-field>
                 </mat-grid-tile>
 
+                <mat-grid-tile [colspan]="1" [rowspan]="1" *ngIf="prestamoEspecifico.tipoPrestamo==='semanal'">
+                    <mat-form-field class="ancho">
+
+                      <input 
+                      matInput 
+                      [matDatepicker]="picker1" 
+                      placeholder="seleccione fecha" 
+                      (dateChange)="onDateChange($event)" 
+                      [matDatepickerFilter]="filtrarDiasPermitidos"
+                      formControlName="proximoPagoFech">
+                      <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                      <mat-datepicker #picker1></mat-datepicker>
+
+                    </mat-form-field>
+                  </mat-grid-tile>
+
                 <mat-grid-tile [colspan]="2" [rowspan]="1">
                     <h3>Datos de cliente</h3>
                 </mat-grid-tile>
@@ -102,6 +118,20 @@
 
                 <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <mat-form-field class="ancho">
+                        <mat-label>Direccion Negocio</mat-label>
+                        <input matInput autocomplete="off" formControlName="direccionNegocio" readonly="true">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
+                        <mat-label>Telefono Adicional</mat-label>
+                        <input type="number" matInput autocomplete="off" formControlName="telefonoFijo" readonly="true">
+                    </mat-form-field>
+                </mat-grid-tile>
+
+                <mat-grid-tile [colspan]="1" [rowspan]="1">
+                    <mat-form-field class="ancho">
                         <mat-label>Gestor</mat-label>
                         <input matInput autocomplete="off" formControlName="gestor" readonly="true">
                     </mat-form-field>
@@ -122,12 +152,17 @@
                 <mat-grid-tile [colspan]="1" [rowspan]="1">
                     <button type="submit" mat-raised-button class="my-custom-button" [disabled]="isLoading">Iniciar</button>
                 </mat-grid-tile>
+
+
             </mat-grid-list>
         </form>
     </mat-card>
 
 
     <mat-card class="responsive-container" style="margin-top: 10px;">
+        
+
+    
         <h2 style="text-align: center;">Documentos</h2>
         <mat-grid-list  cols="2" rowHeight="70px">
             
@@ -142,12 +177,16 @@
             </mat-grid-tile>
 
             <br>
-
+        
             <mat-grid-tile [colspan]="2" [rowspan]="2">
                 <mat-progress-spinner *ngIf="subiendoArchivo" mode="determinate" [value]="progreso"></mat-progress-spinner>
             </mat-grid-tile>
             
             <br>
+
+            <mat-grid-tile [colspan]="2" [rowspan]="1">
+                <button  mat-raised-button  color="warn" (click)="cancelarPrestamo()">Eliminar Prestamo</button>
+            </mat-grid-tile>
 
         </mat-grid-list>
     </mat-card>

@@ -44,6 +44,12 @@ export class PrestamoServiceService {
     return this.http.put(`${ ApiURL }/prestamos/${id}`, data);
   }
 
+  //Funciona Prestamos de un dia
+  getPrestamosDia(financiera:any, fecha:any)
+  {
+    return this.http.get(`${ URL }/api/prestamos/pordia/${financiera}/${fecha}`);
+  }
+
   /*DeleteGestorFinanciera(id:any)
   {
     return this.http.delete(`${ ApiURL }/gestores/${id}`);

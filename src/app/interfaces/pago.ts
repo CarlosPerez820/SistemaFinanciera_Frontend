@@ -1,33 +1,32 @@
 export interface Pago {
     _id?: number;
-    fecha?: string;
-    folio?: string;
+    fecha?: string
+    folio?: string;     //no
     nombreCliente?: string;
     numCliente?: string;
-    cobranza?: Number;
-    cantidadPrestamo?: Number;
-    plazo?: Number;
-    totalPagar?: Number;
+    cobranza?: Number; //no
+    cantidadPrestamo?: Number;      //no
+    plazo?: Number;         //no
+    totalPagar?: Number;    //no
     totalRestante?: Number;
     pagoDiario?: Number;
-    folioPrestamo?: string;
-    fechaPago?: string;
+    folioPrestamo?: string;     //no
+    fechaPago?: string;     //no
     horaPago?:string;
-    gestor?: string;
+    gestor?: string;        //no
     tipo?:string;
-    comentario?:string;
-    abono?: Number;
+    comentario?:string;       //no
+    abono?: Number;     
     personasCobrador?: string;
     estado?: string;
     numeroPago?: number;
 
-    adeudo?: number;
-    pagosPendiente?: number;
-    mora?: number;
-    extra?: Number;
+    adeudo?: number;                
+    pagosPendiente?: number;    //no
+    mora?: number;          
+    extra?: Number;             //No
     saldoExtra?:Number;
-    real?:Number,
+    real?:Number,               //NO
     sucursal?: string;
-
-    metodo?:string;
+    metodo?:string;             
 }
